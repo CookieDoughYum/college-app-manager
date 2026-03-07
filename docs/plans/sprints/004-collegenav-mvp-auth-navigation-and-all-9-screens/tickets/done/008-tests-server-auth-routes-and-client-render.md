@@ -1,7 +1,7 @@
 ---
 id: "008"
 title: "Tests — server auth routes and client render"
-status: todo
+status: done
 use-cases:
   - SUC-001
   - SUC-002
@@ -88,10 +88,10 @@ tests to ensure imports and setup match.
 
 ## Acceptance Criteria
 
-- [ ] All server auth tests pass (`npm run test:server`)
-- [ ] All client render tests pass (`npm run test:client`)
-- [ ] All pre-existing tests continue to pass (health, counter, admin, integrations)
-- [ ] `passwordHash` never appears in any test response assertion
+- [x] All server auth tests pass (`npm run test:server`)
+- [x] All client render tests pass (`npm run test:client`)
+- [x] All pre-existing tests continue to pass (health, counter, admin, integrations)
+- [x] `passwordHash` never appears in any test response assertion
 
 ## Testing
 
