@@ -217,17 +217,21 @@ CollegeNav color palette:
 No new CSS framework is introduced. The wireframe uses plain CSS — replicate
 the same approach with CSS Modules per component.
 
-## Open Questions
+## Decisions
 
-1. **Password hashing library**: Does `bcrypt` need to be added, or is it
-   already present from the admin auth implementation? Check `server/package.json`.
-   Options:
-   a. Use `bcrypt` (most common, native bindings)
-   b. Use `bcryptjs` (pure JS, no native deps — simpler for Docker)
+1. **Password hashing library**: `bcryptjs` — pure JavaScript, no native build
+   dependencies, simpler in Docker. Install: `npm install bcryptjs` +
+   `npm install -D @types/bcryptjs` in `server/`.
 
-2. **Student context persistence**: Should `ProtectedRoute` store student info
-   in React Context, Zustand, or simple prop drilling for Sprint 004?
-   Options:
-   a. React Context (simple, sufficient for MVP — recommended)
-   b. Zustand (more scalable, adds a dependency)
-   c. Prop drilling (too messy across 11 pages)
+2. **Student auth state in React**: React Context (`StudentContext`) — simple,
+   built-in, no additional dependencies needed for MVP.
+
+## Architecture Review Notes
+
+- Merge student auth into existing `server/src/routes/auth.ts` rather than a
+  separate router — avoids route conflicts on `GET /api/auth/me` and
+  `POST /api/auth/logout` which already exist there.
+- Strip `passwordHash` before serializing student to session — store only
+  `{ id, name, email, highSchool, grade }`.
+- Import Prisma from `../generated/prisma/client` to match the existing
+  pattern in `services/prisma.ts`.

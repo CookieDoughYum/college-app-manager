@@ -1,20 +1,20 @@
 ---
-id: "004"
-title: "CollegeNav MVP — Auth, Navigation, and All 9 Screens"
-status: planning
+id: '004'
+title: "CollegeNav MVP \u2014 Auth, Navigation, and All 9 Screens"
+status: active
 branch: sprint/004-collegenav-mvp-auth-navigation-and-all-9-screens
 use-cases:
-  - SUC-001
-  - SUC-002
-  - SUC-003
-  - SUC-004
-  - SUC-005
-  - SUC-006
-  - SUC-007
-  - SUC-008
-  - SUC-009
-  - SUC-010
-  - SUC-011
+- SUC-001
+- SUC-002
+- SUC-003
+- SUC-004
+- SUC-005
+- SUC-006
+- SUC-007
+- SUC-008
+- SUC-009
+- SUC-010
+- SUC-011
 ---
 
 # Sprint 004: CollegeNav MVP — Auth, Navigation, and All 9 Screens
