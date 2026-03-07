@@ -9,6 +9,9 @@ import Dashboard from './pages/Dashboard';
 import Activities from './pages/screens/Activities';
 import Exams from './pages/screens/Exams';
 import Colleges from './pages/screens/Colleges';
+import Essays from './pages/screens/Essays';
+import RecLetters from './pages/screens/RecLetters';
+import Portals from './pages/screens/Portals';
 import AdminLogin from './pages/admin/AdminLogin';
 import AdminLayout from './pages/admin/AdminLayout';
 import EnvironmentInfo from './pages/admin/EnvironmentInfo';
@@ -36,7 +39,10 @@ function App() {
               <Route path="/activities" element={<Activities />} />
               <Route path="/exams" element={<Exams />} />
               <Route path="/colleges" element={<Colleges />} />
-              {/* remaining feature screen routes added in tickets 006–007 */}
+              <Route path="/essays" element={<Essays />} />
+              <Route path="/recs" element={<RecLetters />} />
+              <Route path="/portals" element={<Portals />} />
+              {/* remaining feature screen routes added in ticket 007 */}
             </Route>
           </Route>
 

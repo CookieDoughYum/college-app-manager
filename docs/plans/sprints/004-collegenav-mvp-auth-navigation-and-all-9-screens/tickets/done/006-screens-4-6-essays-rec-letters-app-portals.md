@@ -1,7 +1,7 @@
 ---
 id: "006"
 title: "Screens 4–6: Essays, Rec Letters, App Portals"
-status: todo
+status: done
 use-cases:
   - SUC-009
   - SUC-010
@@ -50,14 +50,14 @@ state. Also build the `ChecklistItem` shared UI primitive used in screens 5 and 
 
 ## Acceptance Criteria
 
-- [ ] `/essays` renders timeline cards with correct month labels and colors
-- [ ] `/essays` renders Google Drive folder tag list
-- [ ] `/essays` renders "Why Us?" input and button (non-functional)
-- [ ] `/recs` renders all 6 checklist items; first 2 pre-checked; checkboxes toggle in `useState`
-- [ ] `/recs` renders teacher tracker cards
-- [ ] `/portals` renders key date cards with colored left borders
-- [ ] `/portals` renders portal status cards with colored tags
-- [ ] All three screens reachable from sidebar
+- [x] `/essays` renders timeline cards with correct month labels and colors
+- [x] `/essays` renders Google Drive folder tag list
+- [x] `/essays` renders "Why Us?" input and button (non-functional)
+- [x] `/recs` renders all 6 checklist items; first 2 pre-checked; checkboxes toggle in `useState`
+- [x] `/recs` renders teacher tracker cards
+- [x] `/portals` renders key date cards with colored left borders
+- [x] `/portals` renders portal status cards with colored tags
+- [x] All three screens reachable from sidebar
 
 ## Testing
 
