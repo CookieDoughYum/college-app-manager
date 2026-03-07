@@ -49,6 +49,9 @@ Create `server/prisma.config.ts`:
 - Import `dotenv/config` to load `.env` for CLI operations (Prisma 7
   no longer auto-loads env vars)
 - Configure schema path and migration output
+- **Note (7.4.2+):** Use `datasource: { url: ... }` not `migrate: { url: ... }`.
+  The key name changed in a point release. Using `migrate` silently does nothing
+  and causes "The datasource.url property is required" at runtime.
 
 Add `server/src/generated/` to `.gitignore`.
 

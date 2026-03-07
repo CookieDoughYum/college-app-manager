@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>College Nav Wireframes</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, sans-serif; background: #f0f0f0; color: #222; }
+
+  header {
+    background: #1a1a2e; color: white; padding: 16px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
+  }
+  header h1 { font-size: 16px; letter-spacing: 1px; }
+  .nav-pills { display: flex; gap: 6px; flex-wrap: wrap; }
+  .pill {
+    background: #16213e; color: #aaa; border: 1px solid #333;
+    padding: 4px 10px; border-radius: 20px; font-size: 11px;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .pill:hover, .pill.active { background: #e94560; color: white; border-color: #e94560; }
+
+  .screen { display: none; padding: 24px; max-width: 900px; margin: 0 auto; }
+  .screen.active { display: block; }
+
+  .screen-label {
+    font-size: 11px; color: #888; text-transform: uppercase;
+    letter-spacing: 1px; margin-bottom: 6px;
+  }
+  .screen-title { font-size: 22px; font-weight: bold; margin-bottom: 4px; color: #1a1a2e; }
+  .screen-desc { font-size: 13px; color: #666; margin-bottom: 20px; }
+
+  .wireframe {
+    background: white; border: 2px solid #ccc; border-radius: 10px;
+    overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  }
+
+  /* Wireframe elements */
+  .wf-topbar {
+    background: #e8e8e8; padding: 10px 16px;
+    display: flex; align-items: center; gap: 10px;
+    border-bottom: 1px solid #ccc;
+  }
+  .wf-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .wf-url { background: white; border: 1px solid #ccc; border-radius: 4px;
+    flex: 1; height: 20px; font-size: 11px; color: #999;
+    display: flex; align-items: center; padding: 0 8px; }
+
+  .wf-body { display: flex; min-height: 420px; }
+
+  .wf-sidebar {
+    width: 180px; background: #1a1a2e; padding: 16px 0; flex-shrink: 0;
+  }
+  .wf-sidebar-logo {
+    color: white; font-size: 13px; font-weight: bold;
+    padding: 0 16px 16px; border-bottom: 1px solid #333; margin-bottom: 10px;
+  }
+  .wf-nav-item {
+    padding: 8px 16px; font-size: 11px; color: #aaa; cursor: pointer;
+    border-left: 3px solid transparent;
+  }
+  .wf-nav-item.active { color: white; border-left-color: #e94560; background: #16213e; }
+  .wf-nav-item.locked { color: #555; }
+
+  .wf-main { flex: 1; padding: 20px; overflow: hidden; }
+  .wf-section-title {
+    font-size: 13px; font-weight: bold; color: #333;
+    border-bottom: 2px solid #e94560; padding-bottom: 6px; margin-bottom: 14px;
+  }
+
+  /* Generic wireframe components */
+  .wf-box {
+    background: #f5f5f5; border: 1px dashed #bbb; border-radius: 6px;
+    padding: 10px 14px; margin-bottom: 10px; font-size: 12px; color: #666;
+  }
+  .wf-box.filled { background: #eef2ff; border-color: #99a; }
+  .wf-input {
+    background: white; border: 1px solid #ccc; border-radius: 4px;
+    height: 28px; width: 100%; margin-bottom: 8px; padding: 0 10px;
+    font-size: 12px; color: #999; display: flex; align-items: center;
+  }
+  .wf-btn {
+    display: inline-block; padding: 7px 16px; border-radius: 5px;
+    font-size: 12px; font-weight: bold; cursor: pointer; margin-right: 8px;
+  }
+  .wf-btn.primary { background: #e94560; color: white; }
+  .wf-btn.secondary { background: #eee; color: #555; border: 1px solid #ccc; }
+  .wf-row { display: flex; gap: 10px; margin-bottom: 10px; }
+  .wf-col { flex: 1; }
+  .wf-tag {
+    display: inline-block; background: #e8eaf6; color: #3949ab;
+    border-radius: 12px; padding: 3px 10px; font-size: 11px; margin: 2px;
+  }
+  .wf-tag.green { background: #e8f5e9; color: #2e7d32; }
+  .wf-tag.red { background: #fce4ec; color: #c62828; }
+  .wf-tag.orange { background: #fff3e0; color: #e65100; }
+  .wf-check { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 12px; color: #444; }
+  .wf-checkbox {
+    width: 14px; height: 14px; border: 2px solid #ccc; border-radius: 3px;
+    display: flex; align-items: center; justify-content: center; font-size: 10px; flex-shrink: 0;
+  }
+  .wf-checkbox.checked { background: #4caf50; border-color: #4caf50; color: white; }
+  .wf-progress-bar {
+    height: 8px; background: #eee; border-radius: 4px; margin-bottom: 12px; overflow: hidden;
+  }
+  .wf-progress-fill { height: 100%; background: #e94560; border-radius: 4px; }
+  .wf-card {
+    border: 1px solid #ddd; border-radius: 8px; padding: 12px;
+    margin-bottom: 10px; background: white;
+  }
+  .wf-card-title { font-size: 12px; font-weight: bold; margin-bottom: 4px; }
+  .wf-card-sub { font-size: 11px; color: #888; }
+  .wf-badge {
+    display: inline-block; font-size: 10px; padding: 2px 8px;
+    border-radius: 10px; font-weight: bold;
+  }
+  .wf-badge.reach { background: #fce4ec; color: #c62828; }
+  .wf-badge.target { background: #fff8e1; color: #f57f17; }
+  .wf-badge.safety { background: #e8f5e9; color: #2e7d32; }
+  .wf-cal {
+    display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; margin-bottom: 10px;
+  }
+  .wf-cal-day {
+    aspect-ratio: 1; background: #f5f5f5; border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; color: #999;
+  }
+  .wf-cal-day.has-event { background: #e94560; color: white; }
+  .wf-cal-day.header { background: none; font-weight: bold; color: #666; }
+
+  .annotation {
+    font-size: 11px; color: #888; font-style: italic;
+    margin-top: 8px; padding: 6px 10px; border-left: 3px solid #e94560;
+    background: #fff8f8;
+  }
+
+  /* Signup screen */
+  .wf-signup { max-width: 360px; margin: 30px auto; text-align: center; }
+  .wf-signup .logo { font-size: 20px; font-weight: bold; color: #1a1a2e; margin-bottom: 4px; }
+  .wf-signup .tagline { font-size: 12px; color: #888; margin-bottom: 20px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>📋 COLLEGE NAV — WIREFRAMES</h1>
+  <div class="nav-pills">
+    <div class="pill active" onclick="show(0)">Signup</div>
+    <div class="pill" onclick="show(1)">Dashboard</div>
+    <div class="pill" onclick="show(2)">S1: Activities</div>
+    <div class="pill" onclick="show(3)">S2: Exams</div>
+    <div class="pill" onclick="show(4)">S3: Colleges</div>
+    <div class="pill" onclick="show(5)">S4: Essays</div>
+    <div class="pill" onclick="show(6)">S5: Recs</div>
+    <div class="pill" onclick="show(7)">S6: Portals</div>
+    <div class="pill" onclick="show(8)">S7: Decide</div>
+    <div class="pill" onclick="show(9)">S8: Aid</div>
+    <div class="pill" onclick="show(10)">S9: Deadlines</div>
+  </div>
+</header>
+
+<!-- SCREEN 0: SIGNUP -->
+<div class="screen active" id="s0">
+  <div class="screen-label">Onboarding</div>
+  <div class="screen-title">Sign Up / Initial Setup</div>
+  <div class="screen-desc">First screen users see. Collects basic info and sets expectations.</div>
+  <div class="wireframe">
+    <div class="wf-topbar">
+      <div class="wf-dot" style="background:#ff5f57"></div>
+      <div class="wf-dot" style="background:#ffbd2e"></div>
+      <div class="wf-dot" style="background:#28c840"></div>
+      <div class="wf-url">collegenav.app/signup</div>
+    </div>
+    <div style="padding: 30px;">
+      <div class="wf-signup">
+        <div class="logo">🎓 CollegeNav</div>
+        <div class="tagline">Your personalized college application guide</div>
+        <div class="wf-input">Full Name</div>
+        <div class="wf-input">Email Address</div>
+        <div class="wf-input">High School Name</div>
+        <div class="wf-input" style="margin-bottom:14px;">Grade Level (8–12)</div>
+        <div class="wf-box" style="text-align:left; margin-bottom:14px;">
+          💡 <strong>Tip:</strong> We recommend creating a <em>separate email</em> for college apps to keep things organized. <span style="color:#e94560;">Learn why →</span>
+        </div>
+        <div class="wf-btn primary" style="width:100%; text-align:center; display:block;">Create My Account</div>
+        <div style="font-size:11px; color:#999; margin-top:10px;">Already have an account? <span style="color:#e94560;">Log in</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="annotation">⬆ Simple, low-friction signup. Grade level determines which screens are recommended/unlocked.</div>
+</div>
+
+<!-- SCREEN 1: DASHBOARD -->
+<div class="screen" id="s1">
+  <div class="screen-label">Home</div>
+  <div class="screen-title">Dashboard</div>
+  <div class="screen-desc">Central hub showing progress across all 9 screens and upcoming tasks.</div>
+  <div class="wireframe">
+    <div class="wf-topbar">
+      <div class="wf-dot" style="background:#ff5f57"></div>
+      <div class="wf-dot" style="background:#ffbd2e"></div>
+      <div class="wf-dot" style="background:#28c840"></div>
+      <div class="wf-url">collegenav.app/dashboard</div>
+    </div>
+    <div class="wf-body">
+      <div class="wf-sidebar">
+        <div class="wf-sidebar-logo">🎓 CollegeNav</div>
+        <div class="wf-nav-item active">🏠 Dashboard</div>
+        <div class="wf-nav-item">📚 Activities & Courses</div>
+        <div class="wf-nav-item">📝 Exam Prep</div>
+        <div class="wf-nav-item">🏫 College & Major</div>
+        <div class="wf-nav-item">✍️ Essays</div>
+        <div class="wf-nav-item">📬 Rec Letters</div>
+        <div class="wf-nav-item">💻 App Portals</div>
+        <div class="wf-nav-item">🎓 Decide</div>
+        <div class="wf-nav-item">💰 Financial Aid</div>
+        <div class="wf-nav-item">📅 Deadlines</div>
+      </div>
+      <div class="wf-main">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+          <div>
+            <div style="font-size:16px; font-weight:bold;">Welcome back, Alex 👋</div>
+            <div style="font-size:12px; color:#888;">Grade 11 · Lincoln High School</div>
+          </div>
+          <div class="wf-tag">Junior Year</div>
+        </div>
+        <div class="wf-section-title">Your Progress</div>
+        <div class="wf-row">
+          <div class="wf-col">
+            <div class="wf-card">
+              <div class="wf-card-title">📚 Activities & Courses</div>
+              <div class="wf-progress-bar"><div class="wf-progress-fill" style="width:70%"></div></div>
+              <div class="wf-card-sub">70% complete</div>
+            </div>
+          </div>
+          <div class="wf-col">
+            <div class="wf-card">
+              <div class="wf-card-title">📝 Exam Prep</div>
+              <div class="wf-progress-bar"><div class="wf-progress-fill" style="width:40%"></div></div>
+              <div class="wf-card-sub">SAT registered · APs pending</div>
+            </div>
+          </div>
+          <div class="wf-col">
+            <div class="wf-card">
+              <div class="wf-card-title">🏫 Colleges</div>
+              <div class="wf-progress-bar"><div class="wf-progress-fill" style="width:20%"></div></div>
+              <div class="wf-card-sub">4 schools added</div>
+            </div>
+          </div>
+        </div>
+        <div class="wf-section-title">⚠️ Action Items</div>
+        <div class="wf-check"><div class="wf-checkbox">!</div> Request Rec Letters from teachers — due end of junior year</div>
+        <div class="wf-check"><div class="wf-checkbox">!</div> Finalize college list (target: 20 schools)</div>
+        <div class="wf-check"><div class="wf-checkbox checked">✓</div> <span style="text-decoration:line-through; color:#aaa;">Register for SAT — done</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="annotation">⬆ Dashboard gives users a birds-eye view. Action items are generated based on grade level and what's incomplete.</div>
+</div>
+
+<!-- SCREEN 2: ACTIVITIES -->
+<div class="screen" id="s2">
+  <div class="screen-label">Screen 1</div>
+  <div class="screen-title">Activities & Course Planning</div>
+  <div class="screen-desc">Questionnaire-driven recommendations for extracurriculars and a 4-year course planner.</div>
+  <div class="wireframe">
+    <div class="wf-topbar">
+      <div class="wf-dot" style="background:#ff5f57"></div>
+      <div class="wf-dot" style="background:#ffbd2e"></div>
+      <div class="wf-dot" style="background:#28c840"></div>
+      <div class="wf-url">collegenav.app/activities</div>
+    </div>
+    <div class="wf-body">
+      <div class="wf-sidebar">
+        <div class="wf-sidebar-logo">🎓 CollegeNav</div>
+        <div class="wf-nav-item active">📚 Activities & Courses</div>
+        <div class="wf-nav-item">📝 Exam Prep</div>
+        <div class="wf-nav-item">🏫 College & Major</div>
+        <div class="wf-nav-item">✍️ Essays</div>
+        <div class="wf-nav-item">📬 Rec Letters</div>
+        <div class="wf-nav-item">💻 App Portals</div>
+        <div class="wf-nav-item">🎓 Decide</div>
+        <div class="wf-nav-item">💰 Financial Aid</div>
+        <div class="wf-nav-item">📅 Deadlines</div>
+      </div>
+      <div class="wf-main">
+        <div class="wf-section-title">Interests Questionnaire</div>
+        <div class="wf-box filled">What are your top interests? <span class="wf-tag">Science</span><span class="wf-tag">Leadership</span><span class="wf-tag">Arts</span><span class="wf-tag">Community</span><span class="wf-tag">Tech</span></div>
+        <div class="wf-input">Current GPA</div>
+        <div class="wf-row">
+          <div class="wf-col"><div class="wf-input">SAT Score (if taken)</div></div>
+          <div class="wf-col"><div class="wf-input">ACT Score (if taken)</div></div>
+        </div>
+        <div class="wf-section-title">🤖 AI Recommendations</div>
+        <div class="wf-row">
+          <div class="wf-col">
+            <div class="wf-card"><div class="wf-card-title">Extracurriculars</div><div class="wf-card-sub">Robotics Club, Science Olympiad, Debate Team</div></div>
+          </div>
+          <div class="wf-col">
+            <div class="wf-card"><div class="wf-card-title">Summer Programs</div><div class="wf-card-sub">Stanford AI4ALL, Local Hospital Volunteer</div></div>
+          </div>
+        </div>
+        <div class="wf-section-title">📅 4-Year Course Plan</div>
+        <div class="wf-row">
+          <div class="wf-col"><div class="wf-box">9th Grade<br><span style="font-size:11px;color:#888">Biology, Algebra II, English 1...</span></div></div>
+          <div class="wf-col"><div class="wf-box">10th Grade<br><span style="font-size:11px;color:#888">AP World, Chemistry...</span></div></div>
+          <div class="wf-col"><div class="wf-box filled" style="border-color:#e94560">11th Grade ⚠️<br><span style="font-size:11px;color:#c00">4 APs — consider reducing</span></div></div>
+          <div class="wf-col"><div class="wf-box">12th Grade<br><span style="font-size:11px;color:#888">Plan courses here...</span></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotation">⬆ Red warning shown when course load is too heavy. AI recommendations appear after questionnaire is submitted.</div>
+</div>
+
+<!-- SCREEN 3: EXAMS -->
+<div class="screen" id="s3">
+  <div class="screen-label">Screen 2</div>
+  <div class="screen-title">Exam Preparation</div>
+  <div class="screen-desc">SAT/ACT decision helper, study tips, registration links, and AP exam tracker.</div>
+  <div class="wireframe">
+    <div class="wf-topbar">
+      <div class="wf-dot" style="background:#ff5f57"></div>
+      <div class="wf-dot" style="background:#ffbd2e"></div>
+      <div class="wf-dot" style="background:#28c840"></div>
+      <div class="wf-url">collegenav.app/exams</div>
+    </div>
+    <div class="wf-body">
+      <div class="wf-sidebar">
+        <div class="wf-sidebar-logo">🎓 CollegeNav</div>
+        <div class="wf-nav-item">📚 Activities & Courses</div>
+        <div class="wf-nav-item active">📝 Exam Prep</div>
+        <div class="wf-nav-item">🏫 College & Major</div>
+        <div class="wf-nav-item">✍️ Essays</div>
+        <div class="wf-nav-item">📬 Rec Letters</div>
+      </div>
+      <div class="wf-main">
+        <div class="wf-section-title">SAT or ACT?</div>
+        <div class="wf-box filled">Answer 5 quick questions → <span style="color:#e94560; font-weight:bold;">Result: SAT recommended for you ✓</span></div>
+        <div class="wf-row">
+          <div class="wf-col">
+            <div class="wf-card">
+              <div class="wf-card-title">📘 SAT Prep</div>
+              <div class="wf-card-sub">Math tips · Reading tips · Practice tests</div>
+              <div style="margin-top:8px;"><span class="wf-btn primary">Register for SAT →</span></div>
+            </div>
+          </div>
+          <div class="wf-col">
+            <div class="wf-card">
+              <div class="wf-card-title">🔔 Test Day Reminders</div>
+              <div class="wf-card-sub">Bring: photo ID, admission ticket, pencils, calculator</div>
+            </div>
+          </div>
+        </div>
+        <div class="wf-section-title">AP Exam Tracker</div>
+        <div class="wf-box">Which AP courses are you taking? <span class="wf-tag">AP Calc AB</span><span class="wf-tag">AP Lang</span><span class="wf-tag">AP Bio</span><span class="wf-tag">+ Add</span></div>
+        <div class="wf-card">
+          <div class="wf-card-title">📅 Suggested Study Schedule (Late March – May)</div>
+          <div class="wf-card-sub">Week 1–2: AP Calc AB · Week 3–4: AP Bio · Week 5: AP Lang · Final review week</div>
+        </div>
+        <div class="wf-box" style="background:#fff8e1; border-color:#f9a825; color:#555;">
+          ⚠️ <strong>Reminder:</strong> AP exams are in May — register in the fall to avoid conflicts with SAT dates.
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotation">⬆ AP study schedule is generated by AI based on which APs the user enters. Registration link opens College Board site.</div>
+</div>
+
+<!-- SCREEN 4: COLLEGES -->
+<div class="screen" id="s4">
+  <div class="screen-label">Screen 3</div>
+  <div class="screen-title">College & Major Exploration</div>
+  <div class="screen-desc">Questionnaire-based college + major recommendations and college list builder.</div>
+  <div class="wireframe">
+    <div class="wf-topbar">
+      <div class="wf-dot" style="background:#ff5f57"></div>
+      <div class="wf-dot" style="background:#ffbd2e"></div>
+      <div class="wf-dot" style="background:#28c840"></div>
+      <div class="wf-url">collegenav.app/colleges</div>
+    </div>
+    <div class="wf-body">
+      <div class="wf-sidebar">
+        <div class="wf-sidebar-logo">🎓 CollegeNav</div>
+        <div class="wf-nav-item">📚 Activities & Courses</div>
+        <div class="wf-nav-item">📝 Exam Prep</div>
+        <div class="wf-nav-item active">🏫 College & Major</div>
+        <div class="wf-nav-item">✍️ Essays</div>
+        <div class="wf-nav-item">📬 Rec Letters</div>
+      </div>
+      <div class="wf-main">
+        <div class="wf-section-title">Major Questionnaire</div>
+        <div class="wf-row">
+          <div class="wf-col"><div class="wf-input">Salary goal range ($)</div></div>
+          <div class="wf-col"><div class="wf-input">Professional interest area</div></div>
+        </div>
+        <div class="wf-box filled">Recommended majors: <span class="wf-tag">Computer Science</span><span class="wf-tag">Biomedical Eng.</span><span class="wf-tag">Data Science</span></div>
+        <div class="wf-section-title">My College List <span style="font-size:11px; color:#888; font-weight:normal;">(Goal: 5 reach · 10 target · 5 safety)</span></div>
+        <div class="wf-row">
+          <div class="wf-col">
+            <div class="wf-card"><div class="wf-card-title">MIT <span class="wf-badge reach">Reach</span></div><div class="wf-card-sub">Cambridge, MA · CS</div></div>
+            <div class="wf-card"><div class="wf-card-title">UCLA <span class="wf-badge target">Target</span></div><div class="wf-card-sub">Los Angeles, CA · CS</div></div>
+            <div class="wf-card"><div class="wf-card-title">Cal Poly SLO <span class="wf-badge safety">Safety</span></div><div class="wf-card-sub">San Luis Obispo, CA · CS</div></div>
+          </div>
+          <div class="wf-col">
+            <div class="wf-box" style="text-align:center; padding: 30px 10px; color:#bbb;">
+              + Add a school<br><span style="font-size:11px;">Search by name or let AI suggest</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotation">⬆ College list shows running count of reach/target/safety. AI suggests schools based on GPA, interests, and major from questionnaire.</div>
+</div>
+
+<!-- SCREEN 5: ESSAYS -->
+<div class="screen" id="s5">
+  <div class="screen-label">Screen 4</div>
+  <div class="screen-title">Essay Writing</div>
+  <div class="screen-desc">Timeline, Google Drive folder setup instructions, and "Why Us?" AI assistant.</div>
+  <div class="wireframe">
+    <div class="wf-topbar">
+      <div class="wf-dot" style="background:#ff5f57"></div>
+      <div class="wf-dot" style="background:#ffbd2e"></div>
+      <div class="wf-dot" style="background:#28c840"></div>
+      <div class="wf-url">collegenav.app/essays</div>
+    </div>
+    <div class="wf-body">
+      <div class="wf-sidebar">
+        <div class="wf-sidebar-logo">🎓 CollegeNav</div>
+        <div class="wf-nav-item">🏫 College & Major</div>
+        <div class="wf-nav-item active">✍️ Essays</div>
+        <div class="wf-nav-item">📬 Rec Letters</div>
+        <div class="wf-nav-item">💻 App Portals</div>
+      </div>
+      <div class="wf-main">
+        <div class="wf-section-title">📅 Essay Timeline</div>
+        <div class="wf-row">
+          <div class="wf-col"><div class="wf-card"><div class="wf-card-title" style="color:#e94560">Late May–June</div><div class="wf-card-sub">UC PIQs + Common App Personal Statement</div></div></div>
+          <div class="wf-col"><div class="wf-card"><div class="wf-card-title" style="color:#f57c00">July</div><div class="wf-card-sub">Supplemental Essays + Activities List</div></div></div>
+          <div class="wf-col"><div class="wf-card"><div class="wf-card-title" style="color:#2e7d32">August</div><div class="wf-card-sub">Honors Essays (before school starts)</div></div></div>
+        </div>
+        <div class="wf-section-title">📁 Google Drive Setup</div>
+        <div class="wf-box filled">
+          Create one folder → inside it, create these docs:<br>
+          <span class="wf-tag green">UC PIQs</span> <span class="wf-tag green">Personal Statement</span> <span class="wf-tag green">Supplementals</span> <span class="wf-tag green">Honors Essays</span> <span class="wf-tag green">Scholarships</span> <span class="wf-tag green">Activities List</span>
+        </div>
+        <div class="wf-section-title">🤖 "Why Us?" Assistant <span style="font-size:11px; color:#888; font-weight:normal;">(powered by Browser MCP)</span></div>
+        <div class="wf-row">
+          <div class="wf-col" style="flex:2">
+            <div class="wf-input">Enter a school name (e.g. "University of Michigan")</div>
+            <div class="wf-box" style="min-height:60px; color:#bbb; font-size:11px;">AI will search the school's website and return specific programs, values, and talking points for your essay...</div>
+          </div>
+          <div class="wf-col" style="flex:0 0 90px; display:flex; align-items:flex-start;">
+            <div class="wf-btn primary">Research →</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotation">⬆ "Why Us?" box uses Browser MCP — Claude searches the real school website to pull specific, usable essay details.</div>
+</div>
+
+<!-- SCREEN 6: RECS -->
+<div class="screen" id="s6">
+  <div class="screen-label">Screen 5</div>
+  <div class="screen-title">Letter of Recommendation Tracker</div>
+  <div class="screen-desc">Step-by-step checklist with date-based reminders for the full rec letter process.</div>
+  <div class="wireframe">
+    <div class="wf-topbar">
+      <div class="wf-dot" style="background:#ff5f57"></div>
+      <div class="wf-dot" style="background:#ffbd2e"></div>
+      <div class="wf-dot" style="background:#28c840"></div>
+      <div class="wf-url">collegenav.app/recs</div>
+    </div>
+    <div class="wf-body">
+      <div class="wf-sidebar">
+        <div class="wf-sidebar-logo">🎓 CollegeNav</div>
+        <div class="wf-nav-item">✍️ Essays</div>
+        <div class="wf-nav-item active">📬 Rec Letters</div>
+        <div class="wf-nav-item">💻 App Portals</div>
+      </div>
+      <div class="wf-main">
+        <div class="wf-section-title">📋 Rec Letter Checklist</div>
+        <div class="wf-check"><div class="wf-checkbox checked">✓</div><div><strong>Build relationships with teachers</strong><br><span style="font-size:11px;color:#888">Ask questions, attend office hours — Junior Year (ongoing)</span></div></div>
+        <div class="wf-check"><div class="wf-checkbox checked">✓</div><div><strong>Request rec letter in person (2–3 teachers)</strong><br><span style="font-size:11px;color:#888">Done by end of Junior Year</span></div></div>
+        <div class="wf-check"><div class="wf-checkbox"></div><div><strong>Complete brag packet, FERPA & teacher forms</strong><br><span style="font-size:11px;color:#888">Due: Summer before Senior Year</span></div></div>
+        <div class="wf-check"><div class="wf-checkbox"></div><div><strong>Give brag packet + FERPA to teachers & counselor</strong><br><span style="font-size:11px;color:#888">Due: First week of Senior Year</span></div></div>
+        <div class="wf-check"><div class="wf-checkbox"></div><div><strong>Add teachers & counselor on Common App</strong><br><span style="font-size:11px;color:#888">Due: First week of Senior Year</span></div></div>
+        <div class="wf-check"><div class="wf-checkbox"></div><div><strong>Write thank you notes + gift</strong><br><span style="font-size:11px;color:#888">After submission — or 2 weeks before deadline if not yet submitted</span></div></div>
+        <div class="wf-section-title">👩‍🏫 Teacher Tracker</div>
+        <div class="wf-row">
+          <div class="wf-col"><div class="wf-card"><div class="wf-card-title">Ms. Johnson — AP Lit</div><div class="wf-card-sub">Requested ✓ · Brag packet: pending</div></div></div>
+          <div class="wf-col"><div class="wf-card"><div class="wf-card-title">Mr. Patel — AP Calc</div><div class="wf-card-sub">Not yet requested</div></div></div>
+          <div class="wf-col"><div class="wf-card"><div class="wf-card-title">Counselor: Ms. Lee</div><div class="wf-card-sub">Added to Common App ✓</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotation">⬆ Checklist auto-highlights the next action based on current date and grade. Teacher tracker shows status per person.</div>
+</div>
+
+<!-- SCREEN 7: PORTALS -->
+<div class="screen" id="s7">
+  <div class="screen-label">Screen 6</div>
+  <div class="screen-title">College Application Portals</div>
+  <div class="screen-desc">Tracks all application platforms and portal logins in one place.</div>
+  <div class="wireframe">
+    <div class="wf-topbar">
+      <div class="wf-dot" style="background:#ff5f57"></div>
+      <div class="wf-dot" style="background:#ffbd2e"></div>
+      <div class="wf-dot" style="background:#28c840"></div>
+      <div class="wf-url">collegenav.app/portals</div>
+    </div>
+    <div class="wf-body">
+      <div class="wf-sidebar">
+        <div class="wf-sidebar-logo">🎓 CollegeNav</div>
+        <div class="wf-nav-item">📬 Rec Letters</div>
+        <div class="wf-nav-item active">💻 App Portals</div>
+        <div class="wf-nav-item">🎓 Decide</div>
+      </div>
+      <div class="wf-main">
+        <div class="wf-section-title">📌 Key Dates</div>
+        <div class="wf-row">
+          <div class="wf-col"><div class="wf-card" style="border-left:4px solid #e94560"><div class="wf-card-title">Common App + UC App</div><div class="wf-card-sub">Opens August 1 · Finish before school starts</div></div></div>
+          <div class="wf-col"><div class="wf-card" style="border-left:4px solid #f57c00"><div class="wf-card-title">CSU Application</div><div class="wf-card-sub">Opens October 1 · Complete ASAP</div></div></div>
+        </div>
+        <div class="wf-section-title">💼 My Application Portals</div>
+        <div class="wf-box" style="color:#bbb; text-align:center; padding:20px;">
+          📁 Save links to your college portals here so they're all in one place<br>
+          <span style="font-size:11px;">Reminder: check these portals regularly for updates, decisions, and missing documents</span>
+        </div>
+        <div class="wf-card"><div class="wf-card-title">Common App <span class="wf-tag green">In Progress</span></div><div class="wf-card-sub">commonapp.org · Last checked: 2 days ago</div></div>
+        <div class="wf-card"><div class="wf-card-title">UC Application <span class="wf-tag orange">Not Started</span></div><div class="wf-card-sub">apply.universityofcalifornia.edu</div></div>
+        <div class="wf-btn primary" style="margin-top:8px;">+ Add Portal</div>
+      </div>
+    </div>
+  </div>
+  <div class="annotation">⬆ Portals page is essentially a saved link organizer with status tags. Reminder to check regularly is surfaced on the dashboard too.</div>
+</div>
+
+<!-- SCREEN 8: DECIDE -->
+<div class="screen" id="s8">
+  <div class="screen-label">Screen 7</div>
+  <div class="screen-title">Deciding Which School</div>
+  <div class="screen-desc">Enter acceptance results and get AI-assisted pros/cons to help choose.</div>
+  <div class="wireframe">
+    <div class="wf-topbar">
+      <div class="wf-dot" style="background:#ff5f57"></div>
+      <div class="wf-dot" style="background:#ffbd2e"></div>
+      <div class="wf-dot" style="background:#28c840"></div>
+      <div class="wf-url">collegenav.app/decide</div>
+    </div>
+    <div class="wf-body">
+      <div class="wf-sidebar">
+        <div class="wf-sidebar-logo">🎓 CollegeNav</div>
+        <div class="wf-nav-item">💻 App Portals</div>
+        <div class="wf-nav-item active">🎓 Decide</div>
+        <div class="wf-nav-item">💰 Financial Aid</div>
+      </div>
+      <div class="wf-main">
+        <div class="wf-section-title">🎉 Acceptances</div>
+        <div class="wf-row">
+          <div class="wf-col">
+            <div class="wf-card" style="border-left:4px solid #4caf50"><div class="wf-card-title">UCLA ✅ Accepted</div><div class="wf-card-sub">Honors Program available · Deposit due May 1</div></div>
+            <div class="wf-card" style="border-left:4px solid #4caf50"><div class="wf-card-title">UC San Diego ✅ Accepted</div><div class="wf-card-sub">Regents Scholarship offered</div></div>
+            <div class="wf-card" style="border-left:4px solid #ccc"><div class="wf-card-title">MIT ❌ Not admitted</div></div>
+            <div class="wf-btn secondary">+ Add Result</div>
+          </div>
+          <div class="wf-col">
+            <div class="wf-section-title">🤖 AI Decision Helper</div>
+            <div class="wf-box filled" style="min-height:80px;">
+              Based on your priorities (location, CS program, cost):<br><br>
+              <strong>UCLA</strong>: Strong CS, honors access, higher cost<br>
+              <strong>UCSD</strong>: Excellent research, scholarship offer, San Diego
+            </div>
+            <div class="wf-card"><div class="wf-card-title">🏅 Honors Programs</div><div class="wf-card-sub">UCLA Honors → <span style="color:#e94560;">Apply here →</span><br>UCSD Regents → Auto-considered ✓</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotation">⬆ AI pros/cons reference the user's original questionnaire preferences (location, cost, major). Honors program links auto-surface for accepted schools.</div>
+</div>
+
+<!-- SCREEN 9: FINANCIAL AID -->
+<div class="screen" id="s9">
+  <div class="screen-label">Screen 8</div>
+  <div class="screen-title">Scholarships & Financial Aid</div>
+  <div class="screen-desc">FAFSA/CSS reminders, personalized scholarship recommendations, and deadlines.</div>
+  <div class="wireframe">
+    <div class="wf-topbar">
+      <div class="wf-dot" style="background:#ff5f57"></div>
+      <div class="wf-dot" style="background:#ffbd2e"></div>
+      <div class="wf-dot" style="background:#28c840"></div>
+      <div class="wf-url">collegenav.app/aid</div>
+    </div>
+    <div class="wf-body">
+      <div class="wf-sidebar">
+        <div class="wf-sidebar-logo">🎓 CollegeNav</div>
+        <div class="wf-nav-item">🎓 Decide</div>
+        <div class="wf-nav-item active">💰 Financial Aid</div>
+        <div class="wf-nav-item">📅 Deadlines</div>
+      </div>
+      <div class="wf-main">
+        <div class="wf-section-title">📋 FAFSA & CSS Checklist</div>
+        <div class="wf-box" style="background:#fff3e0; border-color:#f9a825;">
+          ⚠️ Remind your parents: <strong>FAFSA and CSS Profile</strong> should be completed by <strong>October 1st</strong>. This affects financial aid offers.
+        </div>
+        <div class="wf-check"><div class="wf-checkbox"></div>Parents completed FAFSA (fafsa.gov)</div>
+        <div class="wf-check"><div class="wf-checkbox"></div>Parents completed CSS Profile (if required)</div>
+        <div class="wf-section-title">🎓 Recommended Scholarships</div>
+        <div class="wf-box filled" style="margin-bottom:8px;">Complete questionnaire to get personalized matches →<br><span class="wf-tag">First-gen</span><span class="wf-tag">STEM</span><span class="wf-tag">California resident</span><span class="wf-tag">Community service</span></div>
+        <div class="wf-card"><div class="wf-card-title">Gates Scholarship <span style="color:#e94560; font-size:11px; float:right;">Deadline: Sept 15</span></div><div class="wf-card-sub">Up to full ride · High-achieving students of color</div></div>
+        <div class="wf-card"><div class="wf-card-title">Dell Scholars Program <span style="color:#f57c00; font-size:11px; float:right;">Deadline: Dec 1</span></div><div class="wf-card-sub">$20,000 · First-gen, low-income students</div></div>
+        <div class="wf-card"><div class="wf-card-title">Local Community Foundation <span style="color:#2e7d32; font-size:11px; float:right;">Deadline: Mar 1</span></div><div class="wf-card-sub">$2,500 · Varies by county</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="annotation">⬆ Scholarship tags come from the questionnaire answers. Deadlines are color-coded: red = soon, orange = upcoming, green = plenty of time.</div>
+</div>
+
+<!-- SCREEN 10: DEADLINES -->
+<div class="screen" id="s10">
+  <div class="screen-label">Screen 9</div>
+  <div class="screen-title">Automated Deadline Tracker</div>
+  <div class="screen-desc">AI scrapes deadlines from each school on the user's list and plots them on a calendar.</div>
+  <div class="wireframe">
+    <div class="wf-topbar">
+      <div class="wf-dot" style="background:#ff5f57"></div>
+      <div class="wf-dot" style="background:#ffbd2e"></div>
+      <div class="wf-dot" style="background:#28c840"></div>
+      <div class="wf-url">collegenav.app/deadlines</div>
+    </div>
+    <div class="wf-body">
+      <div class="wf-sidebar">
+        <div class="wf-sidebar-logo">🎓 CollegeNav</div>
+        <div class="wf-nav-item">💰 Financial Aid</div>
+        <div class="wf-nav-item active">📅 Deadlines</div>
+      </div>
+      <div class="wf-main">
+        <div class="wf-section-title">📅 November 2025 <span style="font-size:11px; font-weight:normal; color:#888;">(auto-populated from your college list)</span></div>
+        <div class="wf-cal">
+          <div class="wf-cal-day header">S</div><div class="wf-cal-day header">M</div><div class="wf-cal-day header">T</div><div class="wf-cal-day header">W</div><div class="wf-cal-day header">T</div><div class="wf-cal-day header">F</div><div class="wf-cal-day header">S</div>
+          <div class="wf-cal-day"></div><div class="wf-cal-day"></div><div class="wf-cal-day"></div><div class="wf-cal-day"></div><div class="wf-cal-day"></div><div class="wf-cal-day">1</div><div class="wf-cal-day">2</div>
+          <div class="wf-cal-day">3</div><div class="wf-cal-day">4</div><div class="wf-cal-day">5</div><div class="wf-cal-day">6</div><div class="wf-cal-day">7</div><div class="wf-cal-day">8</div><div class="wf-cal-day">9</div>
+          <div class="wf-cal-day">10</div><div class="wf-cal-day">11</div><div class="wf-cal-day">12</div><div class="wf-cal-day">13</div><div class="wf-cal-day">14</div><div class="wf-cal-day has-event" title="MIT EA">15</div><div class="wf-cal-day">16</div>
+          <div class="wf-cal-day">17</div><div class="wf-cal-day">18</div><div class="wf-cal-day">19</div><div class="wf-cal-day">20</div><div class="wf-cal-day">21</div><div class="wf-cal-day">22</div><div class="wf-cal-day">23</div>
+          <div class="wf-cal-day">24</div><div class="wf-cal-day">25</div><div class="wf-cal-day">26</div><div class="wf-cal-day">27</div><div class="wf-cal-day">28</div><div class="wf-cal-day">29</div><div class="wf-cal-day has-event">30</div>
+        </div>
+        <div class="wf-section-title">Upcoming Deadlines</div>
+        <div class="wf-card"><div class="wf-card-title">MIT — Early Action <span class="wf-badge reach" style="float:right">Reach</span></div><div class="wf-card-sub">📅 Nov 15 · Common App · <span style="color:#e94560;">22 days away</span></div></div>
+        <div class="wf-card"><div class="wf-card-title">UC Application System <span class="wf-badge target" style="float:right">All UCs</span></div><div class="wf-card-sub">📅 Nov 30 · UC Portal · <span style="color:#f57c00;">37 days away</span></div></div>
+        <div class="wf-card"><div class="wf-card-title">Cal Poly SLO — Regular Decision <span class="wf-badge safety" style="float:right">Safety</span></div><div class="wf-card-sub">📅 Dec 15 · CSU Portal · <span style="color:#2e7d32;">52 days away</span></div></div>
+        <div style="margin-top:8px; font-size:12px; color:#888;">🤖 Deadlines auto-fetched via Browser MCP from each school's admissions page. Last updated: today.</div>
+      </div>
+    </div>
+  </div>
+  <div class="annotation">⬆ Browser MCP scrapes each school's admissions site when the user's college list is finalized. Calendar highlights deadline days. Color = urgency.</div>
+</div>
+
+<script>
+  const screens = document.querySelectorAll('.screen');
+  const pills = document.querySelectorAll('.pill');
+  function show(i) {
+    screens.forEach((s,j) => { s.classList.toggle('active', j===i); });
+    pills.forEach((p,j) => { p.classList.toggle('active', j===i); });
+  }
+</script>
+</body>
+</html>
