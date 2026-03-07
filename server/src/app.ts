@@ -65,8 +65,14 @@ if (process.env.NODE_ENV !== 'test' && process.env.DATABASE_URL) {
 app.use(session(sessionConfig));
 
 // Passport authentication
+// Store only safe fields — never persist passwordHash in session.
 passport.serializeUser((user: Express.User, done) => {
-  done(null, user);
+  const u = user as any;
+  if (u.type === 'student') {
+    done(null, { type: 'student', id: u.id, name: u.name, email: u.email, highSchool: u.highSchool, grade: u.grade });
+  } else {
+    done(null, user);
+  }
 });
 passport.deserializeUser((user: Express.User, done) => {
   done(null, user);

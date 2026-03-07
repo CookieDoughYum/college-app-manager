@@ -1,9 +1,35 @@
-import { Router, Request, Response } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 import passport from 'passport';
 import pkg_github2 from 'passport-github2';
 import pkg_google from 'passport-google-oauth20';
+import { Strategy as LocalStrategy } from 'passport-local';
+import bcrypt from 'bcryptjs';
+import { prisma } from '../services/prisma';
 
 export const authRouter = Router();
+
+// --- Student Local Strategy ---
+passport.use('student-local', new LocalStrategy(
+  { usernameField: 'email', passwordField: 'password' },
+  async (email: string, password: string, done: any) => {
+    try {
+      const student = await prisma.student.findUnique({ where: { email } });
+      if (!student) return done(null, false, { message: 'Invalid credentials' });
+      const match = await bcrypt.compare(password, student.passwordHash);
+      if (!match) return done(null, false, { message: 'Invalid credentials' });
+      return done(null, {
+        type: 'student' as const,
+        id: student.id,
+        name: student.name,
+        email: student.email,
+        highSchool: student.highSchool,
+        grade: student.grade,
+      });
+    } catch (err) {
+      return done(err);
+    }
+  }
+));
 
 // --- GitHub OAuth Strategy ---
 // Register only if credentials are configured.
@@ -112,6 +138,62 @@ authRouter.get('/auth/google/callback',
     res.redirect('/');
   },
 );
+
+// --- Student auth endpoints ---
+
+// Sign up
+authRouter.post('/auth/signup', async (req: Request, res: Response, next: NextFunction) => {
+  const { name, email, password, highSchool, grade } = req.body;
+
+  if (!name || !email || !password || !highSchool || grade == null) {
+    return res.status(400).json({ error: 'All fields are required' });
+  }
+  if (password.length < 8) {
+    return res.status(400).json({ error: 'Password must be at least 8 characters' });
+  }
+  const gradeNum = Number(grade);
+  if (!Number.isInteger(gradeNum) || gradeNum < 8 || gradeNum > 12) {
+    return res.status(400).json({ error: 'Grade must be between 8 and 12' });
+  }
+
+  try {
+    const existing = await prisma.student.findUnique({ where: { email } });
+    if (existing) return res.status(409).json({ error: 'Email already in use' });
+
+    const passwordHash = await bcrypt.hash(password, 10);
+    const student = await prisma.student.create({
+      data: { name, email, passwordHash, highSchool, grade: gradeNum },
+    });
+
+    const sessionUser = {
+      type: 'student' as const,
+      id: student.id,
+      name: student.name,
+      email: student.email,
+      highSchool: student.highSchool,
+      grade: student.grade,
+    };
+
+    req.login(sessionUser, (err) => {
+      if (err) return next(err);
+      res.status(201).json(sessionUser);
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Login
+authRouter.post('/auth/login', (req: Request, res: Response, next: NextFunction) => {
+  passport.authenticate('student-local', (err: any, user: any, _info: any) => {
+    if (err) return next(err);
+    if (!user) return res.status(401).json({ error: 'Invalid credentials' });
+    req.login(user, (err) => {
+      if (err) return next(err);
+      res.json(user);
+    });
+  })(req, res, next);
+});
 
 // --- Shared auth endpoints ---
 
