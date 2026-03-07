@@ -33,7 +33,10 @@ function App() {
             <Route element={<AppLayout />}>
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
               <Route path="/dashboard" element={<Dashboard />} />
-              {/* feature screen routes added in tickets 005–007 */}
+              <Route path="/activities" element={<Activities />} />
+              <Route path="/exams" element={<Exams />} />
+              <Route path="/colleges" element={<Colleges />} />
+              {/* remaining feature screen routes added in tickets 006–007 */}
             </Route>
           </Route>
 
