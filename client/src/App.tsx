@@ -12,6 +12,9 @@ import Colleges from './pages/screens/Colleges';
 import Essays from './pages/screens/Essays';
 import RecLetters from './pages/screens/RecLetters';
 import Portals from './pages/screens/Portals';
+import Decide from './pages/screens/Decide';
+import FinancialAid from './pages/screens/FinancialAid';
+import Deadlines from './pages/screens/Deadlines';
 import AdminLogin from './pages/admin/AdminLogin';
 import AdminLayout from './pages/admin/AdminLayout';
 import EnvironmentInfo from './pages/admin/EnvironmentInfo';
@@ -42,7 +45,9 @@ function App() {
               <Route path="/essays" element={<Essays />} />
               <Route path="/recs" element={<RecLetters />} />
               <Route path="/portals" element={<Portals />} />
-              {/* remaining feature screen routes added in ticket 007 */}
+              <Route path="/decide" element={<Decide />} />
+              <Route path="/aid" element={<FinancialAid />} />
+              <Route path="/deadlines" element={<Deadlines />} />
             </Route>
           </Route>
 

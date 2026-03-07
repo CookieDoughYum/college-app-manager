@@ -1,0 +1,132 @@
+.page {
+  max-width: 760px;
+}
+
+.title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0 0 24px;
+}
+
+.section {
+  background: white;
+  border-radius: 8px;
+  padding: 20px 24px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  margin-bottom: 20px;
+}
+
+.sectionTitle {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1a1a2e;
+  margin: 0;
+}
+
+.calHeader {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.calNote {
+  font-size: 12px;
+  color: #888;
+  font-style: italic;
+}
+
+.calGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.calDow {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: #aaa;
+  padding: 4px 0;
+  text-transform: uppercase;
+}
+
+.calDay {
+  text-align: center;
+  padding: 6px 4px;
+  font-size: 13px;
+  color: #444;
+  border-radius: 4px;
+}
+
+.calDay:hover {
+  background: #f5f5f5;
+}
+
+.calDayHighlight {
+  background: #e94560;
+  color: white;
+  font-weight: 700;
+  border-radius: 50%;
+}
+
+.calDayHighlight:hover {
+  background: #c73652;
+}
+
+.calEmpty {
+  padding: 6px 4px;
+}
+
+.deadlineList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.deadlineCard {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid #e8e8e8;
+  border-radius: 6px;
+  padding: 12px 16px;
+}
+
+.deadlineLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.deadlineSchool {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a1a2e;
+}
+
+.deadlineType {
+  font-size: 12px;
+  color: #888;
+}
+
+.deadlineRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.daysUntil {
+  font-size: 12px;
+  color: #888;
+}
+
+.footNote {
+  font-size: 11px;
+  color: #aaa;
+  margin: 0;
+  font-style: italic;
+}

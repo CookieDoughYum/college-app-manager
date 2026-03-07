@@ -1,7 +1,7 @@
 ---
 id: "007"
 title: "Screens 7–9: Decide, Financial Aid, Deadlines"
-status: todo
+status: done
 use-cases:
   - SUC-010
 depends-on:
@@ -51,11 +51,11 @@ React state. These complete the full 9-screen CollegeNav MVP.
 
 ## Acceptance Criteria
 
-- [ ] `/decide` renders acceptance result cards with color-coded left borders
-- [ ] `/aid` renders FAFSA checklist with toggleable checkboxes and scholarship cards with deadline badges
-- [ ] `/deadlines` renders a calendar grid with two highlighted days and upcoming deadline cards
-- [ ] All 9 feature screens are reachable via sidebar navigation
-- [ ] No broken routes — all `/activities`, `/exams`, `/colleges`, `/essays`, `/recs`, `/portals`, `/decide`, `/aid`, `/deadlines` load without error
+- [x] `/decide` renders acceptance result cards with color-coded left borders
+- [x] `/aid` renders FAFSA checklist with toggleable checkboxes and scholarship cards with deadline badges
+- [x] `/deadlines` renders a calendar grid with two highlighted days and upcoming deadline cards
+- [x] All 9 feature screens are reachable via sidebar navigation
+- [x] No broken routes — all `/activities`, `/exams`, `/colleges`, `/essays`, `/recs`, `/portals`, `/decide`, `/aid`, `/deadlines` load without error
 
 ## Testing
 
