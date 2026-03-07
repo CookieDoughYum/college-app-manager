@@ -1,9 +1,11 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { StudentProvider } from './contexts/StudentContext';
 import AuthLayout from './layouts/AuthLayout';
+import AppLayout from './layouts/AppLayout';
 import Login from './pages/auth/Login';
 import Signup from './pages/auth/Signup';
 import ProtectedRoute from './components/ProtectedRoute';
+import Dashboard from './pages/Dashboard';
 import AdminLogin from './pages/admin/AdminLogin';
 import AdminLayout from './pages/admin/AdminLayout';
 import EnvironmentInfo from './pages/admin/EnvironmentInfo';
@@ -23,10 +25,13 @@ function App() {
             <Route path="/signup" element={<Signup />} />
           </Route>
 
-          {/* Protected student routes (AppLayout added in ticket 004) */}
+          {/* Protected student routes */}
           <Route element={<ProtectedRoute />}>
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
-            <Route path="/dashboard" element={<div>Dashboard (coming soon)</div>} />
+            <Route element={<AppLayout />}>
+              <Route path="/" element={<Navigate to="/dashboard" replace />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              {/* feature screen routes added in tickets 005–007 */}
+            </Route>
           </Route>
 
           {/* Admin routes */}
