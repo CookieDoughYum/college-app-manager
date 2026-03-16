@@ -1,26 +1,54 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import TagChip from '../../components/TagChip';
 import BadgeLabel from '../../components/BadgeLabel';
 import styles from './Colleges.module.css';
 
-interface College {
+interface CollegeEntry {
   name: string;
   location: string;
   variant: 'reach' | 'target' | 'safety';
 }
 
-const DEFAULT_COLLEGES: College[] = [
-  { name: 'MIT', location: 'Cambridge, MA', variant: 'reach' },
-  { name: 'UCLA', location: 'Los Angeles, CA', variant: 'target' },
-  { name: 'Cal Poly SLO', location: 'San Luis Obispo, CA', variant: 'safety' },
-];
+interface CollegesData {
+  majorAnswers: { salaryGoal: string; interestArea: string };
+  collegeList: CollegeEntry[];
+}
+
+const DEFAULT_DATA: CollegesData = { majorAnswers: { salaryGoal: '', interestArea: '' }, collegeList: [] };
 
 const RECOMMENDED_MAJORS = ['Computer Science', 'Biomedical Eng.', 'Data Science'];
 
 export default function Colleges() {
-  const [salaryGoal, setSalaryGoal] = useState('');
-  const [interestArea, setInterestArea] = useState('');
-  const [colleges] = useState<College[]>(DEFAULT_COLLEGES);
+  const [data, setData] = useState<CollegesData>(DEFAULT_DATA);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/student/colleges', { credentials: 'include' })
+      .then(r => r.json())
+      .then(d => { setData(d ?? DEFAULT_DATA); setLoading(false); })
+      .catch(() => setLoading(false));
+  }, []);
+
+  function save(updated: CollegesData) {
+    setData(updated);
+    fetch('/api/student/colleges', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify(updated),
+    });
+  }
+
+  function updateMajorAnswers(field: 'salaryGoal' | 'interestArea', value: string) {
+    const updated = { ...data, majorAnswers: { ...data.majorAnswers, [field]: value } };
+    setData(updated);
+  }
+
+  function saveMajorAnswers() {
+    save(data);
+  }
+
+  if (loading) return <div className={styles.page}><p>Loading…</p></div>;
 
   return (
     <div className={styles.page}>
@@ -35,8 +63,9 @@ export default function Colleges() {
               className={styles.input}
               type="text"
               placeholder="e.g. $80,000"
-              value={salaryGoal}
-              onChange={(e) => setSalaryGoal(e.target.value)}
+              value={data.majorAnswers.salaryGoal}
+              onChange={(e) => updateMajorAnswers('salaryGoal', e.target.value)}
+              onBlur={saveMajorAnswers}
             />
           </div>
           <div className={styles.field}>
@@ -45,8 +74,9 @@ export default function Colleges() {
               className={styles.input}
               type="text"
               placeholder="e.g. Healthcare, Engineering"
-              value={interestArea}
-              onChange={(e) => setInterestArea(e.target.value)}
+              value={data.majorAnswers.interestArea}
+              onChange={(e) => updateMajorAnswers('interestArea', e.target.value)}
+              onBlur={saveMajorAnswers}
             />
           </div>
         </div>
@@ -67,7 +97,7 @@ export default function Colleges() {
           <span className={styles.goalNote}>Aim for 2–3 reach, 3–4 target, 2–3 safety</span>
         </div>
         <div className={styles.collegeList}>
-          {colleges.map((college) => (
+          {data.collegeList.map((college) => (
             <div key={college.name} className={styles.collegeCard}>
               <div className={styles.collegeName}>{college.name}</div>
               <div className={styles.collegeLocation}>{college.location}</div>

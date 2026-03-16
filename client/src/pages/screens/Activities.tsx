@@ -1,29 +1,55 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import TagChip from '../../components/TagChip';
 import styles from './Activities.module.css';
 
 const INTEREST_TAGS = ['Science', 'Leadership', 'Arts', 'Community', 'Tech'];
 
 const GRADE_COLUMNS = [
-  { label: '9th Grade', warn: false },
-  { label: '10th Grade', warn: false },
-  { label: '11th Grade', warn: true },
-  { label: '12th Grade', warn: false },
+  { label: '9th Grade', key: '9', warn: false },
+  { label: '10th Grade', key: '10', warn: false },
+  { label: '11th Grade', key: '11', warn: true },
+  { label: '12th Grade', key: '12', warn: false },
 ];
 
+interface ActivitiesData {
+  interests: string[];
+  coursePlan: Record<string, string[]>;
+}
+
+const DEFAULT_DATA: ActivitiesData = { interests: [], coursePlan: {} };
+
 export default function Activities() {
-  const [interests, setInterests] = useState<Set<string>>(new Set());
+  const [data, setData] = useState<ActivitiesData>(DEFAULT_DATA);
+  const [loading, setLoading] = useState(true);
   const [gpa, setGpa] = useState('');
   const [sat, setSat] = useState('');
   const [act, setAct] = useState('');
 
-  function toggleInterest(tag: string) {
-    setInterests((prev) => {
-      const next = new Set(prev);
-      next.has(tag) ? next.delete(tag) : next.add(tag);
-      return next;
+  useEffect(() => {
+    fetch('/api/student/activities', { credentials: 'include' })
+      .then(r => r.json())
+      .then(d => { setData(d ?? DEFAULT_DATA); setLoading(false); })
+      .catch(() => setLoading(false));
+  }, []);
+
+  function save(updated: ActivitiesData) {
+    setData(updated);
+    fetch('/api/student/activities', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify(updated),
     });
   }
+
+  function toggleInterest(tag: string) {
+    const interests = data.interests.includes(tag)
+      ? data.interests.filter(t => t !== tag)
+      : [...data.interests, tag];
+    save({ ...data, interests });
+  }
+
+  if (loading) return <div className={styles.page}><p>Loading…</p></div>;
 
   return (
     <div className={styles.page}>
@@ -36,7 +62,7 @@ export default function Activities() {
             <TagChip
               key={tag}
               label={tag}
-              selected={interests.has(tag)}
+              selected={data.interests.includes(tag)}
               onClick={() => toggleInterest(tag)}
             />
           ))}
@@ -89,11 +115,17 @@ export default function Activities() {
       <section className={styles.section}>
         <h2 className={styles.sectionTitle}>4-Year Course Plan</h2>
         <div className={styles.planGrid}>
-          {GRADE_COLUMNS.map(({ label, warn }) => (
+          {GRADE_COLUMNS.map(({ label, key, warn }) => (
             <div key={label} className={warn ? `${styles.planCol} ${styles.planColWarn}` : styles.planCol}>
               <div className={styles.planColHeader}>{label}</div>
               <div className={styles.planColBody}>
-                <p className={styles.planPlaceholder}>No courses added yet.</p>
+                {(data.coursePlan[key] ?? []).length === 0 ? (
+                  <p className={styles.planPlaceholder}>No courses added yet.</p>
+                ) : (
+                  (data.coursePlan[key] ?? []).map((course, i) => (
+                    <p key={i} className={styles.planCourse}>{course}</p>
+                  ))
+                )}
               </div>
             </div>
           ))}

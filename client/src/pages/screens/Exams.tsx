@@ -1,24 +1,49 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import TagChip from '../../components/TagChip';
 import styles from './Exams.module.css';
 
+interface ExamsData {
+  testPreference: string | null;
+  apCourses: string[];
+}
+
+const DEFAULT_DATA: ExamsData = { testPreference: null, apCourses: [] };
+
 export default function Exams() {
-  const [apCourses, setApCourses] = useState<string[]>(['AP Calculus', 'AP Biology']);
+  const [data, setData] = useState<ExamsData>(DEFAULT_DATA);
+  const [loading, setLoading] = useState(true);
   const [addingAp, setAddingAp] = useState(false);
   const [apInput, setApInput] = useState('');
 
+  useEffect(() => {
+    fetch('/api/student/exams', { credentials: 'include' })
+      .then(r => r.json())
+      .then(d => { setData(d ?? DEFAULT_DATA); setLoading(false); })
+      .catch(() => setLoading(false));
+  }, []);
+
+  function save(updated: ExamsData) {
+    setData(updated);
+    fetch('/api/student/exams', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify(updated),
+    });
+  }
+
   function addApCourse() {
     const trimmed = apInput.trim();
-    if (trimmed) {
-      setApCourses((prev) => [...prev, trimmed]);
-    }
+    if (trimmed) save({ ...data, apCourses: [...data.apCourses, trimmed] });
     setApInput('');
     setAddingAp(false);
   }
 
   function removeApCourse(course: string) {
-    setApCourses((prev) => prev.filter((c) => c !== course));
+    save({ ...data, apCourses: data.apCourses.filter(c => c !== course) });
   }
+
+  if (loading) return <div className={styles.page}><p>Loading…</p></div>;
 
   return (
     <div className={styles.page}>
@@ -47,7 +72,7 @@ export default function Exams() {
       <section className={styles.section}>
         <h2 className={styles.sectionTitle}>AP Exam Tracker</h2>
         <div className={styles.chipRow}>
-          {apCourses.map((course) => (
+          {data.apCourses.map((course) => (
             <TagChip
               key={course}
               label={course}

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styles from './Portals.module.css';
 
 interface Portal {
@@ -7,10 +7,11 @@ interface Portal {
   status: 'In Progress' | 'Not Started' | 'Submitted';
 }
 
-const INITIAL_PORTALS: Portal[] = [
-  { name: 'Common App', url: 'commonapp.org', status: 'In Progress' },
-  { name: 'UC Application', url: 'apply.universityofcalifornia.edu', status: 'Not Started' },
-];
+interface PortalsData {
+  portals: Portal[];
+}
+
+const DEFAULT_DATA: PortalsData = { portals: [] };
 
 const STATUS_STYLE: Record<string, string> = {
   'In Progress': styles.statusInProgress,
@@ -19,7 +20,35 @@ const STATUS_STYLE: Record<string, string> = {
 };
 
 export default function Portals() {
-  const [portals] = useState<Portal[]>(INITIAL_PORTALS);
+  const [data, setData] = useState<PortalsData>(DEFAULT_DATA);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/student/portals', { credentials: 'include' })
+      .then(r => r.json())
+      .then(d => { setData(d ?? DEFAULT_DATA); setLoading(false); })
+      .catch(() => setLoading(false));
+  }, []);
+
+  function save(updated: PortalsData) {
+    setData(updated);
+    fetch('/api/student/portals', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify(updated),
+    });
+  }
+
+  function cycleStatus(index: number) {
+    const statuses: Portal['status'][] = ['Not Started', 'In Progress', 'Submitted'];
+    const current = data.portals[index].status;
+    const next = statuses[(statuses.indexOf(current) + 1) % statuses.length];
+    const updated = data.portals.map((p, i) => i === index ? { ...p, status: next } : p);
+    save({ portals: updated });
+  }
+
+  if (loading) return <div className={styles.page}><p>Loading…</p></div>;
 
   return (
     <div className={styles.page}>
@@ -42,17 +71,21 @@ export default function Portals() {
       <section className={styles.section}>
         <div className={styles.listHeader}>
           <h2 className={styles.sectionTitle}>My Application Portals</h2>
-          <button className={styles.addBtn}>+ Add Portal</button>
+          <button className={styles.addBtn} onClick={() => save({ portals: [...data.portals, { name: 'New Portal', url: '', status: 'Not Started' }] })}>+ Add Portal</button>
         </div>
-        {portals.length === 0 ? (
+        {data.portals.length === 0 ? (
           <p className={styles.emptyState}>No portals added yet. Click "+ Add Portal" to get started.</p>
         ) : (
           <div className={styles.portalList}>
-            {portals.map((portal) => (
-              <div key={portal.name} className={styles.portalCard}>
+            {data.portals.map((portal, i) => (
+              <div key={i} className={styles.portalCard}>
                 <div className={styles.portalName}>{portal.name}</div>
                 <div className={styles.portalUrl}>{portal.url}</div>
-                <span className={`${styles.statusTag} ${STATUS_STYLE[portal.status]}`}>
+                <span
+                  className={`${styles.statusTag} ${STATUS_STYLE[portal.status]}`}
+                  onClick={() => cycleStatus(i)}
+                  style={{ cursor: 'pointer' }}
+                >
                   {portal.status}
                 </span>
               </div>
