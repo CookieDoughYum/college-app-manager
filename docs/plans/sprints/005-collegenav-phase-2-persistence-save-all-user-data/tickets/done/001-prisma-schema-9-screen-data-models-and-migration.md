@@ -1,7 +1,7 @@
 ---
 id: "001"
 title: "Prisma schema — 9 screen data models and migration"
-status: todo
+status: done
 use-cases:
   - SUC-001
   - SUC-002
@@ -31,10 +31,10 @@ schema.
 
 ## Acceptance Criteria
 
-- [ ] All 9 models are added to `schema.prisma` with correct fields and relation
-- [ ] Migration file is generated under `server/prisma/migrations/`
-- [ ] `npx prisma migrate dev` succeeds without errors
-- [ ] `npx prisma generate` succeeds
+- [x] All 9 models are added to `schema.prisma` with correct fields and relation
+- [x] Migration file is generated under `server/prisma/migrations/`
+- [x] `npx prisma migrate dev` succeeds without errors
+- [x] `npx prisma generate` succeeds
 
 ## Testing
 

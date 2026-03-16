@@ -29,6 +29,94 @@ model Student {
   grade        Int      // 8–12
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+
+  activities   StudentActivities?
+  exams        StudentExams?
+  colleges     StudentColleges?
+  essays       StudentEssays?
+  recLetters   StudentRecLetters?
+  portals      StudentPortals?
+  decide       StudentDecide?
+  financialAid StudentFinancialAid?
+  deadlines    StudentDeadlines?
+}
+
+model StudentActivities {
+  id         Int      @id @default(autoincrement())
+  studentId  Int      @unique
+  student    Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  interests  Json     @default("[]")
+  coursePlan Json     @default("{}")
+  updatedAt  DateTime @updatedAt
+}
+
+model StudentExams {
+  id             Int      @id @default(autoincrement())
+  studentId      Int      @unique
+  student        Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  testPreference String?
+  apCourses      Json     @default("[]")
+  updatedAt      DateTime @updatedAt
+}
+
+model StudentColleges {
+  id           Int      @id @default(autoincrement())
+  studentId    Int      @unique
+  student      Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  majorAnswers Json     @default("{}")
+  collegeList  Json     @default("[]")
+  updatedAt    DateTime @updatedAt
+}
+
+model StudentEssays {
+  id        Int      @id @default(autoincrement())
+  studentId Int      @unique
+  student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  driveLink String?
+  notes     String?
+  updatedAt DateTime @updatedAt
+}
+
+model StudentRecLetters {
+  id        Int      @id @default(autoincrement())
+  studentId Int      @unique
+  student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  checklist Json     @default("{}")
+  teachers  Json     @default("[]")
+  updatedAt DateTime @updatedAt
+}
+
+model StudentPortals {
+  id        Int      @id @default(autoincrement())
+  studentId Int      @unique
+  student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  portals   Json     @default("[]")
+  updatedAt DateTime @updatedAt
+}
+
+model StudentDecide {
+  id        Int      @id @default(autoincrement())
+  studentId Int      @unique
+  student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  decisions Json     @default("[]")
+  updatedAt DateTime @updatedAt
+}
+
+model StudentFinancialAid {
+  id                 Int      @id @default(autoincrement())
+  studentId          Int      @unique
+  student            Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  fafsaChecklist     Json     @default("{}")
+  scholarshipAnswers Json     @default("{}")
+  updatedAt          DateTime @updatedAt
+}
+
+model StudentDeadlines {
+  id              Int      @id @default(autoincrement())
+  studentId       Int      @unique
+  student         Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  manualDeadlines Json     @default("[]")
+  updatedAt       DateTime @updatedAt
 }
 
 // Express session store (connect-pg-simple).
