@@ -1,7 +1,7 @@
 ---
 id: '004'
 title: "CollegeNav MVP \u2014 Auth, Navigation, and All 9 Screens"
-status: active
+status: done
 branch: sprint/004-collegenav-mvp-auth-navigation-and-all-9-screens
 use-cases:
 - SUC-001
