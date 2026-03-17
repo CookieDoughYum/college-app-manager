@@ -25,6 +25,7 @@ export default function Deadlines() {
   const [loading, setLoading] = useState(true);
   const [fetchLoading, setFetchLoading] = useState(false);
   const [fetchStatus, setFetchStatus] = useState('');
+  const [fetchError, setFetchError] = useState('');
 
   useEffect(() => {
     fetch('/api/student/deadlines', { credentials: 'include' })
@@ -46,11 +47,13 @@ export default function Deadlines() {
   async function fetchDeadlines() {
     setFetchLoading(true);
     setFetchStatus('');
+    setFetchError('');
     try {
       const res = await fetch('/api/ai/deadlines/scrape', {
         method: 'POST',
         credentials: 'include',
       });
+      if (!res.ok) throw new Error('Server error');
       const { result, deadlines } = await res.json();
       if (deadlines && deadlines.length > 0) {
         const merged = [
@@ -60,6 +63,8 @@ export default function Deadlines() {
         save({ manualDeadlines: merged });
       }
       setFetchStatus(result);
+    } catch {
+      setFetchError('Could not generate recommendations — please try again.');
     } finally {
       setFetchLoading(false);
     }
@@ -121,6 +126,7 @@ export default function Deadlines() {
             </button>
           </div>
         </div>
+        {fetchError && <p style={{ color: '#e94560' }}>{fetchError}</p>}
         {fetchStatus && <p style={{ color: '#aaa', fontSize: '0.85rem', marginTop: '0.5rem' }}>{fetchStatus}</p>}
         <div className={styles.deadlineList}>
           {data.manualDeadlines.length === 0 ? (

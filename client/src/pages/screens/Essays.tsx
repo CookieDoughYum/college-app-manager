@@ -37,6 +37,7 @@ export default function Essays() {
   const [whyUsUrl, setWhyUsUrl] = useState('');
   const [whyUsResult, setWhyUsResult] = useState('');
   const [whyUsLoading, setWhyUsLoading] = useState(false);
+  const [whyUsError, setWhyUsError] = useState('');
 
   useEffect(() => {
     fetch('/api/student/essays', { credentials: 'include' })
@@ -62,6 +63,7 @@ export default function Essays() {
   async function researchSchool() {
     if (!schoolName.trim()) return;
     setWhyUsLoading(true);
+    setWhyUsError('');
     try {
       const res = await fetch('/api/ai/essays/whyus', {
         method: 'POST',
@@ -69,9 +71,12 @@ export default function Essays() {
         credentials: 'include',
         body: JSON.stringify({ schoolName: schoolName.trim(), url: whyUsUrl.trim() || undefined }),
       });
+      if (!res.ok) throw new Error('Server error');
       const { result } = await res.json();
       setWhyUsResult(result);
       setData(prev => ({ ...prev, whyUsResults: { ...prev.whyUsResults, [schoolName.trim()]: result } }));
+    } catch {
+      setWhyUsError('Could not generate recommendations — please try again.');
     } finally {
       setWhyUsLoading(false);
     }
@@ -140,6 +145,7 @@ export default function Essays() {
             {whyUsLoading ? 'Researching…' : 'Research →'}
           </button>
         </div>
+        {whyUsError && <p style={{ color: '#e94560' }}>{whyUsError}</p>}
         <div className={styles.outputArea}>
           {whyUsResult
             ? <pre style={{ whiteSpace: 'pre-wrap', margin: 0 }}>{whyUsResult}</pre>
