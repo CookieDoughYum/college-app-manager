@@ -1,10 +1,10 @@
 ---
-id: "001"
-title: "Mobile-responsive layout and grade-based sidebar locking"
-status: todo
+id: '001'
+title: Mobile-responsive layout and grade-based sidebar locking
+status: in-progress
 use-cases:
-  - SUC-001
-  - SUC-003
+- SUC-001
+- SUC-003
 depends-on: []
 ---
 
@@ -29,12 +29,12 @@ Two related changes to `AppLayout.tsx` and `AppLayout.module.css`:
 
 ## Acceptance Criteria
 
-- [ ] Sidebar hides at ≤768px, hamburger button appears
-- [ ] Hamburger toggles a slide-out sidebar overlay
-- [ ] Dashboard progress cards stack 1-column at ≤768px
-- [ ] Grade 9 student sees Decide and Portals dimmed in sidebar
-- [ ] Grade 12 student sees all sidebar items at full opacity
-- [ ] All client tests pass
+- [x] Sidebar hides at ≤768px, hamburger button appears
+- [x] Hamburger toggles a slide-out sidebar overlay
+- [x] Dashboard progress cards stack 1-column at ≤768px
+- [x] Grade 9 student sees Decide and Portals dimmed in sidebar
+- [x] Grade 12 student sees all sidebar items at full opacity
+- [x] All client tests pass
 
 ## Testing
 

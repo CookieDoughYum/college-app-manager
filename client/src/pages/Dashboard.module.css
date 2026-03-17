@@ -55,3 +55,13 @@
   color: #888;
   margin: 0;
 }
+
+@media (max-width: 768px) {
+  .cards {
+    grid-template-columns: 1fr;
+  }
+
+  .welcome {
+    font-size: 20px;
+  }
+}
