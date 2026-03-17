@@ -41,7 +41,7 @@ studentRouter.get('/activities', async (req: Request, res: Response, next: NextF
       create: { studentId: studentId(req) },
       update: {},
     });
-    res.json({ interests: data.interests, coursePlan: data.coursePlan });
+    res.json({ interests: data.interests, coursePlan: data.coursePlan, aiRecommendations: data.aiRecommendations });
   } catch (err) { next(err); }
 });
 
@@ -66,7 +66,7 @@ studentRouter.get('/exams', async (req: Request, res: Response, next: NextFuncti
       create: { studentId: studentId(req) },
       update: {},
     });
-    res.json({ testPreference: data.testPreference, apCourses: data.apCourses });
+    res.json({ testPreference: data.testPreference, apCourses: data.apCourses, aiRecommendations: data.aiRecommendations });
   } catch (err) { next(err); }
 });
 
@@ -91,7 +91,7 @@ studentRouter.get('/colleges', async (req: Request, res: Response, next: NextFun
       create: { studentId: studentId(req) },
       update: {},
     });
-    res.json({ majorAnswers: data.majorAnswers, collegeList: data.collegeList });
+    res.json({ majorAnswers: data.majorAnswers, collegeList: data.collegeList, aiRecommendations: data.aiRecommendations });
   } catch (err) { next(err); }
 });
 
@@ -191,7 +191,7 @@ studentRouter.get('/decide', async (req: Request, res: Response, next: NextFunct
       create: { studentId: studentId(req) },
       update: {},
     });
-    res.json({ decisions: data.decisions });
+    res.json({ decisions: data.decisions, aiRecommendations: data.aiRecommendations });
   } catch (err) { next(err); }
 });
 
@@ -216,7 +216,7 @@ studentRouter.get('/financialaid', async (req: Request, res: Response, next: Nex
       create: { studentId: studentId(req) },
       update: {},
     });
-    res.json({ fafsaChecklist: data.fafsaChecklist, scholarshipAnswers: data.scholarshipAnswers });
+    res.json({ fafsaChecklist: data.fafsaChecklist, scholarshipAnswers: data.scholarshipAnswers, aiRecommendations: data.aiRecommendations });
   } catch (err) { next(err); }
 });
 

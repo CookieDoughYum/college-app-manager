@@ -42,30 +42,33 @@ model Student {
 }
 
 model StudentActivities {
-  id         Int      @id @default(autoincrement())
-  studentId  Int      @unique
-  student    Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  interests  Json     @default("[]")
-  coursePlan Json     @default("{}")
-  updatedAt  DateTime @updatedAt
+  id                 Int      @id @default(autoincrement())
+  studentId          Int      @unique
+  student            Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  interests          Json     @default("[]")
+  coursePlan         Json     @default("{}")
+  aiRecommendations  Json     @default("{}")
+  updatedAt          DateTime @updatedAt
 }
 
 model StudentExams {
-  id             Int      @id @default(autoincrement())
-  studentId      Int      @unique
-  student        Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  testPreference String?
-  apCourses      Json     @default("[]")
-  updatedAt      DateTime @updatedAt
+  id                Int      @id @default(autoincrement())
+  studentId         Int      @unique
+  student           Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  testPreference    String?
+  apCourses         Json     @default("[]")
+  aiRecommendations Json     @default("{}")
+  updatedAt         DateTime @updatedAt
 }
 
 model StudentColleges {
-  id           Int      @id @default(autoincrement())
-  studentId    Int      @unique
-  student      Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  majorAnswers Json     @default("{}")
-  collegeList  Json     @default("[]")
-  updatedAt    DateTime @updatedAt
+  id                Int      @id @default(autoincrement())
+  studentId         Int      @unique
+  student           Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  majorAnswers      Json     @default("{}")
+  collegeList       Json     @default("[]")
+  aiRecommendations Json     @default("{}")
+  updatedAt         DateTime @updatedAt
 }
 
 model StudentEssays {
@@ -95,11 +98,12 @@ model StudentPortals {
 }
 
 model StudentDecide {
-  id        Int      @id @default(autoincrement())
-  studentId Int      @unique
-  student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  decisions Json     @default("[]")
-  updatedAt DateTime @updatedAt
+  id                Int      @id @default(autoincrement())
+  studentId         Int      @unique
+  student           Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  decisions         Json     @default("[]")
+  aiRecommendations Json     @default("{}")
+  updatedAt         DateTime @updatedAt
 }
 
 model StudentFinancialAid {
@@ -108,6 +112,7 @@ model StudentFinancialAid {
   student            Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
   fafsaChecklist     Json     @default("{}")
   scholarshipAnswers Json     @default("{}")
+  aiRecommendations  Json     @default("{}")
   updatedAt          DateTime @updatedAt
 }
 
