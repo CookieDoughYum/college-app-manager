@@ -1,12 +1,12 @@
 ---
-id: "003"
-title: "Wire Why Us assistant and Deadline Scraper into Essays and Deadlines screens"
-status: todo
+id: '003'
+title: Wire Why Us assistant and Deadline Scraper into Essays and Deadlines screens
+status: in-progress
 use-cases:
-  - SUC-001
-  - SUC-002
+- SUC-001
+- SUC-002
 depends-on:
-  - "002"
+- '002'
 ---
 
 # Wire Why Us assistant and Deadline Scraper into Essays and Deadlines screens
@@ -32,12 +32,12 @@ Update the Essays and Deadlines React screens to use the new AI endpoints.
 
 ## Acceptance Criteria
 
-- [ ] Essays screen shows "Why Us? Assistant" section with school name + URL inputs
-- [ ] "Research School" button calls the endpoint and displays result
-- [ ] Essays screen loads cached whyUsResults on mount
-- [ ] Deadlines screen has "Fetch Deadlines" button
-- [ ] "Fetch Deadlines" populates the deadline list from the student's college list
-- [ ] Client render tests pass
+- [x] Essays screen shows "Why Us? Assistant" section with school name + URL inputs
+- [x] "Research School" button calls the endpoint and displays result
+- [x] Essays screen loads cached whyUsResults on mount
+- [x] Deadlines screen has "Fetch Deadlines" button
+- [x] "Fetch Deadlines" populates the deadline list from the student's college list
+- [x] Client render tests pass
 
 ## Testing
 

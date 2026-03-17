@@ -23,6 +23,8 @@ const HIGHLIGHTED_DAYS = new Set([15, 30]);
 export default function Deadlines() {
   const [data, setData] = useState<DeadlinesData>(DEFAULT_DATA);
   const [loading, setLoading] = useState(true);
+  const [fetchLoading, setFetchLoading] = useState(false);
+  const [fetchStatus, setFetchStatus] = useState('');
 
   useEffect(() => {
     fetch('/api/student/deadlines', { credentials: 'include' })
@@ -39,6 +41,28 @@ export default function Deadlines() {
       credentials: 'include',
       body: JSON.stringify(updated),
     });
+  }
+
+  async function fetchDeadlines() {
+    setFetchLoading(true);
+    setFetchStatus('');
+    try {
+      const res = await fetch('/api/ai/deadlines/scrape', {
+        method: 'POST',
+        credentials: 'include',
+      });
+      const { result, deadlines } = await res.json();
+      if (deadlines && deadlines.length > 0) {
+        const merged = [
+          ...data.manualDeadlines.filter((d: any) => !deadlines.find((nd: any) => nd.school === d.school && nd.type === d.label)),
+          ...deadlines.map((d: any) => ({ school: d.school, label: d.type, date: d.date, variant: 'target' as const })),
+        ];
+        save({ manualDeadlines: merged });
+      }
+      setFetchStatus(result);
+    } finally {
+      setFetchLoading(false);
+    }
   }
 
   const calendarCells: (number | null)[] = [];
@@ -79,15 +103,25 @@ export default function Deadlines() {
       </section>
 
       <section className={styles.section}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
           <h2 className={styles.sectionTitle}>Upcoming Deadlines</h2>
-          <button
-            style={{ background: '#e94560', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.4rem 0.8rem', cursor: 'pointer' }}
-            onClick={() => save({ manualDeadlines: [...data.manualDeadlines, { school: 'School Name', label: 'Regular Decision', date: '', variant: 'target' }] })}
-          >
-            + Add Deadline
-          </button>
+          <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <button
+              style={{ background: '#0f3460', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.4rem 0.8rem', cursor: 'pointer' }}
+              onClick={fetchDeadlines}
+              disabled={fetchLoading}
+            >
+              {fetchLoading ? 'Fetching…' : 'Fetch Deadlines'}
+            </button>
+            <button
+              style={{ background: '#e94560', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.4rem 0.8rem', cursor: 'pointer' }}
+              onClick={() => save({ manualDeadlines: [...data.manualDeadlines, { school: 'School Name', label: 'Regular Decision', date: '', variant: 'target' }] })}
+            >
+              + Add Deadline
+            </button>
+          </div>
         </div>
+        {fetchStatus && <p style={{ color: '#aaa', fontSize: '0.85rem', marginTop: '0.5rem' }}>{fetchStatus}</p>}
         <div className={styles.deadlineList}>
           {data.manualDeadlines.length === 0 ? (
             <p style={{ color: '#888' }}>No deadlines added yet.</p>
@@ -107,7 +141,7 @@ export default function Deadlines() {
           )}
         </div>
         <p className={styles.footNote}>
-          Deadlines auto-fetched via Browser MCP from each school's admissions page. Last updated: today.
+          Click "Fetch Deadlines" to auto-populate from your college list. You can also add deadlines manually.
         </p>
       </section>
     </div>
