@@ -1,15 +1,15 @@
 ---
-id: "006"
-title: "CollegeNav Phase 3 — AI Recommendations via Claude API"
-status: planning
+id: '006'
+title: "CollegeNav Phase 3 \u2014 AI Recommendations via Claude API"
+status: done
 branch: sprint/006-collegenav-phase-3-ai-recommendations-via-claude-api
 use-cases:
-  - SUC-001
-  - SUC-002
-  - SUC-003
-  - SUC-004
-  - SUC-005
-  - SUC-006
+- SUC-001
+- SUC-002
+- SUC-003
+- SUC-004
+- SUC-005
+- SUC-006
 ---
 
 # Sprint 006: CollegeNav Phase 3 — AI Recommendations via Claude API
