@@ -1,18 +1,18 @@
 ---
-id: "005"
-title: "CollegeNav Phase 2 — Persistence: Save All User Data"
-status: planning
+id: '005'
+title: "CollegeNav Phase 2 \u2014 Persistence: Save All User Data"
+status: done
 branch: sprint/005-collegenav-phase-2-persistence-save-all-user-data
 use-cases:
-  - SUC-001
-  - SUC-002
-  - SUC-003
-  - SUC-004
-  - SUC-005
-  - SUC-006
-  - SUC-007
-  - SUC-008
-  - SUC-009
+- SUC-001
+- SUC-002
+- SUC-003
+- SUC-004
+- SUC-005
+- SUC-006
+- SUC-007
+- SUC-008
+- SUC-009
 ---
 
 # Sprint 005: CollegeNav Phase 2 — Persistence: Save All User Data
