@@ -1,11 +1,11 @@
 ---
-id: "007"
-title: "CollegeNav Phase 4 — Web Research (Why Us Assistant + Deadline Scraper)"
-status: active
+id: '007'
+title: "CollegeNav Phase 4 \u2014 Web Research (Why Us Assistant + Deadline Scraper)"
+status: done
 branch: sprint/007-collegenav-phase-4-web-research-why-us-assistant-deadline-scraper
 use-cases:
-  - SUC-001
-  - SUC-002
+- SUC-001
+- SUC-002
 ---
 
 # Sprint 007: CollegeNav Phase 4 — Web Research (Why Us Assistant + Deadline Scraper)
