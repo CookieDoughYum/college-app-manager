@@ -1,0 +1,72 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+}
+
+.card {
+  background: #16213e;
+  border: 1px solid #0f3460;
+  border-radius: 12px;
+  padding: 2rem;
+  max-width: 480px;
+  width: 90%;
+  color: #e0e0e0;
+}
+
+.card h2 {
+  margin: 0 0 0.75rem;
+  color: #e94560;
+  font-size: 1.4rem;
+}
+
+.card p {
+  margin: 0 0 0.75rem;
+  color: #ccc;
+}
+
+.card ul {
+  margin: 0 0 1.5rem;
+  padding-left: 1.25rem;
+  color: #ccc;
+  line-height: 1.8;
+}
+
+.actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.primaryBtn {
+  background: #e94560;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  font-size: 0.95rem;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.primaryBtn:hover {
+  background: #c73652;
+}
+
+.secondaryBtn {
+  background: #0f3460;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.secondaryBtn:hover {
+  background: #1a4a80;
+}
