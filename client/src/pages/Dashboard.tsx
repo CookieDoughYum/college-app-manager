@@ -15,19 +15,36 @@ interface Progress {
   deadlines: number;
 }
 
+interface Reminder {
+  type: string;
+  urgency: 'red' | 'amber' | 'green';
+  message: string;
+}
+
 const DEFAULT_PROGRESS: Progress = {
   activities: 0, exams: 0, colleges: 0, essays: 0, recletters: 0,
   portals: 0, decide: 0, financialaid: 0, deadlines: 0,
 };
 
+const URGENCY_COLORS: Record<string, string> = {
+  red: '#e94560',
+  amber: '#f59e0b',
+  green: '#22c55e',
+};
+
 export default function Dashboard() {
   const { student } = useStudent();
   const [progress, setProgress] = useState<Progress>(DEFAULT_PROGRESS);
+  const [reminders, setReminders] = useState<Reminder[]>([]);
 
   useEffect(() => {
     fetch('/api/student/progress', { credentials: 'include' })
       .then(r => r.json())
       .then(d => setProgress(d ?? DEFAULT_PROGRESS))
+      .catch(() => {});
+    fetch('/api/student/reminders', { credentials: 'include' })
+      .then(r => r.json())
+      .then(d => setReminders(d?.reminders ?? []))
       .catch(() => {});
   }, []);
 
@@ -89,12 +106,26 @@ export default function Dashboard() {
         />
       </div>
 
-      <div className={styles.actionItems}>
-        <h2 className={styles.sectionTitle}>Action Items</h2>
-        <p className={styles.placeholder}>
-          Complete your profile to see personalized action items.
-        </p>
-      </div>
+      {reminders.length > 0 && (
+        <div className={styles.actionItems}>
+          <h2 className={styles.sectionTitle}>Action Items</h2>
+          {reminders.map((r, i) => (
+            <div
+              key={i}
+              style={{
+                borderLeft: `4px solid ${URGENCY_COLORS[r.urgency] ?? '#888'}`,
+                background: '#16213e',
+                padding: '0.6rem 1rem',
+                marginBottom: '0.5rem',
+                borderRadius: '4px',
+                fontSize: '0.9rem',
+              }}
+            >
+              {r.message}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

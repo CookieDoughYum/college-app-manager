@@ -331,3 +331,43 @@ studentRouter.get('/progress', async (req: Request, res: Response, next: NextFun
     });
   } catch (err) { next(err); }
 });
+
+// --- Reminders ---
+
+const GRADE_REMINDERS: Record<string, string> = {
+  '8':  'Grade 8: Focus on exploring interests and building relationships with teachers.',
+  '9':  'Grade 9: Join clubs and activities that align with your interests.',
+  '10': 'Grade 10: Start building relationships with 2–3 teachers who could write you strong rec letters.',
+  '11': 'Grade 11: Request rec letters from teachers before summer. Take the PSAT in October.',
+  '12': 'Grade 12: Finalize rec letters, complete your college list, and watch your deadlines!',
+};
+
+studentRouter.get('/reminders', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const sid = studentId(req);
+    const student = req.user as any;
+    const grade: number = student.grade ?? 12;
+    const deadlines = await prisma.studentDeadlines.findUnique({ where: { studentId: sid } });
+    const manualDeadlines = Array.isArray(deadlines?.manualDeadlines) ? (deadlines.manualDeadlines as any[]) : [];
+
+    const now = Date.now();
+    const reminders: { type: string; urgency: string; message: string }[] = [];
+
+    for (const d of manualDeadlines) {
+      const date = new Date(d.date);
+      if (isNaN(date.getTime())) continue;
+      const daysUntil = Math.ceil((date.getTime() - now) / (1000 * 60 * 60 * 24));
+      if (daysUntil <= 0) continue;
+      if (daysUntil <= 7) {
+        reminders.push({ type: 'deadline', urgency: 'red', message: `${d.school} ${d.label || d.type || 'deadline'} is in ${daysUntil} day${daysUntil === 1 ? '' : 's'}!` });
+      } else if (daysUntil <= 30) {
+        reminders.push({ type: 'deadline', urgency: 'amber', message: `${d.school} ${d.label || d.type || 'deadline'} is in ${daysUntil} days.` });
+      }
+    }
+
+    const gradeReminder = GRADE_REMINDERS[String(grade)] ?? GRADE_REMINDERS['12'];
+    reminders.push({ type: 'grade', urgency: 'green', message: gradeReminder });
+
+    res.json({ reminders });
+  } catch (err) { next(err); }
+});

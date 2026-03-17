@@ -1,9 +1,9 @@
 ---
-id: "001"
-title: "Reminder endpoint and Dashboard banners"
-status: todo
+id: '001'
+title: Reminder endpoint and Dashboard banners
+status: in-progress
 use-cases:
-  - SUC-001
+- SUC-001
 depends-on: []
 ---
 
@@ -27,11 +27,11 @@ above the progress section.
 
 ## Acceptance Criteria
 
-- [ ] `GET /api/student/reminders` returns 401 without auth
-- [ ] Returns `{ reminders: array }` when authenticated
-- [ ] Includes a grade-based reminder in the response
-- [ ] Includes a deadline reminder when a deadline is within 30 days
-- [ ] Dashboard displays reminder banners color-coded by urgency
+- [x] `GET /api/student/reminders` returns 401 without auth
+- [x] Returns `{ reminders: array }` when authenticated
+- [x] Includes a grade-based reminder in the response
+- [x] Includes a deadline reminder when a deadline is within 30 days
+- [x] Dashboard displays reminder banners color-coded by urgency
 
 ## Testing
 
