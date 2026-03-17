@@ -116,7 +116,7 @@ studentRouter.get('/essays', async (req: Request, res: Response, next: NextFunct
       create: { studentId: studentId(req) },
       update: {},
     });
-    res.json({ driveLink: data.driveLink, notes: data.notes });
+    res.json({ driveLink: data.driveLink, notes: data.notes, whyUsResults: data.whyUsResults });
   } catch (err) { next(err); }
 });
 

@@ -1,12 +1,12 @@
 ---
-id: "004"
-title: "Server tests for web research endpoints"
-status: todo
+id: '004'
+title: Server tests for web research endpoints
+status: in-progress
 use-cases:
-  - SUC-001
-  - SUC-002
+- SUC-001
+- SUC-002
 depends-on:
-  - "002"
+- '002'
 ---
 
 # Server tests for web research endpoints
@@ -26,12 +26,12 @@ Verify:
 
 ## Acceptance Criteria
 
-- [ ] Unauthenticated requests to `/api/ai/essays/whyus` return 401
-- [ ] Unauthenticated requests to `/api/ai/deadlines/scrape` return 401
-- [ ] `whyus` returns `{ result: string }` and caches in `whyUsResults`
-- [ ] `scrape` iterates college list and returns merged deadlines
-- [ ] Failed fetches for a school are skipped without crashing
-- [ ] All 100+ existing server tests still pass
+- [x] Unauthenticated requests to `/api/ai/essays/whyus` return 401
+- [x] Unauthenticated requests to `/api/ai/deadlines/scrape` return 401
+- [x] `whyus` returns `{ result: string }` and caches in `whyUsResults`
+- [x] `scrape` iterates college list and returns merged deadlines
+- [x] Failed fetches for a school are skipped without crashing
+- [x] All 100+ existing server tests still pass
 
 ## Testing
 
