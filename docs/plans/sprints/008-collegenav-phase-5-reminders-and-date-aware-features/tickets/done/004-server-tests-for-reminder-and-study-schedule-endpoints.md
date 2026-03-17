@@ -1,13 +1,13 @@
 ---
-id: "004"
-title: "Server tests for reminder and study schedule endpoints"
-status: todo
+id: '004'
+title: Server tests for reminder and study schedule endpoints
+status: in-progress
 use-cases:
-  - SUC-001
-  - SUC-002
+- SUC-001
+- SUC-002
 depends-on:
-  - "001"
-  - "002"
+- '001'
+- '002'
 ---
 
 # Server tests for reminder and study schedule endpoints
@@ -25,13 +25,13 @@ Write `tests/server/reminders.test.ts` with:
 
 ## Acceptance Criteria
 
-- [ ] 401 for unauthenticated `GET /api/student/reminders`
-- [ ] Reminders array includes a grade-based reminder
-- [ ] Deadline reminder appears when deadline date is within 30 days
-- [ ] 401 for unauthenticated `POST /api/ai/exams/schedule`
-- [ ] Schedule endpoint returns `{ result: string }`
-- [ ] Schedule cached in `aiRecommendations.schedule`
-- [ ] All 108+ existing server tests still pass
+- [x] 401 for unauthenticated `GET /api/student/reminders`
+- [x] Reminders array includes a grade-based reminder
+- [x] Deadline reminder appears when deadline date is within 30 days
+- [x] 401 for unauthenticated `POST /api/ai/exams/schedule`
+- [x] Schedule endpoint returns `{ result: string }`
+- [x] Schedule cached in `aiRecommendations.schedule`
+- [x] All 108+ existing server tests still pass
 
 ## Testing
 
