@@ -1,9 +1,9 @@
 ---
-id: "001"
-title: "Prisma schema — add whyUsResults field and migration"
-status: todo
+id: '001'
+title: "Prisma schema \u2014 add whyUsResults field and migration"
+status: in-progress
 use-cases:
-  - SUC-001
+- SUC-001
 depends-on: []
 ---
 
@@ -22,9 +22,9 @@ in the response (it already returns all fields via upsert).
 
 ## Acceptance Criteria
 
-- [ ] `StudentEssays` model has `whyUsResults Json @default("{}")`
-- [ ] Migration created and applied successfully
-- [ ] `npm run test:server` passes with no regressions
+- [x] `StudentEssays` model has `whyUsResults Json @default("{}")`
+- [x] Migration created and applied successfully
+- [x] `npm run test:server` passes with no regressions
 
 ## Testing
 

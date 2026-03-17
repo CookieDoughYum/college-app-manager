@@ -72,12 +72,13 @@ model StudentColleges {
 }
 
 model StudentEssays {
-  id        Int      @id @default(autoincrement())
-  studentId Int      @unique
-  student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  driveLink String?
-  notes     String?
-  updatedAt DateTime @updatedAt
+  id           Int      @id @default(autoincrement())
+  studentId    Int      @unique
+  student      Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  driveLink    String?
+  notes        String?
+  whyUsResults Json     @default("{}")
+  updatedAt    DateTime @updatedAt
 }
 
 model StudentRecLetters {
