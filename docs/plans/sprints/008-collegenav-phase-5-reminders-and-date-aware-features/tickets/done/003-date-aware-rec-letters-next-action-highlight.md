@@ -1,11 +1,11 @@
 ---
-id: "003"
-title: "Date-aware Rec Letters next-action highlight"
-status: todo
+id: '003'
+title: Date-aware Rec Letters next-action highlight
+status: in-progress
 use-cases:
-  - SUC-003
+- SUC-003
 depends-on:
-  - "001"
+- '001'
 ---
 
 # Date-aware Rec Letters next-action highlight
@@ -24,10 +24,10 @@ Update `client/src/pages/screens/RecLetters.tsx` to:
 
 ## Acceptance Criteria
 
-- [ ] Rec Letters screen fetches student profile on mount
-- [ ] One checklist step is highlighted as the recommended next action
-- [ ] The highlighted step matches the student's grade
-- [ ] Client render tests pass
+- [x] Rec Letters screen fetches student profile on mount
+- [x] One checklist step is highlighted as the recommended next action
+- [x] The highlighted step matches the student's grade
+- [x] Client render tests pass
 
 ## Testing
 

@@ -24,15 +24,29 @@ interface RecLettersData {
 
 const DEFAULT_DATA: RecLettersData = { checklist: {}, teachers: [] };
 
+function getNextActionKey(grade: number): string {
+  const now = new Date();
+  const month = now.getMonth(); // 0=Jan, 10=Nov
+  if (grade <= 10) return 'build';
+  if (grade === 11) return 'request';
+  if (grade === 12 && month < 10) return 'commonApp'; // before Nov
+  return 'thankYou';
+}
+
 export default function RecLetters() {
   const [data, setData] = useState<RecLettersData>(DEFAULT_DATA);
   const [loading, setLoading] = useState(true);
+  const [grade, setGrade] = useState<number>(11);
 
   useEffect(() => {
     fetch('/api/student/recletters', { credentials: 'include' })
       .then(r => r.json())
       .then(d => { setData(d ?? DEFAULT_DATA); setLoading(false); })
       .catch(() => setLoading(false));
+    fetch('/api/student/profile', { credentials: 'include' })
+      .then(r => r.json())
+      .then(d => { if (d?.grade) setGrade(d.grade); })
+      .catch(() => {});
   }, []);
 
   function save(updated: RecLettersData) {
@@ -51,6 +65,8 @@ export default function RecLetters() {
 
   if (loading) return <div className={styles.page}><p>Loading…</p></div>;
 
+  const nextActionKey = getNextActionKey(grade);
+
   return (
     <div className={styles.page}>
       <h1 className={styles.title}>Rec Letters</h1>
@@ -58,13 +74,19 @@ export default function RecLetters() {
       <section className={styles.section}>
         <h2 className={styles.sectionTitle}>Rec Letter Checklist</h2>
         {CHECKLIST_ITEMS.map((item) => (
-          <ChecklistItem
-            key={item.key}
-            checked={data.checklist[item.key] ?? false}
-            label={item.label}
-            subtext={item.subtext}
-            onChange={(checked) => toggleItem(item.key, checked)}
-          />
+          <div key={item.key} style={{ position: 'relative' }}>
+            {item.key === nextActionKey && !data.checklist[item.key] && (
+              <div data-next-action style={{ position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)', background: '#e94560', color: '#fff', fontSize: '0.7rem', padding: '2px 6px', borderRadius: '4px', whiteSpace: 'nowrap' }}>
+                → Next Step
+              </div>
+            )}
+            <ChecklistItem
+              checked={data.checklist[item.key] ?? false}
+              label={item.label}
+              subtext={item.subtext}
+              onChange={(checked) => toggleItem(item.key, checked)}
+            />
+          </div>
         ))}
       </section>
 
