@@ -1,12 +1,12 @@
 ---
-id: "008"
-title: "CollegeNav Phase 5 — Reminders and Date-Aware Features"
-status: active
+id: 008
+title: "CollegeNav Phase 5 \u2014 Reminders and Date-Aware Features"
+status: done
 branch: sprint/008-collegenav-phase-5-reminders-and-date-aware-features
 use-cases:
-  - SUC-001
-  - SUC-002
-  - SUC-003
+- SUC-001
+- SUC-002
+- SUC-003
 ---
 
 # Sprint 008: CollegeNav Phase 5 — Reminders and Date-Aware Features
