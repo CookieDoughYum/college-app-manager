@@ -5,13 +5,15 @@ import styles from './Exams.module.css';
 interface ExamsData {
   testPreference: string | null;
   apCourses: string[];
+  aiRecommendations: Record<string, string>;
 }
 
-const DEFAULT_DATA: ExamsData = { testPreference: null, apCourses: [] };
+const DEFAULT_DATA: ExamsData = { testPreference: null, apCourses: [], aiRecommendations: {} };
 
 export default function Exams() {
   const [data, setData] = useState<ExamsData>(DEFAULT_DATA);
   const [loading, setLoading] = useState(true);
+  const [aiLoading, setAiLoading] = useState(false);
   const [addingAp, setAddingAp] = useState(false);
   const [apInput, setApInput] = useState('');
 
@@ -43,18 +45,43 @@ export default function Exams() {
     save({ ...data, apCourses: data.apCourses.filter(c => c !== course) });
   }
 
+  async function getRecommendation() {
+    setAiLoading(true);
+    try {
+      const res = await fetch('/api/ai/exams/recommend', { method: 'POST', credentials: 'include' });
+      const { result } = await res.json();
+      setData(prev => ({ ...prev, aiRecommendations: { ...prev.aiRecommendations, exam: result } }));
+    } finally {
+      setAiLoading(false);
+    }
+  }
+
   if (loading) return <div className={styles.page}><p>Loading…</p></div>;
+
+  const aiText = data.aiRecommendations?.exam;
 
   return (
     <div className={styles.page}>
       <h1 className={styles.title}>Exam Prep</h1>
 
       <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>SAT or ACT?</h2>
-        <div className={styles.satActBox}>
-          <p className={styles.satActPrompt}>Answer 5 quick questions to find out which test is right for you.</p>
-          <p className={styles.satActResult}>— Complete the questionnaire to see your recommendation —</p>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <h2 className={styles.sectionTitle}>SAT or ACT?</h2>
+          <button
+            onClick={getRecommendation}
+            disabled={aiLoading}
+            style={{ background: '#e94560', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.4rem 0.8rem', cursor: 'pointer' }}
+          >
+            {aiLoading ? 'Generating…' : 'Get Recommendation'}
+          </button>
         </div>
+        {aiText ? (
+          <pre style={{ whiteSpace: 'pre-wrap', fontFamily: 'inherit', color: '#ccc', lineHeight: 1.6, marginTop: '0.75rem' }}>{aiText}</pre>
+        ) : (
+          <div className={styles.satActBox}>
+            <p className={styles.satActPrompt}>Click "Get Recommendation" for a personalized SAT vs ACT recommendation.</p>
+          </div>
+        )}
       </section>
 
       <div className={styles.cardRow}>
@@ -73,34 +100,17 @@ export default function Exams() {
         <h2 className={styles.sectionTitle}>AP Exam Tracker</h2>
         <div className={styles.chipRow}>
           {data.apCourses.map((course) => (
-            <TagChip
-              key={course}
-              label={course}
-              selected={true}
-              onClick={() => removeApCourse(course)}
-            />
+            <TagChip key={course} label={course} selected={true} onClick={() => removeApCourse(course)} />
           ))}
           {addingAp ? (
             <span className={styles.apInputWrap}>
-              <input
-                autoFocus
-                className={styles.apInput}
-                value={apInput}
-                onChange={(e) => setApInput(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && addApCourse()}
-                placeholder="Course name"
-              />
+              <input autoFocus className={styles.apInput} value={apInput} onChange={(e) => setApInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && addApCourse()} placeholder="Course name" />
               <button className={styles.apAddBtn} onClick={addApCourse}>Add</button>
             </span>
           ) : (
             <button className={styles.addChip} onClick={() => setAddingAp(true)}>+ Add</button>
           )}
         </div>
-      </section>
-
-      <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Suggested Study Schedule</h2>
-        <p className={styles.placeholder}>Complete your profile to see a personalized study schedule.</p>
       </section>
 
       <div className={styles.warningBox}>

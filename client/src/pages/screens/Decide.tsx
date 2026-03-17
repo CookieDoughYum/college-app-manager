@@ -8,9 +8,10 @@ interface AdmissionResult {
 
 interface DecideData {
   decisions: AdmissionResult[];
+  aiRecommendations: Record<string, string>;
 }
 
-const DEFAULT_DATA: DecideData = { decisions: [] };
+const DEFAULT_DATA: DecideData = { decisions: [], aiRecommendations: {} };
 
 const STATUS_STYLE: Record<string, string> = {
   Accepted: styles.accepted,
@@ -21,6 +22,7 @@ const STATUS_STYLE: Record<string, string> = {
 export default function Decide() {
   const [data, setData] = useState<DecideData>(DEFAULT_DATA);
   const [loading, setLoading] = useState(true);
+  const [aiLoading, setAiLoading] = useState(false);
 
   useEffect(() => {
     fetch('/api/student/decide', { credentials: 'include' })
@@ -40,10 +42,23 @@ export default function Decide() {
   }
 
   function addResult() {
-    save({ decisions: [...data.decisions, { school: 'School Name', result: '' }] });
+    save({ ...data, decisions: [...data.decisions, { school: 'School Name', result: '' }] });
+  }
+
+  async function getComparison() {
+    setAiLoading(true);
+    try {
+      const res = await fetch('/api/ai/decide/compare', { method: 'POST', credentials: 'include' });
+      const { result } = await res.json();
+      setData(prev => ({ ...prev, aiRecommendations: { ...prev.aiRecommendations, comparison: result } }));
+    } finally {
+      setAiLoading(false);
+    }
   }
 
   if (loading) return <div className={styles.page}><p>Loading…</p></div>;
+
+  const aiText = data.aiRecommendations?.comparison;
 
   return (
     <div className={styles.page}>
@@ -71,10 +86,19 @@ export default function Decide() {
       </section>
 
       <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>AI Decision Helper</h2>
-        <div className={styles.helperBox}>
-          <p className={styles.helperNote}>Add your acceptance results above, then complete your profile to generate a personalized comparison.</p>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <h2 className={styles.sectionTitle}>AI Decision Helper</h2>
+          <button onClick={getComparison} disabled={aiLoading} style={{ background: '#e94560', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.4rem 0.8rem', cursor: 'pointer' }}>
+            {aiLoading ? 'Generating…' : 'Generate Comparison'}
+          </button>
         </div>
+        {aiText ? (
+          <pre style={{ whiteSpace: 'pre-wrap', fontFamily: 'inherit', color: '#ccc', lineHeight: 1.6, marginTop: '0.75rem' }}>{aiText}</pre>
+        ) : (
+          <div className={styles.helperBox}>
+            <p className={styles.helperNote}>Add at least 2 accepted schools above, then click "Generate Comparison" for a personalized pros/cons analysis.</p>
+          </div>
+        )}
       </section>
 
       <section className={styles.section}>

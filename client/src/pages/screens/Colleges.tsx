@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import TagChip from '../../components/TagChip';
 import BadgeLabel from '../../components/BadgeLabel';
 import styles from './Colleges.module.css';
 
@@ -12,15 +11,15 @@ interface CollegeEntry {
 interface CollegesData {
   majorAnswers: { salaryGoal: string; interestArea: string };
   collegeList: CollegeEntry[];
+  aiRecommendations: Record<string, string>;
 }
 
-const DEFAULT_DATA: CollegesData = { majorAnswers: { salaryGoal: '', interestArea: '' }, collegeList: [] };
-
-const RECOMMENDED_MAJORS = ['Computer Science', 'Biomedical Eng.', 'Data Science'];
+const DEFAULT_DATA: CollegesData = { majorAnswers: { salaryGoal: '', interestArea: '' }, collegeList: [], aiRecommendations: {} };
 
 export default function Colleges() {
   const [data, setData] = useState<CollegesData>(DEFAULT_DATA);
   const [loading, setLoading] = useState(true);
+  const [aiLoading, setAiLoading] = useState(false);
 
   useEffect(() => {
     fetch('/api/student/colleges', { credentials: 'include' })
@@ -40,15 +39,25 @@ export default function Colleges() {
   }
 
   function updateMajorAnswers(field: 'salaryGoal' | 'interestArea', value: string) {
-    const updated = { ...data, majorAnswers: { ...data.majorAnswers, [field]: value } };
-    setData(updated);
+    setData(prev => ({ ...prev, majorAnswers: { ...prev.majorAnswers, [field]: value } }));
   }
 
-  function saveMajorAnswers() {
-    save(data);
+  function saveMajorAnswers() { save(data); }
+
+  async function getMajorRecommendations() {
+    setAiLoading(true);
+    try {
+      const res = await fetch('/api/ai/colleges/recommend', { method: 'POST', credentials: 'include' });
+      const { result } = await res.json();
+      setData(prev => ({ ...prev, aiRecommendations: { ...prev.aiRecommendations, majors: result } }));
+    } finally {
+      setAiLoading(false);
+    }
   }
 
   if (loading) return <div className={styles.page}><p>Loading…</p></div>;
+
+  const aiText = data.aiRecommendations?.majors;
 
   return (
     <div className={styles.page}>
@@ -59,36 +68,27 @@ export default function Colleges() {
         <div className={styles.fieldRow}>
           <div className={styles.field}>
             <label className={styles.label}>Salary Goal (annual)</label>
-            <input
-              className={styles.input}
-              type="text"
-              placeholder="e.g. $80,000"
-              value={data.majorAnswers.salaryGoal}
-              onChange={(e) => updateMajorAnswers('salaryGoal', e.target.value)}
-              onBlur={saveMajorAnswers}
-            />
+            <input className={styles.input} type="text" placeholder="e.g. $80,000" value={data.majorAnswers.salaryGoal} onChange={(e) => updateMajorAnswers('salaryGoal', e.target.value)} onBlur={saveMajorAnswers} />
           </div>
           <div className={styles.field}>
             <label className={styles.label}>Professional Interest Area</label>
-            <input
-              className={styles.input}
-              type="text"
-              placeholder="e.g. Healthcare, Engineering"
-              value={data.majorAnswers.interestArea}
-              onChange={(e) => updateMajorAnswers('interestArea', e.target.value)}
-              onBlur={saveMajorAnswers}
-            />
+            <input className={styles.input} type="text" placeholder="e.g. Healthcare, Engineering" value={data.majorAnswers.interestArea} onChange={(e) => updateMajorAnswers('interestArea', e.target.value)} onBlur={saveMajorAnswers} />
           </div>
         </div>
       </section>
 
       <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Recommended Majors</h2>
-        <div className={styles.chipRow}>
-          {RECOMMENDED_MAJORS.map((major) => (
-            <TagChip key={major} label={major} selected={false} onClick={() => {}} />
-          ))}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <h2 className={styles.sectionTitle}>Recommended Majors</h2>
+          <button onClick={getMajorRecommendations} disabled={aiLoading} style={{ background: '#e94560', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.4rem 0.8rem', cursor: 'pointer' }}>
+            {aiLoading ? 'Generating…' : 'Get Major Recommendations'}
+          </button>
         </div>
+        {aiText ? (
+          <pre style={{ whiteSpace: 'pre-wrap', fontFamily: 'inherit', color: '#ccc', lineHeight: 1.6, marginTop: '0.75rem' }}>{aiText}</pre>
+        ) : (
+          <p style={{ color: '#888' }}>Fill in your salary goal and interest area, then click "Get Major Recommendations".</p>
+        )}
       </section>
 
       <section className={styles.section}>

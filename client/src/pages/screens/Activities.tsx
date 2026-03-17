@@ -14,13 +14,15 @@ const GRADE_COLUMNS = [
 interface ActivitiesData {
   interests: string[];
   coursePlan: Record<string, string[]>;
+  aiRecommendations: Record<string, string>;
 }
 
-const DEFAULT_DATA: ActivitiesData = { interests: [], coursePlan: {} };
+const DEFAULT_DATA: ActivitiesData = { interests: [], coursePlan: {}, aiRecommendations: {} };
 
 export default function Activities() {
   const [data, setData] = useState<ActivitiesData>(DEFAULT_DATA);
   const [loading, setLoading] = useState(true);
+  const [aiLoading, setAiLoading] = useState(false);
   const [gpa, setGpa] = useState('');
   const [sat, setSat] = useState('');
   const [act, setAct] = useState('');
@@ -49,7 +51,20 @@ export default function Activities() {
     save({ ...data, interests });
   }
 
+  async function getRecommendations() {
+    setAiLoading(true);
+    try {
+      const res = await fetch('/api/ai/activities/recommend', { method: 'POST', credentials: 'include' });
+      const { result } = await res.json();
+      setData(prev => ({ ...prev, aiRecommendations: { ...prev.aiRecommendations, activities: result } }));
+    } finally {
+      setAiLoading(false);
+    }
+  }
+
   if (loading) return <div className={styles.page}><p>Loading…</p></div>;
+
+  const aiText = data.aiRecommendations?.activities;
 
   return (
     <div className={styles.page}>
@@ -74,42 +89,37 @@ export default function Activities() {
         <div className={styles.fieldRow}>
           <div className={styles.field}>
             <label className={styles.label}>GPA</label>
-            <input
-              className={styles.input}
-              type="text"
-              placeholder="e.g. 3.8"
-              value={gpa}
-              onChange={(e) => setGpa(e.target.value)}
-            />
+            <input className={styles.input} type="text" placeholder="e.g. 3.8" value={gpa} onChange={(e) => setGpa(e.target.value)} />
           </div>
           <div className={styles.field}>
             <label className={styles.label}>SAT Score</label>
-            <input
-              className={styles.input}
-              type="text"
-              placeholder="e.g. 1400"
-              value={sat}
-              onChange={(e) => setSat(e.target.value)}
-            />
+            <input className={styles.input} type="text" placeholder="e.g. 1400" value={sat} onChange={(e) => setSat(e.target.value)} />
           </div>
           <div className={styles.field}>
             <label className={styles.label}>ACT Score</label>
-            <input
-              className={styles.input}
-              type="text"
-              placeholder="e.g. 31"
-              value={act}
-              onChange={(e) => setAct(e.target.value)}
-            />
+            <input className={styles.input} type="text" placeholder="e.g. 31" value={act} onChange={(e) => setAct(e.target.value)} />
           </div>
         </div>
       </section>
 
       <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>AI Recommendations</h2>
-        <div className={styles.placeholder}>
-          Complete the questionnaire above to see personalized recommendations for Extracurriculars and Summer Programs.
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <h2 className={styles.sectionTitle}>AI Recommendations</h2>
+          <button
+            onClick={getRecommendations}
+            disabled={aiLoading}
+            style={{ background: '#e94560', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.4rem 0.8rem', cursor: 'pointer' }}
+          >
+            {aiLoading ? 'Generating…' : 'Get Recommendations'}
+          </button>
         </div>
+        {aiText ? (
+          <pre style={{ whiteSpace: 'pre-wrap', fontFamily: 'inherit', color: '#ccc', lineHeight: 1.6 }}>{aiText}</pre>
+        ) : (
+          <div className={styles.placeholder}>
+            Select your interests above and click "Get Recommendations" to see personalized suggestions.
+          </div>
+        )}
       </section>
 
       <section className={styles.section}>

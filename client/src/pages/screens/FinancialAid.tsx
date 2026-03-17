@@ -5,19 +5,6 @@ import styles from './FinancialAid.module.css';
 
 const PROFILE_TAGS = ['First-gen', 'STEM', 'California resident', 'Community service'];
 
-const SCHOLARSHIPS = [
-  { name: 'Gates Scholarship', amount: 'Up to full cost', deadline: 'September 15', deadlineVariant: 'red' as const },
-  { name: 'Dell Scholars Program', amount: '$20,000 total', deadline: 'December 1', deadlineVariant: 'amber' as const },
-  { name: 'Local Community Foundation', amount: 'Varies', deadline: 'March 1', deadlineVariant: 'green' as const },
-];
-
-const BADGE_STYLES: Record<string, string> = {
-  red: styles.badgeRed,
-  amber: styles.badgeAmber,
-  green: styles.badgeGreen,
-};
-
-const FAFSA_KEYS = ['fafsa', 'css'];
 const FAFSA_ITEMS = [
   { key: 'fafsa', label: 'Parents/guardian completed FAFSA', subtext: 'studentaid.gov — opens October 1' },
   { key: 'css', label: 'Parents/guardian completed CSS Profile', subtext: 'cssprofile.collegeboard.org — required by many private colleges' },
@@ -26,13 +13,15 @@ const FAFSA_ITEMS = [
 interface FinancialAidData {
   fafsaChecklist: Record<string, boolean>;
   scholarshipAnswers: Record<string, boolean>;
+  aiRecommendations: Record<string, string>;
 }
 
-const DEFAULT_DATA: FinancialAidData = { fafsaChecklist: {}, scholarshipAnswers: {} };
+const DEFAULT_DATA: FinancialAidData = { fafsaChecklist: {}, scholarshipAnswers: {}, aiRecommendations: {} };
 
 export default function FinancialAid() {
   const [data, setData] = useState<FinancialAidData>(DEFAULT_DATA);
   const [loading, setLoading] = useState(true);
+  const [aiLoading, setAiLoading] = useState(false);
 
   useEffect(() => {
     fetch('/api/student/financialaid', { credentials: 'include' })
@@ -60,7 +49,20 @@ export default function FinancialAid() {
     save({ ...data, scholarshipAnswers: { ...data.scholarshipAnswers, [key]: !data.scholarshipAnswers[key] } });
   }
 
+  async function findScholarships() {
+    setAiLoading(true);
+    try {
+      const res = await fetch('/api/ai/financialaid/scholarships', { method: 'POST', credentials: 'include' });
+      const { result } = await res.json();
+      setData(prev => ({ ...prev, aiRecommendations: { ...prev.aiRecommendations, scholarships: result } }));
+    } finally {
+      setAiLoading(false);
+    }
+  }
+
   if (loading) return <div className={styles.page}><p>Loading…</p></div>;
+
+  const aiText = data.aiRecommendations?.scholarships;
 
   return (
     <div className={styles.page}>
@@ -73,43 +75,29 @@ export default function FinancialAid() {
       <section className={styles.section}>
         <h2 className={styles.sectionTitle}>FAFSA &amp; CSS Checklist</h2>
         {FAFSA_ITEMS.map((item) => (
-          <ChecklistItem
-            key={item.key}
-            checked={data.fafsaChecklist[item.key] ?? false}
-            label={item.label}
-            subtext={item.subtext}
-            onChange={(checked) => toggleFafsa(item.key, checked)}
-          />
+          <ChecklistItem key={item.key} checked={data.fafsaChecklist[item.key] ?? false} label={item.label} subtext={item.subtext} onChange={(checked) => toggleFafsa(item.key, checked)} />
         ))}
       </section>
 
       <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Recommended Scholarships</h2>
-        <p className={styles.profileNote}>Based on your profile:</p>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <h2 className={styles.sectionTitle}>Recommended Scholarships</h2>
+          <button onClick={findScholarships} disabled={aiLoading} style={{ background: '#e94560', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.4rem 0.8rem', cursor: 'pointer' }}>
+            {aiLoading ? 'Finding…' : 'Find Scholarships'}
+          </button>
+        </div>
+        <p className={styles.profileNote}>Select your profile tags to get matched scholarships:</p>
         <div className={styles.chipRow}>
           {PROFILE_TAGS.map((tag) => {
             const key = tag.toLowerCase().replace(/\s+/g, '_');
-            return (
-              <TagChip
-                key={tag}
-                label={tag}
-                selected={data.scholarshipAnswers[key] ?? false}
-                onClick={() => toggleScholarshipTag(tag)}
-              />
-            );
+            return <TagChip key={tag} label={tag} selected={data.scholarshipAnswers[key] ?? false} onClick={() => toggleScholarshipTag(tag)} />;
           })}
         </div>
-        <div className={styles.scholarshipList}>
-          {SCHOLARSHIPS.map((s) => (
-            <div key={s.name} className={styles.scholarshipCard}>
-              <div className={styles.scholarshipName}>{s.name}</div>
-              <div className={styles.scholarshipAmount}>{s.amount}</div>
-              <span className={`${styles.deadlineBadge} ${BADGE_STYLES[s.deadlineVariant]}`}>
-                Deadline: {s.deadline}
-              </span>
-            </div>
-          ))}
-        </div>
+        {aiText ? (
+          <pre style={{ whiteSpace: 'pre-wrap', fontFamily: 'inherit', color: '#ccc', lineHeight: 1.6, marginTop: '0.75rem' }}>{aiText}</pre>
+        ) : (
+          <p style={{ color: '#888', marginTop: '0.75rem' }}>Select your profile tags and click "Find Scholarships" to see AI-matched scholarships.</p>
+        )}
       </section>
     </div>
   );
