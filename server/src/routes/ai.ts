@@ -297,3 +297,39 @@ Page text: ${pageText}`;
     res.json({ result: summary, deadlines });
   } catch (err) { next(err); }
 });
+
+// --- Exams: AP study schedule ---
+
+aiRouter.post('/exams/schedule', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const studentId = sid(req);
+    const exams = await prisma.studentExams.findUnique({ where: { studentId } });
+    const apCourses = Array.isArray(exams?.apCourses) ? (exams.apCourses as string[]) : [];
+
+    const now = new Date();
+    const nextMay = new Date(now.getFullYear(), 4, 1); // May 1
+    if (nextMay < now) nextMay.setFullYear(now.getFullYear() + 1);
+    const weeksUntil = Math.ceil((nextMay.getTime() - now.getTime()) / (1000 * 60 * 60 * 24 * 7));
+    const planWeeks = Math.min(weeksUntil, 12);
+
+    const prompt = `You are a study coach for a high school student taking AP exams in May.
+AP courses: ${apCourses.join(', ') || 'not specified'}
+Weeks until exams: ${weeksUntil}
+
+Create a week-by-week study plan for the next ${planWeeks} weeks.
+For each week, specify: which course(s) to focus on and 1–2 specific study tasks.
+Format as a numbered list (Week 1: ..., Week 2: ...).`;
+
+    const result = await askClaude(prompt);
+
+    const existing = await prisma.studentExams.findUnique({ where: { studentId } });
+    const currentRecs = (existing?.aiRecommendations as Record<string, any>) ?? {};
+    await prisma.studentExams.upsert({
+      where: { studentId },
+      create: { studentId, aiRecommendations: { ...currentRecs, schedule: result } },
+      update: { aiRecommendations: { ...currentRecs, schedule: result } },
+    });
+
+    res.json({ result });
+  } catch (err) { next(err); }
+});

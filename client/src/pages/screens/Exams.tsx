@@ -14,6 +14,7 @@ export default function Exams() {
   const [data, setData] = useState<ExamsData>(DEFAULT_DATA);
   const [loading, setLoading] = useState(true);
   const [aiLoading, setAiLoading] = useState(false);
+  const [scheduleLoading, setScheduleLoading] = useState(false);
   const [addingAp, setAddingAp] = useState(false);
   const [apInput, setApInput] = useState('');
 
@@ -56,9 +57,21 @@ export default function Exams() {
     }
   }
 
+  async function generateSchedule() {
+    setScheduleLoading(true);
+    try {
+      const res = await fetch('/api/ai/exams/schedule', { method: 'POST', credentials: 'include' });
+      const { result } = await res.json();
+      setData(prev => ({ ...prev, aiRecommendations: { ...prev.aiRecommendations, schedule: result } }));
+    } finally {
+      setScheduleLoading(false);
+    }
+  }
+
   if (loading) return <div className={styles.page}><p>Loading…</p></div>;
 
   const aiText = data.aiRecommendations?.exam;
+  const scheduleText = data.aiRecommendations?.schedule;
 
   return (
     <div className={styles.page}>
@@ -111,6 +124,24 @@ export default function Exams() {
             <button className={styles.addChip} onClick={() => setAddingAp(true)}>+ Add</button>
           )}
         </div>
+      </section>
+
+      <section className={styles.section}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <h2 className={styles.sectionTitle}>AP Study Schedule</h2>
+          <button
+            onClick={generateSchedule}
+            disabled={scheduleLoading}
+            style={{ background: '#0f3460', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.4rem 0.8rem', cursor: 'pointer' }}
+          >
+            {scheduleLoading ? 'Generating…' : 'Generate Study Schedule'}
+          </button>
+        </div>
+        {scheduleText ? (
+          <pre style={{ whiteSpace: 'pre-wrap', fontFamily: 'inherit', color: '#ccc', lineHeight: 1.6, marginTop: '0.75rem' }}>{scheduleText}</pre>
+        ) : (
+          <p style={{ color: '#888', marginTop: '0.5rem' }}>Add AP courses above, then click "Generate Study Schedule" for a week-by-week plan.</p>
+        )}
       </section>
 
       <div className={styles.warningBox}>

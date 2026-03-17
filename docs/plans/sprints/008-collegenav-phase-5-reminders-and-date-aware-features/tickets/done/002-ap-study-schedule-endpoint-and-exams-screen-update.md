@@ -1,9 +1,9 @@
 ---
-id: "002"
-title: "AP study schedule endpoint and Exams screen update"
-status: todo
+id: '002'
+title: AP study schedule endpoint and Exams screen update
+status: in-progress
 use-cases:
-  - SUC-002
+- SUC-002
 depends-on: []
 ---
 
@@ -27,11 +27,11 @@ Update `client/src/pages/screens/Exams.tsx` to:
 
 ## Acceptance Criteria
 
-- [ ] `POST /api/ai/exams/schedule` returns 401 without auth
-- [ ] Returns `{ result: string }` with auth
-- [ ] Result is cached in `StudentExams.aiRecommendations.schedule`
-- [ ] Exams screen shows "Generate Study Schedule" button
-- [ ] Schedule displayed on page reload from cache
+- [x] `POST /api/ai/exams/schedule` returns 401 without auth
+- [x] Returns `{ result: string }` with auth
+- [x] Result is cached in `StudentExams.aiRecommendations.schedule`
+- [x] Exams screen shows "Generate Study Schedule" button
+- [x] Schedule displayed on page reload from cache
 
 ## Testing
 
