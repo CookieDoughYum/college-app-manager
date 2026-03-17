@@ -14,7 +14,9 @@ export default function Exams() {
   const [data, setData] = useState<ExamsData>(DEFAULT_DATA);
   const [loading, setLoading] = useState(true);
   const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState('');
   const [scheduleLoading, setScheduleLoading] = useState(false);
+  const [scheduleError, setScheduleError] = useState('');
   const [addingAp, setAddingAp] = useState(false);
   const [apInput, setApInput] = useState('');
 
@@ -48,10 +50,14 @@ export default function Exams() {
 
   async function getRecommendation() {
     setAiLoading(true);
+    setAiError('');
     try {
       const res = await fetch('/api/ai/exams/recommend', { method: 'POST', credentials: 'include' });
+      if (!res.ok) throw new Error('Server error');
       const { result } = await res.json();
       setData(prev => ({ ...prev, aiRecommendations: { ...prev.aiRecommendations, exam: result } }));
+    } catch {
+      setAiError('Could not generate recommendations — please try again.');
     } finally {
       setAiLoading(false);
     }
@@ -59,10 +65,14 @@ export default function Exams() {
 
   async function generateSchedule() {
     setScheduleLoading(true);
+    setScheduleError('');
     try {
       const res = await fetch('/api/ai/exams/schedule', { method: 'POST', credentials: 'include' });
+      if (!res.ok) throw new Error('Server error');
       const { result } = await res.json();
       setData(prev => ({ ...prev, aiRecommendations: { ...prev.aiRecommendations, schedule: result } }));
+    } catch {
+      setScheduleError('Could not generate schedule — please try again.');
     } finally {
       setScheduleLoading(false);
     }
@@ -88,6 +98,7 @@ export default function Exams() {
             {aiLoading ? 'Generating…' : 'Get Recommendation'}
           </button>
         </div>
+        {aiError && <p style={{ color: '#e94560' }}>{aiError}</p>}
         {aiText ? (
           <pre style={{ whiteSpace: 'pre-wrap', fontFamily: 'inherit', color: '#ccc', lineHeight: 1.6, marginTop: '0.75rem' }}>{aiText}</pre>
         ) : (
@@ -137,6 +148,7 @@ export default function Exams() {
             {scheduleLoading ? 'Generating…' : 'Generate Study Schedule'}
           </button>
         </div>
+        {scheduleError && <p style={{ color: '#e94560' }}>{scheduleError}</p>}
         {scheduleText ? (
           <pre style={{ whiteSpace: 'pre-wrap', fontFamily: 'inherit', color: '#ccc', lineHeight: 1.6, marginTop: '0.75rem' }}>{scheduleText}</pre>
         ) : (

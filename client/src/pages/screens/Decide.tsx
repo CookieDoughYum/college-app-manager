@@ -23,6 +23,7 @@ export default function Decide() {
   const [data, setData] = useState<DecideData>(DEFAULT_DATA);
   const [loading, setLoading] = useState(true);
   const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState('');
 
   useEffect(() => {
     fetch('/api/student/decide', { credentials: 'include' })
@@ -47,10 +48,14 @@ export default function Decide() {
 
   async function getComparison() {
     setAiLoading(true);
+    setAiError('');
     try {
       const res = await fetch('/api/ai/decide/compare', { method: 'POST', credentials: 'include' });
+      if (!res.ok) throw new Error('Server error');
       const { result } = await res.json();
       setData(prev => ({ ...prev, aiRecommendations: { ...prev.aiRecommendations, comparison: result } }));
+    } catch {
+      setAiError('Could not generate recommendations — please try again.');
     } finally {
       setAiLoading(false);
     }
@@ -92,6 +97,7 @@ export default function Decide() {
             {aiLoading ? 'Generating…' : 'Generate Comparison'}
           </button>
         </div>
+        {aiError && <p style={{ color: '#e94560' }}>{aiError}</p>}
         {aiText ? (
           <pre style={{ whiteSpace: 'pre-wrap', fontFamily: 'inherit', color: '#ccc', lineHeight: 1.6, marginTop: '0.75rem' }}>{aiText}</pre>
         ) : (

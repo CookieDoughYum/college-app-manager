@@ -23,6 +23,7 @@ export default function Activities() {
   const [data, setData] = useState<ActivitiesData>(DEFAULT_DATA);
   const [loading, setLoading] = useState(true);
   const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState('');
   const [gpa, setGpa] = useState('');
   const [sat, setSat] = useState('');
   const [act, setAct] = useState('');
@@ -53,10 +54,14 @@ export default function Activities() {
 
   async function getRecommendations() {
     setAiLoading(true);
+    setAiError('');
     try {
       const res = await fetch('/api/ai/activities/recommend', { method: 'POST', credentials: 'include' });
+      if (!res.ok) throw new Error('Server error');
       const { result } = await res.json();
       setData(prev => ({ ...prev, aiRecommendations: { ...prev.aiRecommendations, activities: result } }));
+    } catch {
+      setAiError('Could not generate recommendations — please try again.');
     } finally {
       setAiLoading(false);
     }
@@ -113,6 +118,7 @@ export default function Activities() {
             {aiLoading ? 'Generating…' : 'Get Recommendations'}
           </button>
         </div>
+        {aiError && <p style={{ color: '#e94560' }}>{aiError}</p>}
         {aiText ? (
           <pre style={{ whiteSpace: 'pre-wrap', fontFamily: 'inherit', color: '#ccc', lineHeight: 1.6 }}>{aiText}</pre>
         ) : (

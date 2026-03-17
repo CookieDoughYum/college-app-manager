@@ -22,6 +22,7 @@ export default function FinancialAid() {
   const [data, setData] = useState<FinancialAidData>(DEFAULT_DATA);
   const [loading, setLoading] = useState(true);
   const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState('');
 
   useEffect(() => {
     fetch('/api/student/financialaid', { credentials: 'include' })
@@ -51,10 +52,14 @@ export default function FinancialAid() {
 
   async function findScholarships() {
     setAiLoading(true);
+    setAiError('');
     try {
       const res = await fetch('/api/ai/financialaid/scholarships', { method: 'POST', credentials: 'include' });
+      if (!res.ok) throw new Error('Server error');
       const { result } = await res.json();
       setData(prev => ({ ...prev, aiRecommendations: { ...prev.aiRecommendations, scholarships: result } }));
+    } catch {
+      setAiError('Could not generate recommendations — please try again.');
     } finally {
       setAiLoading(false);
     }
@@ -93,6 +98,7 @@ export default function FinancialAid() {
             return <TagChip key={tag} label={tag} selected={data.scholarshipAnswers[key] ?? false} onClick={() => toggleScholarshipTag(tag)} />;
           })}
         </div>
+        {aiError && <p style={{ color: '#e94560' }}>{aiError}</p>}
         {aiText ? (
           <pre style={{ whiteSpace: 'pre-wrap', fontFamily: 'inherit', color: '#ccc', lineHeight: 1.6, marginTop: '0.75rem' }}>{aiText}</pre>
         ) : (

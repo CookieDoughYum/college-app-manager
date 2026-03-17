@@ -20,6 +20,7 @@ export default function Colleges() {
   const [data, setData] = useState<CollegesData>(DEFAULT_DATA);
   const [loading, setLoading] = useState(true);
   const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState('');
 
   useEffect(() => {
     fetch('/api/student/colleges', { credentials: 'include' })
@@ -46,10 +47,14 @@ export default function Colleges() {
 
   async function getMajorRecommendations() {
     setAiLoading(true);
+    setAiError('');
     try {
       const res = await fetch('/api/ai/colleges/recommend', { method: 'POST', credentials: 'include' });
+      if (!res.ok) throw new Error('Server error');
       const { result } = await res.json();
       setData(prev => ({ ...prev, aiRecommendations: { ...prev.aiRecommendations, majors: result } }));
+    } catch {
+      setAiError('Could not generate recommendations — please try again.');
     } finally {
       setAiLoading(false);
     }
@@ -84,6 +89,7 @@ export default function Colleges() {
             {aiLoading ? 'Generating…' : 'Get Major Recommendations'}
           </button>
         </div>
+        {aiError && <p style={{ color: '#e94560' }}>{aiError}</p>}
         {aiText ? (
           <pre style={{ whiteSpace: 'pre-wrap', fontFamily: 'inherit', color: '#ccc', lineHeight: 1.6, marginTop: '0.75rem' }}>{aiText}</pre>
         ) : (

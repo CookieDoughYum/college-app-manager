@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import Dashboard from '../src/pages/Dashboard';
 import { StudentContext } from '../src/contexts/StudentContext';
 
@@ -23,6 +23,11 @@ function renderDashboard() {
 }
 
 describe('Dashboard', () => {
+  beforeEach(() => {
+    // Suppress the onboarding overlay so it doesn't interfere with dashboard assertions
+    localStorage.setItem('collegenav_onboarded', '1');
+  });
+
   it('renders welcome message with student name from context', () => {
     renderDashboard();
     expect(screen.getByText(/welcome back, jane smith/i)).toBeInTheDocument();

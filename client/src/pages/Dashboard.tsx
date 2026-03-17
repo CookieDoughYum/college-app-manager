@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useStudent } from '../contexts/StudentContext';
 import ProgressCard from '../components/ProgressCard';
+import OnboardingOverlay from '../components/OnboardingOverlay';
 import styles from './Dashboard.module.css';
 
 interface Progress {
@@ -50,6 +51,7 @@ export default function Dashboard() {
 
   return (
     <div className={styles.page}>
+      <OnboardingOverlay grade={student?.grade ?? 9} />
       <div className={styles.header}>
         <h1 className={styles.welcome}>Welcome back, {student?.name ?? 'Student'}</h1>
         <p className={styles.subtitle}>{student?.highSchool}</p>

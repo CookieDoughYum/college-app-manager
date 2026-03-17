@@ -9,3 +9,52 @@
   padding: 32px;
   overflow-y: auto;
 }
+
+.sidebarWrap {
+  display: contents;
+}
+
+.hamburger {
+  display: none;
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 300;
+  background: #1a1a2e;
+  color: white;
+  border: none;
+  font-size: 20px;
+  padding: 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.overlay {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .hamburger {
+    display: block;
+  }
+
+  .main {
+    padding: 56px 16px 16px;
+  }
+
+  .overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 150;
+  }
+
+  .sidebarWrap aside {
+    display: none;
+  }
+
+  .open aside {
+    display: flex !important;
+  }
+}

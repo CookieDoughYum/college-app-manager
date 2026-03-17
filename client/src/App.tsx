@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { StudentProvider } from './contexts/StudentContext';
+import ErrorBoundary from './components/ErrorBoundary';
 import AuthLayout from './layouts/AuthLayout';
 import AppLayout from './layouts/AppLayout';
 import Login from './pages/auth/Login';
@@ -25,9 +26,10 @@ import SessionViewer from './pages/admin/SessionViewer';
 
 function App() {
   return (
-    <StudentProvider>
-      <BrowserRouter>
-        <Routes>
+    <ErrorBoundary>
+      <StudentProvider>
+        <BrowserRouter>
+          <Routes>
           {/* Public auth routes */}
           <Route element={<AuthLayout />}>
             <Route path="/login" element={<Login />} />
@@ -60,9 +62,10 @@ function App() {
             <Route path="/admin/logs" element={<LogViewer />} />
             <Route path="/admin/sessions" element={<SessionViewer />} />
           </Route>
-        </Routes>
-      </BrowserRouter>
-    </StudentProvider>
+          </Routes>
+        </BrowserRouter>
+      </StudentProvider>
+    </ErrorBoundary>
   );
 }
 
