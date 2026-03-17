@@ -10,7 +10,7 @@ const studentId = (req: Request) => (req.user as any).id as number;
 
 // --- Profile ---
 
-studentRouter.get('/student/profile', async (req: Request, res: Response, next: NextFunction) => {
+studentRouter.get('/profile', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const student = await prisma.student.findUnique({
       where: { id: studentId(req) },
@@ -20,7 +20,7 @@ studentRouter.get('/student/profile', async (req: Request, res: Response, next: 
   } catch (err) { next(err); }
 });
 
-studentRouter.put('/student/profile', async (req: Request, res: Response, next: NextFunction) => {
+studentRouter.put('/profile', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { name, highSchool, grade } = req.body;
     const updated = await prisma.student.update({
@@ -34,7 +34,7 @@ studentRouter.put('/student/profile', async (req: Request, res: Response, next: 
 
 // --- Activities ---
 
-studentRouter.get('/student/activities', async (req: Request, res: Response, next: NextFunction) => {
+studentRouter.get('/activities', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const data = await prisma.studentActivities.upsert({
       where: { studentId: studentId(req) },
@@ -45,7 +45,7 @@ studentRouter.get('/student/activities', async (req: Request, res: Response, nex
   } catch (err) { next(err); }
 });
 
-studentRouter.put('/student/activities', async (req: Request, res: Response, next: NextFunction) => {
+studentRouter.put('/activities', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { interests, coursePlan } = req.body;
     await prisma.studentActivities.upsert({
@@ -59,7 +59,7 @@ studentRouter.put('/student/activities', async (req: Request, res: Response, nex
 
 // --- Exams ---
 
-studentRouter.get('/student/exams', async (req: Request, res: Response, next: NextFunction) => {
+studentRouter.get('/exams', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const data = await prisma.studentExams.upsert({
       where: { studentId: studentId(req) },
@@ -70,7 +70,7 @@ studentRouter.get('/student/exams', async (req: Request, res: Response, next: Ne
   } catch (err) { next(err); }
 });
 
-studentRouter.put('/student/exams', async (req: Request, res: Response, next: NextFunction) => {
+studentRouter.put('/exams', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { testPreference, apCourses } = req.body;
     await prisma.studentExams.upsert({
@@ -84,7 +84,7 @@ studentRouter.put('/student/exams', async (req: Request, res: Response, next: Ne
 
 // --- Colleges ---
 
-studentRouter.get('/student/colleges', async (req: Request, res: Response, next: NextFunction) => {
+studentRouter.get('/colleges', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const data = await prisma.studentColleges.upsert({
       where: { studentId: studentId(req) },
@@ -95,7 +95,7 @@ studentRouter.get('/student/colleges', async (req: Request, res: Response, next:
   } catch (err) { next(err); }
 });
 
-studentRouter.put('/student/colleges', async (req: Request, res: Response, next: NextFunction) => {
+studentRouter.put('/colleges', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { majorAnswers, collegeList } = req.body;
     await prisma.studentColleges.upsert({
@@ -109,7 +109,7 @@ studentRouter.put('/student/colleges', async (req: Request, res: Response, next:
 
 // --- Essays ---
 
-studentRouter.get('/student/essays', async (req: Request, res: Response, next: NextFunction) => {
+studentRouter.get('/essays', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const data = await prisma.studentEssays.upsert({
       where: { studentId: studentId(req) },
@@ -120,7 +120,7 @@ studentRouter.get('/student/essays', async (req: Request, res: Response, next: N
   } catch (err) { next(err); }
 });
 
-studentRouter.put('/student/essays', async (req: Request, res: Response, next: NextFunction) => {
+studentRouter.put('/essays', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { driveLink, notes } = req.body;
     await prisma.studentEssays.upsert({
@@ -134,7 +134,7 @@ studentRouter.put('/student/essays', async (req: Request, res: Response, next: N
 
 // --- Rec Letters ---
 
-studentRouter.get('/student/recletters', async (req: Request, res: Response, next: NextFunction) => {
+studentRouter.get('/recletters', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const data = await prisma.studentRecLetters.upsert({
       where: { studentId: studentId(req) },
@@ -145,7 +145,7 @@ studentRouter.get('/student/recletters', async (req: Request, res: Response, nex
   } catch (err) { next(err); }
 });
 
-studentRouter.put('/student/recletters', async (req: Request, res: Response, next: NextFunction) => {
+studentRouter.put('/recletters', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { checklist, teachers } = req.body;
     await prisma.studentRecLetters.upsert({
@@ -159,7 +159,7 @@ studentRouter.put('/student/recletters', async (req: Request, res: Response, nex
 
 // --- Portals ---
 
-studentRouter.get('/student/portals', async (req: Request, res: Response, next: NextFunction) => {
+studentRouter.get('/portals', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const data = await prisma.studentPortals.upsert({
       where: { studentId: studentId(req) },
@@ -170,7 +170,7 @@ studentRouter.get('/student/portals', async (req: Request, res: Response, next: 
   } catch (err) { next(err); }
 });
 
-studentRouter.put('/student/portals', async (req: Request, res: Response, next: NextFunction) => {
+studentRouter.put('/portals', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { portals } = req.body;
     await prisma.studentPortals.upsert({
@@ -184,7 +184,7 @@ studentRouter.put('/student/portals', async (req: Request, res: Response, next: 
 
 // --- Decide ---
 
-studentRouter.get('/student/decide', async (req: Request, res: Response, next: NextFunction) => {
+studentRouter.get('/decide', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const data = await prisma.studentDecide.upsert({
       where: { studentId: studentId(req) },
@@ -195,7 +195,7 @@ studentRouter.get('/student/decide', async (req: Request, res: Response, next: N
   } catch (err) { next(err); }
 });
 
-studentRouter.put('/student/decide', async (req: Request, res: Response, next: NextFunction) => {
+studentRouter.put('/decide', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { decisions } = req.body;
     await prisma.studentDecide.upsert({
@@ -209,7 +209,7 @@ studentRouter.put('/student/decide', async (req: Request, res: Response, next: N
 
 // --- Financial Aid ---
 
-studentRouter.get('/student/financialaid', async (req: Request, res: Response, next: NextFunction) => {
+studentRouter.get('/financialaid', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const data = await prisma.studentFinancialAid.upsert({
       where: { studentId: studentId(req) },
@@ -220,7 +220,7 @@ studentRouter.get('/student/financialaid', async (req: Request, res: Response, n
   } catch (err) { next(err); }
 });
 
-studentRouter.put('/student/financialaid', async (req: Request, res: Response, next: NextFunction) => {
+studentRouter.put('/financialaid', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { fafsaChecklist, scholarshipAnswers } = req.body;
     await prisma.studentFinancialAid.upsert({
@@ -234,7 +234,7 @@ studentRouter.put('/student/financialaid', async (req: Request, res: Response, n
 
 // --- Deadlines ---
 
-studentRouter.get('/student/deadlines', async (req: Request, res: Response, next: NextFunction) => {
+studentRouter.get('/deadlines', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const data = await prisma.studentDeadlines.upsert({
       where: { studentId: studentId(req) },
@@ -245,7 +245,7 @@ studentRouter.get('/student/deadlines', async (req: Request, res: Response, next
   } catch (err) { next(err); }
 });
 
-studentRouter.put('/student/deadlines', async (req: Request, res: Response, next: NextFunction) => {
+studentRouter.put('/deadlines', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { manualDeadlines } = req.body;
     await prisma.studentDeadlines.upsert({
@@ -259,7 +259,7 @@ studentRouter.put('/student/deadlines', async (req: Request, res: Response, next
 
 // --- Progress ---
 
-studentRouter.get('/student/progress', async (req: Request, res: Response, next: NextFunction) => {
+studentRouter.get('/progress', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const sid = studentId(req);
     const [acts, exams, colleges, essays, recs, portals, decide, aid, deadlines] = await Promise.all([

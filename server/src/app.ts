@@ -86,7 +86,7 @@ app.use('/api', healthRouter);
 app.use('/api', counterRouter);
 app.use('/api', integrationsRouter);
 app.use('/api', authRouter);
-app.use('/api', studentRouter);
+app.use('/api/student', studentRouter);
 app.use('/api', pike13Router);
 app.use('/api', githubRouter);
 app.use('/api', adminRouter);
