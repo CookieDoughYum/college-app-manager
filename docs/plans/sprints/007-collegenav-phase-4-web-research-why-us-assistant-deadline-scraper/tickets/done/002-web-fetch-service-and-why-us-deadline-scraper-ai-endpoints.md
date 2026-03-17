@@ -1,12 +1,12 @@
 ---
-id: "002"
-title: "Web fetch service and Why Us + Deadline Scraper AI endpoints"
-status: todo
+id: '002'
+title: Web fetch service and Why Us + Deadline Scraper AI endpoints
+status: in-progress
 use-cases:
-  - SUC-001
-  - SUC-002
+- SUC-001
+- SUC-002
 depends-on:
-  - "001"
+- '001'
 ---
 
 # Web fetch service and Why Us + Deadline Scraper AI endpoints
@@ -28,12 +28,12 @@ Add two new POST endpoints to `server/src/routes/ai.ts`:
 
 ## Acceptance Criteria
 
-- [ ] `server/src/services/webFetch.ts` exists and strips HTML to plain text
-- [ ] `POST /api/ai/essays/whyus` returns 401 without auth, `{ result }` with auth
-- [ ] `POST /api/ai/essays/whyus` saves result to `StudentEssays.whyUsResults`
-- [ ] `POST /api/ai/deadlines/scrape` returns 401 without auth
-- [ ] `POST /api/ai/deadlines/scrape` iterates college list and merges deadlines
-- [ ] Failed fetches for individual schools are skipped gracefully
+- [x] `server/src/services/webFetch.ts` exists and strips HTML to plain text
+- [x] `POST /api/ai/essays/whyus` returns 401 without auth, `{ result }` with auth
+- [x] `POST /api/ai/essays/whyus` saves result to `StudentEssays.whyUsResults`
+- [x] `POST /api/ai/deadlines/scrape` returns 401 without auth
+- [x] `POST /api/ai/deadlines/scrape` iterates college list and merges deadlines
+- [x] Failed fetches for individual schools are skipped gracefully
 
 ## Testing
 

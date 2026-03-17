@@ -2,6 +2,7 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { prisma } from '../services/prisma';
 import { requireAuth } from '../middleware/requireAuth';
 import { askClaude } from '../services/claude';
+import { fetchPageText } from '../services/webFetch';
 
 export const aiRouter = Router();
 
@@ -194,5 +195,105 @@ Format as a numbered list.`;
     });
 
     res.json({ result });
+  } catch (err) { next(err); }
+});
+
+// --- Essays: "Why Us?" assistant ---
+
+aiRouter.post('/essays/whyus', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const studentId = sid(req);
+    const { schoolName, url } = req.body as { schoolName: string; url?: string };
+
+    const fetchUrl = url || `https://www.google.com/search?q=${encodeURIComponent(schoolName + ' admissions why attend')}`;
+    let pageText = '';
+    try {
+      pageText = await fetchPageText(fetchUrl);
+    } catch {
+      pageText = '';
+    }
+
+    const prompt = `You are a college admissions counselor.
+A student is writing a "Why Us?" essay for ${schoolName}.
+${pageText ? `Here is text from the school's website:\n\n${pageText}\n\n` : ''}
+List 3–5 specific programs, values, or opportunities the student should mention in their "Why Us?" essay for ${schoolName}.
+Be specific — use actual program names and details${pageText ? ' from the text above' : ''}.
+Format as a numbered list.`;
+
+    const result = await askClaude(prompt);
+
+    const existing = await prisma.studentEssays.findUnique({ where: { studentId } });
+    const currentResults = (existing?.whyUsResults as Record<string, string>) ?? {};
+    const updatedResults = { ...currentResults, [schoolName]: result };
+
+    await prisma.studentEssays.upsert({
+      where: { studentId },
+      create: { studentId, whyUsResults: updatedResults },
+      update: { whyUsResults: updatedResults },
+    });
+
+    res.json({ result });
+  } catch (err) { next(err); }
+});
+
+// --- Deadlines: auto-scrape from college list ---
+
+aiRouter.post('/deadlines/scrape', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const studentId = sid(req);
+    const colleges = await prisma.studentColleges.findUnique({ where: { studentId } });
+    const collegeList = Array.isArray(colleges?.collegeList) ? (colleges.collegeList as any[]) : [];
+
+    const deadlines: any[] = [];
+    const errors: string[] = [];
+
+    for (const college of collegeList) {
+      const name: string = college.name || college;
+      const url: string = college.url || `https://www.google.com/search?q=${encodeURIComponent(name + ' application deadlines')}`;
+
+      let pageText = '';
+      try {
+        pageText = await fetchPageText(url);
+      } catch {
+        errors.push(name);
+        continue;
+      }
+
+      const prompt = `Extract application deadlines for ${name} from this page.
+List Regular Decision (RD), Early Action (EA), and Early Decision (ED) deadlines if present.
+Return ONLY a JSON array like: [{"type":"RD","date":"January 1"},{"type":"EA","date":"November 1"}]
+If no deadline is found, return [].
+Page text: ${pageText}`;
+
+      let extracted: any[] = [];
+      try {
+        const raw = await askClaude(prompt);
+        const match = raw.match(/\[[\s\S]*\]/);
+        if (match) extracted = JSON.parse(match[0]);
+      } catch {
+        errors.push(name);
+        continue;
+      }
+
+      for (const d of extracted) {
+        deadlines.push({ school: name, type: d.type, date: d.date });
+      }
+    }
+
+    const existing = await prisma.studentDeadlines.findUnique({ where: { studentId } });
+    const current = Array.isArray(existing?.manualDeadlines) ? (existing.manualDeadlines as any[]) : [];
+    const merged = [...current.filter((d: any) => !deadlines.find(nd => nd.school === d.school && nd.type === d.type)), ...deadlines];
+
+    await prisma.studentDeadlines.upsert({
+      where: { studentId },
+      create: { studentId, manualDeadlines: merged },
+      update: { manualDeadlines: merged },
+    });
+
+    const summary = errors.length > 0
+      ? `Fetched deadlines for ${deadlines.length} entries. Could not fetch: ${errors.join(', ')}.`
+      : `Fetched ${deadlines.length} deadline entries from your college list.`;
+
+    res.json({ result: summary, deadlines });
   } catch (err) { next(err); }
 });
