@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import BadgeLabel from '../../components/BadgeLabel';
+import MarkdownOutput from '../../components/MarkdownOutput';
 import styles from './Colleges.module.css';
 
 interface CollegeEntry {
@@ -91,7 +92,7 @@ export default function Colleges() {
         </div>
         {aiError && <p style={{ color: '#e94560' }}>{aiError}</p>}
         {aiText ? (
-          <pre style={{ whiteSpace: 'pre-wrap', fontFamily: 'inherit', color: '#ccc', lineHeight: 1.6, marginTop: '0.75rem' }}>{aiText}</pre>
+          <MarkdownOutput>{aiText}</MarkdownOutput>
         ) : (
           <p style={{ color: '#888' }}>Fill in your salary goal and interest area, then click "Get Major Recommendations".</p>
         )}

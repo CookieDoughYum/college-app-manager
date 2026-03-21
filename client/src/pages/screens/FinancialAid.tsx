@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import ChecklistItem from '../../components/ChecklistItem';
 import TagChip from '../../components/TagChip';
+import MarkdownOutput from '../../components/MarkdownOutput';
 import styles from './FinancialAid.module.css';
 
 const PROFILE_TAGS = ['First-gen', 'STEM', 'California resident', 'Community service'];
@@ -100,7 +101,7 @@ export default function FinancialAid() {
         </div>
         {aiError && <p style={{ color: '#e94560' }}>{aiError}</p>}
         {aiText ? (
-          <pre style={{ whiteSpace: 'pre-wrap', fontFamily: 'inherit', color: '#ccc', lineHeight: 1.6, marginTop: '0.75rem' }}>{aiText}</pre>
+          <MarkdownOutput>{aiText}</MarkdownOutput>
         ) : (
           <p style={{ color: '#888', marginTop: '0.75rem' }}>Select your profile tags and click "Find Scholarships" to see AI-matched scholarships.</p>
         )}

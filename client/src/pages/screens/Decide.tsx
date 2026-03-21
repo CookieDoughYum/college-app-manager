@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import MarkdownOutput from '../../components/MarkdownOutput';
 import styles from './Decide.module.css';
 
 interface AdmissionResult {
@@ -99,7 +100,7 @@ export default function Decide() {
         </div>
         {aiError && <p style={{ color: '#e94560' }}>{aiError}</p>}
         {aiText ? (
-          <pre style={{ whiteSpace: 'pre-wrap', fontFamily: 'inherit', color: '#ccc', lineHeight: 1.6, marginTop: '0.75rem' }}>{aiText}</pre>
+          <MarkdownOutput>{aiText}</MarkdownOutput>
         ) : (
           <div className={styles.helperBox}>
             <p className={styles.helperNote}>Add at least 2 accepted schools above, then click "Generate Comparison" for a personalized pros/cons analysis.</p>

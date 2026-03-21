@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import TagChip from '../../components/TagChip';
+import MarkdownOutput from '../../components/MarkdownOutput';
 import styles from './Essays.module.css';
 
 const TIMELINE = [
@@ -148,7 +149,7 @@ export default function Essays() {
         {whyUsError && <p style={{ color: '#e94560' }}>{whyUsError}</p>}
         <div className={styles.outputArea}>
           {whyUsResult
-            ? <pre style={{ whiteSpace: 'pre-wrap', margin: 0 }}>{whyUsResult}</pre>
+            ? <MarkdownOutput>{whyUsResult}</MarkdownOutput>
             : 'Enter a school name and click Research to generate talking points for your "Why Us?" essay.'}
         </div>
       </section>

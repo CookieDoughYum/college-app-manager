@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import TagChip from '../../components/TagChip';
+import MarkdownOutput from '../../components/MarkdownOutput';
 import styles from './Activities.module.css';
 
 const INTEREST_TAGS = ['Science', 'Leadership', 'Arts', 'Community', 'Tech'];
@@ -120,7 +121,7 @@ export default function Activities() {
         </div>
         {aiError && <p style={{ color: '#e94560' }}>{aiError}</p>}
         {aiText ? (
-          <pre style={{ whiteSpace: 'pre-wrap', fontFamily: 'inherit', color: '#ccc', lineHeight: 1.6 }}>{aiText}</pre>
+          <MarkdownOutput>{aiText}</MarkdownOutput>
         ) : (
           <div className={styles.placeholder}>
             Select your interests above and click "Get Recommendations" to see personalized suggestions.

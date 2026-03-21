@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useStudent } from '../contexts/StudentContext';
 import ProgressCard from '../components/ProgressCard';
 import OnboardingOverlay from '../components/OnboardingOverlay';
+import MarkdownOutput from '../components/MarkdownOutput';
 import styles from './Dashboard.module.css';
 
 interface Progress {
@@ -123,7 +124,7 @@ export default function Dashboard() {
                 fontSize: '0.9rem',
               }}
             >
-              {r.message}
+              <MarkdownOutput>{r.message}</MarkdownOutput>
             </div>
           ))}
         </div>

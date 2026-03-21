@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import TagChip from '../../components/TagChip';
+import MarkdownOutput from '../../components/MarkdownOutput';
 import styles from './Exams.module.css';
 
 interface ExamsData {
@@ -100,7 +101,7 @@ export default function Exams() {
         </div>
         {aiError && <p style={{ color: '#e94560' }}>{aiError}</p>}
         {aiText ? (
-          <pre style={{ whiteSpace: 'pre-wrap', fontFamily: 'inherit', color: '#ccc', lineHeight: 1.6, marginTop: '0.75rem' }}>{aiText}</pre>
+          <MarkdownOutput>{aiText}</MarkdownOutput>
         ) : (
           <div className={styles.satActBox}>
             <p className={styles.satActPrompt}>Click "Get Recommendation" for a personalized SAT vs ACT recommendation.</p>
@@ -150,7 +151,7 @@ export default function Exams() {
         </div>
         {scheduleError && <p style={{ color: '#e94560' }}>{scheduleError}</p>}
         {scheduleText ? (
-          <pre style={{ whiteSpace: 'pre-wrap', fontFamily: 'inherit', color: '#ccc', lineHeight: 1.6, marginTop: '0.75rem' }}>{scheduleText}</pre>
+          <MarkdownOutput>{scheduleText}</MarkdownOutput>
         ) : (
           <p style={{ color: '#888', marginTop: '0.5rem' }}>Add AP courses above, then click "Generate Study Schedule" for a week-by-week plan.</p>
         )}
