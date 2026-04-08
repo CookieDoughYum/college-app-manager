@@ -24,23 +24,74 @@
   margin: 0;
 }
 
+/* Calendar header */
+
 .calHeader {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 10px;
-  margin-bottom: 14px;
+  margin-bottom: 16px;
 }
 
-.calNote {
-  font-size: 12px;
-  color: #888;
-  font-style: italic;
+.calTitle {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1a1a2e;
+  margin: 0;
+  min-width: 160px;
+  text-align: center;
 }
+
+.navBtn {
+  background: none;
+  border: 1px solid #e0e0e0;
+  border-radius: 5px;
+  width: 28px;
+  height: 28px;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  color: #444;
+  flex-shrink: 0;
+}
+
+.navBtn:hover {
+  background: #f5f5f5;
+}
+
+.fetchBtn {
+  margin-left: auto;
+  background: #0f3460;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.35rem 0.8rem;
+  font-size: 12px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.fetchBtn:hover:not(:disabled) {
+  background: #16213e;
+}
+
+.fetchBtn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.fetchError {
+  color: #e94560;
+  font-size: 13px;
+  margin: 0 0 10px;
+}
+
+/* Calendar grid */
 
 .calGrid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 4px;
+  gap: 3px;
 }
 
 .calDow {
@@ -48,85 +99,228 @@
   font-size: 11px;
   font-weight: 600;
   color: #aaa;
-  padding: 4px 0;
+  padding: 4px 0 6px;
   text-transform: uppercase;
 }
 
+.calEmpty {
+  min-height: 52px;
+}
+
 .calDay {
-  text-align: center;
-  padding: 6px 4px;
-  font-size: 13px;
-  color: #444;
-  border-radius: 4px;
+  min-height: 52px;
+  border-radius: 5px;
+  padding: 5px 6px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
 }
 
 .calDay:hover {
   background: #f5f5f5;
 }
 
-.calDayHighlight {
-  background: #e94560;
-  color: white;
-  font-weight: 700;
+.calDayNum {
+  font-size: 13px;
+  color: #444;
+  line-height: 1;
+}
+
+.calToday .calDayNum {
+  background: #1a1a2e;
+  color: #fff;
   border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
 }
 
-.calDayHighlight:hover {
-  background: #c73652;
+.calSelected {
+  background: #f0f4ff;
+  outline: 1px solid #0f3460;
 }
 
-.calEmpty {
-  padding: 6px 4px;
+.dotRow {
+  display: flex;
+  gap: 3px;
+  justify-content: center;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+/* Day detail popover */
+
+.dayDetail {
+  margin-top: 14px;
+  background: #f9f9f9;
+  border-radius: 6px;
+  padding: 12px 14px;
+}
+
+.dayDetailTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1a1a2e;
+  margin-bottom: 8px;
+}
+
+.dayDetailItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.dayDetailDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.dayDetailSchool {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1a1a2e;
+}
+
+.dayDetailLabel {
+  font-size: 12px;
+  color: #888;
+}
+
+/* Deadline list */
+
+.listHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.addBtn {
+  background: #e94560;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.35rem 0.8rem;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.addBtn:hover {
+  background: #c62828;
+}
+
+.emptyNote {
+  font-size: 13px;
+  color: #888;
+  margin: 0;
 }
 
 .deadlineList {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-bottom: 14px;
+  gap: 8px;
 }
 
 .deadlineCard {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
+  gap: 10px;
   border: 1px solid #e8e8e8;
   border-radius: 6px;
-  padding: 12px 16px;
+  padding: 10px 12px;
 }
 
-.deadlineLeft {
+.deadlineCardActive {
+  border-color: #bfd0f0;
+  background: #f7f9ff;
+}
+
+.dlDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-top: 6px;
+  flex-shrink: 0;
+}
+
+.dlBody {
+  flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 5px;
 }
 
-.deadlineSchool {
-  font-size: 14px;
+.dlInput {
+  font-size: 13px;
   font-weight: 600;
   color: #1a1a2e;
+  border: none;
+  border-bottom: 1px solid transparent;
+  padding: 0;
+  width: 100%;
+  background: transparent;
 }
 
-.deadlineType {
-  font-size: 12px;
-  color: #888;
+.dlInput:focus {
+  outline: none;
+  border-bottom-color: #e94560;
 }
 
-.deadlineRight {
+.dlMeta {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 4px;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
-.daysUntil {
+.dlInputSm {
   font-size: 12px;
-  color: #888;
+  color: #555;
+  border: none;
+  border-bottom: 1px solid transparent;
+  padding: 0;
+  background: transparent;
+  min-width: 0;
+  flex: 1;
 }
 
-.footNote {
-  font-size: 11px;
-  color: #aaa;
-  margin: 0;
-  font-style: italic;
+.dlInputSm:focus {
+  outline: none;
+  border-bottom-color: #e94560;
+}
+
+.dlSelect {
+  font-size: 12px;
+  color: #555;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.dlRemove {
+  background: none;
+  border: none;
+  color: #ccc;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.dlRemove:hover {
+  color: #e94560;
 }

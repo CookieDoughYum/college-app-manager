@@ -117,6 +117,46 @@ Format as a numbered list.`;
   } catch (err) { next(err); }
 });
 
+// --- Colleges: Why Us? content for a specific school ---
+
+aiRouter.post('/colleges/whyus', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const studentId = sid(req);
+    const { college } = req.body as { college: string };
+    if (!college) return res.status(400).json({ error: 'college is required' });
+
+    const colleges = await prisma.studentColleges.findUnique({ where: { studentId } });
+    const majorAnswers = (colleges?.majorAnswers as any) ?? {};
+    const aiRecs = (colleges?.aiRecommendations as any) ?? {};
+
+    const interestArea = majorAnswers.interestArea || 'not specified';
+    const salaryGoal = majorAnswers.salaryGoal || 'not specified';
+    const majorRecs = aiRecs.majors ? `\nPreviously recommended majors for this student:\n${aiRecs.majors}` : '';
+
+    const prompt = `You are a college admissions counselor with deep knowledge of US universities.
+
+A student is researching ${college} for their college list.
+Their professional interest areas: ${interestArea}
+Their salary goal: ${salaryGoal}${majorRecs}
+
+Using your knowledge of ${college}, provide:
+
+## Programs & Departments
+List 3–4 specific, real programs, majors, or departments at ${college} that align with this student's interests. Use actual program names.
+
+## Research & Opportunities
+List 2–3 specific research centers, labs, institutes, or signature opportunities at ${college} relevant to this student.
+
+## What Makes It Distinctive
+2–3 specific things about ${college}'s culture, pedagogy, or resources that set it apart for someone with these interests — things worth mentioning in a "Why Us?" essay.
+
+Be specific and accurate. Only include things you are confident are real features of ${college}.`;
+
+    const result = await askClaude(prompt);
+    res.json({ result });
+  } catch (err) { next(err); }
+});
+
 // --- Decide: pros/cons comparison ---
 
 aiRouter.post('/decide/compare', async (req: Request, res: Response, next: NextFunction) => {
@@ -236,7 +276,7 @@ Format as a numbered list.`;
   } catch (err) { next(err); }
 });
 
-// --- Deadlines: auto-scrape from college list ---
+// --- Deadlines: look up deadlines from college list using Claude's knowledge ---
 
 aiRouter.post('/deadlines/scrape', async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -244,57 +284,54 @@ aiRouter.post('/deadlines/scrape', async (req: Request, res: Response, next: Nex
     const colleges = await prisma.studentColleges.findUnique({ where: { studentId } });
     const collegeList = Array.isArray(colleges?.collegeList) ? (colleges.collegeList as any[]) : [];
 
-    const deadlines: any[] = [];
-    const errors: string[] = [];
-
-    for (const college of collegeList) {
-      const name: string = college.name || college;
-      const url: string = college.url || `https://www.google.com/search?q=${encodeURIComponent(name + ' application deadlines')}`;
-
-      let pageText = '';
-      try {
-        pageText = await fetchPageText(url);
-      } catch {
-        errors.push(name);
-        continue;
-      }
-
-      const prompt = `Extract application deadlines for ${name} from this page.
-List Regular Decision (RD), Early Action (EA), and Early Decision (ED) deadlines if present.
-Return ONLY a JSON array like: [{"type":"RD","date":"January 1"},{"type":"EA","date":"November 1"}]
-If no deadline is found, return [].
-Page text: ${pageText}`;
-
-      let extracted: any[] = [];
-      try {
-        const raw = await askClaude(prompt);
-        const match = raw.match(/\[[\s\S]*\]/);
-        if (match) extracted = JSON.parse(match[0]);
-      } catch {
-        errors.push(name);
-        continue;
-      }
-
-      for (const d of extracted) {
-        deadlines.push({ school: name, type: d.type, date: d.date });
-      }
+    if (collegeList.length === 0) {
+      return res.json({ result: 'No colleges on your list yet.', deadlines: [] });
     }
 
-    const existing = await prisma.studentDeadlines.findUnique({ where: { studentId } });
-    const current = Array.isArray(existing?.manualDeadlines) ? (existing.manualDeadlines as any[]) : [];
-    const merged = [...current.filter((d: any) => !deadlines.find(nd => nd.school === d.school && nd.type === d.type)), ...deadlines];
+    const names = collegeList.map((c: any) => c.name || c).filter(Boolean).join(', ');
+
+    const prompt = `You are a college admissions expert with knowledge of US university application deadlines.
+
+For each of these schools, list their application deadlines: ${names}
+
+Return ONLY a valid JSON array. Each item must have exactly these fields:
+- "school": the school name (string)
+- "type": one of "Early Decision", "Early Action", "Regular Decision", or "Rolling Admissions"
+- "date": the deadline date as "Month Day" (e.g. "November 1", "January 15")
+
+Include all applicable deadline types for each school. Omit types that don't apply.
+Return ONLY the JSON array with no explanation or markdown fences.`;
+
+    const raw = await askClaude(prompt);
+    const match = raw.match(/\[[\s\S]*\]/);
+    if (!match) return res.json({ result: 'Could not parse deadlines.', deadlines: [] });
+
+    let deadlines: any[] = [];
+    try {
+      deadlines = JSON.parse(match[0]);
+    } catch {
+      return res.json({ result: 'Could not parse deadlines.', deadlines: [] });
+    }
+
+    // Attach variant from the student's college list
+    const variantMap = new Map<string, string>();
+    for (const c of collegeList as any[]) {
+      if (c.name) variantMap.set(c.name.toLowerCase(), c.variant ?? 'target');
+    }
+    const enriched = deadlines.map((d: any) => ({
+      school: d.school,
+      label: d.type,
+      date: d.date,
+      variant: variantMap.get((d.school ?? '').toLowerCase()) ?? 'target',
+    }));
 
     await prisma.studentDeadlines.upsert({
       where: { studentId },
-      create: { studentId, manualDeadlines: merged },
-      update: { manualDeadlines: merged },
+      create: { studentId, manualDeadlines: enriched },
+      update: { manualDeadlines: enriched },
     });
 
-    const summary = errors.length > 0
-      ? `Fetched deadlines for ${deadlines.length} entries. Could not fetch: ${errors.join(', ')}.`
-      : `Fetched ${deadlines.length} deadline entries from your college list.`;
-
-    res.json({ result: summary, deadlines });
+    res.json({ result: `Loaded ${enriched.length} deadlines for ${collegeList.length} schools.`, deadlines: enriched });
   } catch (err) { next(err); }
 });
 

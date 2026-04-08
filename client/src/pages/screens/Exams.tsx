@@ -3,6 +3,57 @@ import TagChip from '../../components/TagChip';
 import MarkdownOutput from '../../components/MarkdownOutput';
 import styles from './Exams.module.css';
 
+const QUIZ_QUESTIONS = [
+  {
+    q: 'How would you describe your test-taking pace?',
+    options: [
+      { label: 'I work fast and can handle a high volume of questions', value: 'act' as const },
+      { label: 'I prefer fewer, more carefully constructed questions', value: 'sat' as const },
+    ],
+  },
+  {
+    q: 'How do you feel about a dedicated Science section?',
+    options: [
+      { label: 'I enjoy analyzing graphs, charts, and scientific data', value: 'act' as const },
+      { label: "I'd rather not have a separate science section", value: 'sat' as const },
+    ],
+  },
+  {
+    q: 'What is your preference for the math section?',
+    options: [
+      { label: 'Calculator allowed throughout the entire math section', value: 'act' as const },
+      { label: "I'm comfortable doing some math without a calculator", value: 'sat' as const },
+    ],
+  },
+  {
+    q: 'How do you approach reading comprehension questions?',
+    options: [
+      { label: 'I find answers quickly by scanning the passage directly', value: 'act' as const },
+      { label: 'I prefer questions that require deeper inference and analysis', value: 'sat' as const },
+    ],
+  },
+  {
+    q: 'Which best describes your strongest academic area?',
+    options: [
+      { label: 'Science and reasoning across multiple subjects', value: 'act' as const },
+      { label: 'Math and evidence-based reading & writing', value: 'sat' as const },
+    ],
+  },
+] as const;
+
+const QUIZ_RESULTS = {
+  sat: {
+    label: 'SAT',
+    summary: 'The SAT may be a better fit for you.',
+    detail: 'You tend to prefer fewer, more analytical questions and are comfortable with some calculator-free math. The SAT rewards careful readers and strong math reasoning — with no separate science section to worry about.',
+  },
+  act: {
+    label: 'ACT',
+    summary: 'The ACT may be a better fit for you.',
+    detail: 'You work at a quick pace, enjoy data and science reasoning, and prefer having a calculator throughout the math section. The ACT rewards broad, multi-subject thinkers and test-takers who can move efficiently.',
+  },
+};
+
 interface ExamsData {
   testPreference: string | null;
   apCourses: string[];
@@ -14,8 +65,9 @@ const DEFAULT_DATA: ExamsData = { testPreference: null, apCourses: [], aiRecomme
 export default function Exams() {
   const [data, setData] = useState<ExamsData>(DEFAULT_DATA);
   const [loading, setLoading] = useState(true);
-  const [aiLoading, setAiLoading] = useState(false);
-  const [aiError, setAiError] = useState('');
+  const [quizOpen, setQuizOpen] = useState(false);
+  const [quizAnswers, setQuizAnswers] = useState<Record<number, 'sat' | 'act'>>({});
+  const [quizResult, setQuizResult] = useState<'sat' | 'act' | null>(null);
   const [scheduleLoading, setScheduleLoading] = useState(false);
   const [scheduleError, setScheduleError] = useState('');
   const [addingAp, setAddingAp] = useState(false);
@@ -49,19 +101,10 @@ export default function Exams() {
     save({ ...data, apCourses: data.apCourses.filter(c => c !== course) });
   }
 
-  async function getRecommendation() {
-    setAiLoading(true);
-    setAiError('');
-    try {
-      const res = await fetch('/api/ai/exams/recommend', { method: 'POST', credentials: 'include' });
-      if (!res.ok) throw new Error('Server error');
-      const { result } = await res.json();
-      setData(prev => ({ ...prev, aiRecommendations: { ...prev.aiRecommendations, exam: result } }));
-    } catch {
-      setAiError('Could not generate recommendations — please try again.');
-    } finally {
-      setAiLoading(false);
-    }
+  function scoreQuiz() {
+    const sat = Object.values(quizAnswers).filter(a => a === 'sat').length;
+    const act = Object.values(quizAnswers).filter(a => a === 'act').length;
+    setQuizResult(sat >= act ? 'sat' : 'act');
   }
 
   async function generateSchedule() {
@@ -81,7 +124,6 @@ export default function Exams() {
 
   if (loading) return <div className={styles.page}><p>Loading…</p></div>;
 
-  const aiText = data.aiRecommendations?.exam;
   const scheduleText = data.aiRecommendations?.schedule;
 
   return (
@@ -89,23 +131,66 @@ export default function Exams() {
       <h1 className={styles.title}>Exam Prep</h1>
 
       <section className={styles.section}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <h2 className={styles.sectionTitle}>About the PSAT</h2>
+        <p className={styles.psatBody}>
+          The <strong>PSAT/NMSQT</strong> (Preliminary SAT / National Merit Scholarship Qualifying Test) is taken in October,
+          typically in 10th or 11th grade. It's offered through your school — check with your counselor to register.
+        </p>
+        <ul className={styles.psatList}>
+          <li><strong>Practice for the SAT</strong> — same format and question style, shorter and lower stakes.</li>
+          <li><strong>National Merit</strong> — 11th grade scores qualify you for the National Merit Scholarship Program. Top scorers advance to Semifinalist and beyond.</li>
+          <li><strong>Score reports</strong> — you'll get detailed feedback on math, reading, and writing skills to guide your SAT prep.</li>
+          <li><strong>No registration required from you</strong> — your school handles sign-up. Confirm the date with your counselor each fall.</li>
+        </ul>
+      </section>
+
+      <section className={styles.section}>
+        <div className={styles.quizHeader}>
           <h2 className={styles.sectionTitle}>SAT or ACT?</h2>
-          <button
-            onClick={getRecommendation}
-            disabled={aiLoading}
-            style={{ background: '#e94560', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.4rem 0.8rem', cursor: 'pointer' }}
-          >
-            {aiLoading ? 'Generating…' : 'Get Recommendation'}
-          </button>
+          {!quizOpen && !quizResult && (
+            <button className={styles.quizToggle} onClick={() => setQuizOpen(true)}>Take the Quiz</button>
+          )}
+          {(quizOpen || quizResult) && (
+            <button className={styles.quizToggle} onClick={() => { setQuizOpen(false); setQuizAnswers({}); setQuizResult(null); }}>Reset</button>
+          )}
         </div>
-        {aiError && <p style={{ color: '#e94560' }}>{aiError}</p>}
-        {aiText ? (
-          <MarkdownOutput>{aiText}</MarkdownOutput>
-        ) : (
-          <div className={styles.satActBox}>
-            <p className={styles.satActPrompt}>Click "Get Recommendation" for a personalized SAT vs ACT recommendation.</p>
+        {quizResult ? (
+          <div className={styles.quizResult}>
+            <div className={styles.quizResultLabel}>{QUIZ_RESULTS[quizResult].label} recommended</div>
+            <p className={styles.quizResultSummary}>{QUIZ_RESULTS[quizResult].summary}</p>
+            <p className={styles.quizResultDetail}>{QUIZ_RESULTS[quizResult].detail}</p>
           </div>
+        ) : quizOpen ? (
+          <div className={styles.quizBody}>
+            {QUIZ_QUESTIONS.map((q, qi) => (
+              <div key={qi} className={styles.quizQuestion}>
+                <p className={styles.quizQ}>{qi + 1}. {q.q}</p>
+                <div className={styles.quizOptions}>
+                  {q.options.map(opt => (
+                    <label key={opt.value} className={`${styles.quizOption} ${quizAnswers[qi] === opt.value ? styles.quizOptionSelected : ''}`}>
+                      <input
+                        type="radio"
+                        name={`q${qi}`}
+                        value={opt.value}
+                        checked={quizAnswers[qi] === opt.value}
+                        onChange={() => setQuizAnswers(prev => ({ ...prev, [qi]: opt.value }))}
+                      />
+                      {opt.label}
+                    </label>
+                  ))}
+                </div>
+              </div>
+            ))}
+            <button
+              className={styles.quizSubmit}
+              disabled={Object.keys(quizAnswers).length < QUIZ_QUESTIONS.length}
+              onClick={scoreQuiz}
+            >
+              See My Result
+            </button>
+          </div>
+        ) : (
+          <p className={styles.placeholder}>Answer 5 quick questions to find out whether SAT or ACT suits your style.</p>
         )}
       </section>
 
@@ -113,7 +198,12 @@ export default function Exams() {
         <div className={styles.card}>
           <div className={styles.cardTitle}>SAT Prep</div>
           <p className={styles.cardBody}>Khan Academy offers free, official SAT prep.</p>
-          <a className={styles.cardLink} href="#sat-prep">Register for SAT →</a>
+          <a className={styles.cardLink} href="https://satsuite.collegeboard.org/sat/registration" target="_blank" rel="noreferrer">Register for SAT →</a>
+        </div>
+        <div className={styles.card}>
+          <div className={styles.cardTitle}>ACT Prep</div>
+          <p className={styles.cardBody}>The ACT website offers free practice tests and prep resources.</p>
+          <a className={styles.cardLink} href="https://www.act.org/content/act/en/products-and-services/the-act/registration.html" target="_blank" rel="noreferrer">Register for ACT →</a>
         </div>
         <div className={styles.card}>
           <div className={styles.cardTitle}>Test Day Reminders</div>

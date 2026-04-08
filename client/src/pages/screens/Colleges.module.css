@@ -53,6 +53,207 @@
   box-sizing: border-box;
 }
 
+.quizHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.quizHeader .sectionTitle {
+  margin: 0;
+}
+
+.quizToggle {
+  background: none;
+  border: 1px solid #e94560;
+  color: #e94560;
+  border-radius: 6px;
+  padding: 0.3rem 0.7rem;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.quizToggle:hover {
+  background: #fff0f2;
+}
+
+.placeholder {
+  font-size: 13px;
+  color: #888;
+  background: #f9f9f9;
+  border-radius: 6px;
+  padding: 14px 16px;
+  margin: 0;
+}
+
+.quizBody {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.quizQuestion {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.quizQ {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1a1a2e;
+  margin: 0;
+}
+
+.quizOptions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.quizOption {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 13px;
+  color: #444;
+  background: #f9f9f9;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.quizOption input[type="radio"] {
+  margin-top: 2px;
+  flex-shrink: 0;
+  accent-color: #e94560;
+}
+
+.quizOptionSelected {
+  background: #fff0f2;
+  border-color: #e94560;
+  color: #1a1a2e;
+}
+
+.quizSubmit {
+  align-self: flex-start;
+  background: #e94560;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.45rem 1rem;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.quizSubmit:disabled {
+  background: #ccc;
+  cursor: default;
+}
+
+.quizSubmit:not(:disabled):hover {
+  background: #c62828;
+}
+
+.quizResult {
+  background: #f0fdf4;
+  border: 1px solid #86efac;
+  border-radius: 8px;
+  padding: 16px 20px;
+}
+
+.quizResultLabel {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #15803d;
+  margin-bottom: 12px;
+}
+
+.quizResultRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.quizResultRank {
+  font-size: 12px;
+  font-weight: 700;
+  color: #888;
+  width: 24px;
+  flex-shrink: 0;
+}
+
+.quizResultBarWrap {
+  flex: 1;
+  min-width: 0;
+}
+
+.quizResultBarLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1a1a2e;
+  margin-bottom: 4px;
+}
+
+.quizResultBar {
+  height: 8px;
+  background: #e8f5e9;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.quizResultBarFill {
+  height: 100%;
+  background: #15803d;
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+
+.quizResultPct {
+  font-size: 12px;
+  font-weight: 600;
+  color: #15803d;
+  width: 36px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.quizResultSummary {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1a1a2e;
+  margin: 0 0 4px;
+}
+
+.quizResultDetail {
+  font-size: 13px;
+  color: #555;
+  margin: 12px 0 0;
+  line-height: 1.5;
+}
+
+.salaryRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.salaryInput {
+  height: 34px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 0 10px;
+  font-size: 13px;
+  box-sizing: border-box;
+  width: 160px;
+}
+
 .chipRow {
   display: flex;
   flex-wrap: wrap;
@@ -82,12 +283,46 @@
 }
 
 .collegeCard {
+  position: relative;
   border: 1px solid #e8e8e8;
   border-radius: 8px;
   padding: 14px 16px;
   display: flex;
   flex-direction: column;
   gap: 4px;
+}
+
+.collegeCardExpanded {
+  grid-column: 1 / -1;
+}
+
+.whyUsBtn {
+  align-self: flex-start;
+  margin-top: 8px;
+  background: none;
+  border: 1px solid #0f3460;
+  color: #0f3460;
+  border-radius: 6px;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.whyUsBtn:hover:not(:disabled) {
+  background: #f0f4ff;
+}
+
+.whyUsBtn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.whyUsOutput {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #f0f0f0;
+  font-size: 13px;
 }
 
 .collegeName {
@@ -100,6 +335,23 @@
   font-size: 12px;
   color: #888;
   margin-bottom: 6px;
+}
+
+.removeBtn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: none;
+  border: none;
+  color: #ccc;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+}
+
+.removeBtn:hover {
+  color: #e94560;
 }
 
 .addCard {
@@ -121,4 +373,98 @@
 
 .addCard:hover .addLabel {
   color: #e94560;
+}
+
+.variantPicker {
+  display: flex;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.variantBtn {
+  flex: 1;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 3px 0;
+  font-size: 11px;
+  font-weight: 600;
+  background: #f5f5f5;
+  color: #999;
+  cursor: pointer;
+}
+
+.variantBtn_reach_active {
+  background: #fde8ea;
+  color: #c62828;
+  border-color: #f5b5ba;
+}
+
+.variantBtn_target_active {
+  background: #fff3e0;
+  color: #e65100;
+  border-color: #fcd5a0;
+}
+
+.variantBtn_safety_active {
+  background: #e8f5e9;
+  color: #2e7d32;
+  border-color: #a5d6a7;
+}
+
+.addFormCard {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.addInput {
+  height: 30px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 0 8px;
+  font-size: 12px;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.addInput:focus {
+  outline: none;
+  border-color: #e94560;
+}
+
+
+.addActions {
+  display: flex;
+  gap: 6px;
+}
+
+.addConfirmBtn {
+  flex: 1;
+  height: 28px;
+  background: #e94560;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.addConfirmBtn:hover {
+  background: #c62828;
+}
+
+.addCancelBtn {
+  flex: 1;
+  height: 28px;
+  background: none;
+  color: #888;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.addCancelBtn:hover {
+  border-color: #aaa;
+  color: #555;
 }

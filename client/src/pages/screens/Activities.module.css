@@ -66,6 +66,129 @@
   padding: 14px 16px;
 }
 
+.quizHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.quizHeader .sectionTitle {
+  margin: 0;
+}
+
+.quizToggle {
+  background: none;
+  border: 1px solid #e94560;
+  color: #e94560;
+  border-radius: 6px;
+  padding: 0.3rem 0.7rem;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.quizToggle:hover {
+  background: #fff0f2;
+}
+
+.quizBody {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.quizQuestion {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.quizQ {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1a1a2e;
+  margin: 0;
+}
+
+.quizOptions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.quizOption {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 13px;
+  color: #444;
+  background: #f9f9f9;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.quizOption input[type="radio"] {
+  margin-top: 2px;
+  flex-shrink: 0;
+  accent-color: #e94560;
+}
+
+.quizOptionSelected {
+  background: #fff0f2;
+  border-color: #e94560;
+  color: #1a1a2e;
+}
+
+.quizSubmit {
+  align-self: flex-start;
+  background: #e94560;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.45rem 1rem;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.quizSubmit:disabled {
+  background: #ccc;
+  cursor: default;
+}
+
+.quizSubmit:not(:disabled):hover {
+  background: #c62828;
+}
+
+.quizResult {
+  background: #f0fdf4;
+  border: 1px solid #86efac;
+  border-radius: 8px;
+  padding: 16px 20px;
+}
+
+.quizResultLabel {
+  font-size: 16px;
+  font-weight: 700;
+  color: #15803d;
+  margin-bottom: 6px;
+}
+
+.quizResultSummary {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a1a2e;
+  margin: 0 0 6px;
+}
+
+.quizResultDetail {
+  font-size: 13px;
+  color: #555;
+  margin: 0;
+  line-height: 1.5;
+}
+
 .planGrid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -106,4 +229,89 @@
   font-size: 12px;
   color: #aaa;
   margin: 0;
+}
+
+.planCourseRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  margin-bottom: 4px;
+}
+
+.planCourse {
+  font-size: 12px;
+  color: #1a1a2e;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.planRemoveBtn {
+  background: none;
+  border: none;
+  color: #aaa;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 2px;
+  flex-shrink: 0;
+}
+
+.planRemoveBtn:hover {
+  color: #e94560;
+}
+
+.planAlert {
+  font-size: 11px;
+  color: #b45309;
+  background: #fffbeb;
+  border: 1px solid #fcd34d;
+  border-radius: 4px;
+  padding: 5px 8px;
+  margin-top: 6px;
+  line-height: 1.4;
+}
+
+.planAddRow {
+  display: flex;
+  gap: 4px;
+  margin-top: 8px;
+  border-top: 1px solid #f0f0f0;
+  padding-top: 8px;
+}
+
+.planAddInput {
+  flex: 1;
+  height: 28px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 0 6px;
+  font-size: 11px;
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+.planAddInput:focus {
+  outline: none;
+  border-color: #e94560;
+}
+
+.planAddBtn {
+  height: 28px;
+  width: 28px;
+  background: #e94560;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.planAddBtn:hover {
+  background: #c62828;
 }

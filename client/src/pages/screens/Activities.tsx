@@ -8,7 +8,7 @@ const INTEREST_TAGS = ['Science', 'Leadership', 'Arts', 'Community', 'Tech'];
 const GRADE_COLUMNS = [
   { label: '9th Grade', key: '9', warn: false },
   { label: '10th Grade', key: '10', warn: false },
-  { label: '11th Grade', key: '11', warn: true },
+  { label: '11th Grade', key: '11', warn: false },
   { label: '12th Grade', key: '12', warn: false },
 ];
 
@@ -20,6 +20,17 @@ interface ActivitiesData {
 
 const DEFAULT_DATA: ActivitiesData = { interests: [], coursePlan: {}, aiRecommendations: {} };
 
+const MAX_AP_HONORS = 3;
+
+function getCourseAlerts(courses: string[]): string[] {
+  const alerts: string[] = [];
+  const apHonors = courses.filter(c => /\bap\b|honors/i.test(c)).length;
+  if (apHonors > MAX_AP_HONORS) {
+    alerts.push(`${apHonors} AP/Honors courses may be too demanding at once.`);
+  }
+  return alerts;
+}
+
 export default function Activities() {
   const [data, setData] = useState<ActivitiesData>(DEFAULT_DATA);
   const [loading, setLoading] = useState(true);
@@ -28,6 +39,7 @@ export default function Activities() {
   const [gpa, setGpa] = useState('');
   const [sat, setSat] = useState('');
   const [act, setAct] = useState('');
+  const [newCourse, setNewCourse] = useState<Record<string, string>>({});
 
   useEffect(() => {
     fetch('/api/student/activities', { credentials: 'include' })
@@ -66,6 +78,19 @@ export default function Activities() {
     } finally {
       setAiLoading(false);
     }
+  }
+
+  function addCourse(gradeKey: string) {
+    const name = (newCourse[gradeKey] ?? '').trim();
+    if (!name) return;
+    const existing = data.coursePlan[gradeKey] ?? [];
+    save({ ...data, coursePlan: { ...data.coursePlan, [gradeKey]: [...existing, name] } });
+    setNewCourse(prev => ({ ...prev, [gradeKey]: '' }));
+  }
+
+  function removeCourse(gradeKey: string, index: number) {
+    const updated = (data.coursePlan[gradeKey] ?? []).filter((_, i) => i !== index);
+    save({ ...data, coursePlan: { ...data.coursePlan, [gradeKey]: updated } });
   }
 
   if (loading) return <div className={styles.page}><p>Loading…</p></div>;
@@ -140,9 +165,25 @@ export default function Activities() {
                   <p className={styles.planPlaceholder}>No courses added yet.</p>
                 ) : (
                   (data.coursePlan[key] ?? []).map((course, i) => (
-                    <p key={i} className={styles.planCourse}>{course}</p>
+                    <div key={i} className={styles.planCourseRow}>
+                      <span className={styles.planCourse}>{course}</span>
+                      <button className={styles.planRemoveBtn} onClick={() => removeCourse(key, i)} title="Remove">×</button>
+                    </div>
                   ))
                 )}
+                {getCourseAlerts(data.coursePlan[key] ?? []).map((msg, i) => (
+                  <div key={i} className={styles.planAlert}>⚠ {msg}</div>
+                ))}
+                <div className={styles.planAddRow}>
+                  <input
+                    className={styles.planAddInput}
+                    placeholder="Add course…"
+                    value={newCourse[key] ?? ''}
+                    onChange={e => setNewCourse(prev => ({ ...prev, [key]: e.target.value }))}
+                    onKeyDown={e => e.key === 'Enter' && addCourse(key)}
+                  />
+                  <button className={styles.planAddBtn} onClick={() => addCourse(key)}>+</button>
+                </div>
               </div>
             </div>
           ))}

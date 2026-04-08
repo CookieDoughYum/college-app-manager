@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import TagChip from '../../components/TagChip';
-import MarkdownOutput from '../../components/MarkdownOutput';
 import styles from './Essays.module.css';
 
 const TIMELINE = [
@@ -26,19 +25,13 @@ const DRIVE_FOLDERS = ['UC PIQs', 'Personal Statement', 'Supplementals', 'Honors
 interface EssaysData {
   driveLink: string | null;
   notes: string | null;
-  whyUsResults: Record<string, string>;
 }
 
-const DEFAULT_DATA: EssaysData = { driveLink: null, notes: null, whyUsResults: {} };
+const DEFAULT_DATA: EssaysData = { driveLink: null, notes: null };
 
 export default function Essays() {
   const [data, setData] = useState<EssaysData>(DEFAULT_DATA);
   const [loading, setLoading] = useState(true);
-  const [schoolName, setSchoolName] = useState('');
-  const [whyUsUrl, setWhyUsUrl] = useState('');
-  const [whyUsResult, setWhyUsResult] = useState('');
-  const [whyUsLoading, setWhyUsLoading] = useState(false);
-  const [whyUsError, setWhyUsError] = useState('');
 
   useEffect(() => {
     fetch('/api/student/essays', { credentials: 'include' })
@@ -59,28 +52,6 @@ export default function Essays() {
       credentials: 'include',
       body: JSON.stringify(updated),
     });
-  }
-
-  async function researchSchool() {
-    if (!schoolName.trim()) return;
-    setWhyUsLoading(true);
-    setWhyUsError('');
-    try {
-      const res = await fetch('/api/ai/essays/whyus', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ schoolName: schoolName.trim(), url: whyUsUrl.trim() || undefined }),
-      });
-      if (!res.ok) throw new Error('Server error');
-      const { result } = await res.json();
-      setWhyUsResult(result);
-      setData(prev => ({ ...prev, whyUsResults: { ...prev.whyUsResults, [schoolName.trim()]: result } }));
-    } catch {
-      setWhyUsError('Could not generate recommendations — please try again.');
-    } finally {
-      setWhyUsLoading(false);
-    }
   }
 
   if (loading) return <div className={styles.page}><p>Loading…</p></div>;
@@ -118,39 +89,6 @@ export default function Essays() {
             onChange={(e) => setData({ ...data, driveLink: e.target.value })}
             onBlur={() => save(data)}
           />
-        </div>
-      </section>
-
-      <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>"Why Us?" Assistant</h2>
-        <div className={styles.whyUsRow}>
-          <input
-            className={styles.input}
-            type="text"
-            placeholder="School name (e.g. Stanford)"
-            value={schoolName}
-            onChange={(e) => {
-              setSchoolName(e.target.value);
-              setWhyUsResult(data.whyUsResults[e.target.value.trim()] ?? '');
-            }}
-          />
-          <input
-            className={styles.input}
-            type="text"
-            placeholder="School URL (optional)"
-            value={whyUsUrl}
-            onChange={(e) => setWhyUsUrl(e.target.value)}
-            style={{ marginTop: '0.5rem' }}
-          />
-          <button className={styles.researchBtn} onClick={researchSchool} disabled={whyUsLoading}>
-            {whyUsLoading ? 'Researching…' : 'Research →'}
-          </button>
-        </div>
-        {whyUsError && <p style={{ color: '#e94560' }}>{whyUsError}</p>}
-        <div className={styles.outputArea}>
-          {whyUsResult
-            ? <MarkdownOutput>{whyUsResult}</MarkdownOutput>
-            : 'Enter a school name and click Research to generate talking points for your "Why Us?" essay.'}
         </div>
       </section>
 

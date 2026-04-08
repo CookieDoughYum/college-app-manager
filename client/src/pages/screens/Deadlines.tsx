@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import BadgeLabel from '../../components/BadgeLabel';
 import styles from './Deadlines.module.css';
 
 interface Deadline {
@@ -15,17 +14,37 @@ interface DeadlinesData {
 
 const DEFAULT_DATA: DeadlinesData = { manualDeadlines: [] };
 
-// Static November 2025 calendar
-const NOVEMBER_START_DOW = 6; // Saturday = 6 (0=Sun)
-const NOVEMBER_DAYS = 30;
-const HIGHLIGHTED_DAYS = new Set([15, 30]);
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December'];
+
+const VARIANT_COLOR: Record<string, string> = {
+  reach: '#e94560',
+  target: '#e65100',
+  safety: '#2e7d32',
+};
+
+/** Parse "November 1" or "January 15, 2026" → { month: 0-11, day: 1-31 } or null */
+function parseDeadlineDate(dateStr: string): { month: number; day: number } | null {
+  if (!dateStr) return null;
+  for (let m = 0; m < MONTHS.length; m++) {
+    if (dateStr.toLowerCase().includes(MONTHS[m].toLowerCase())) {
+      const match = dateStr.match(/\d+/g);
+      const day = match ? parseInt(match[0]) : null;
+      if (day && day >= 1 && day <= 31) return { month: m, day };
+    }
+  }
+  return null;
+}
 
 export default function Deadlines() {
+  const today = new Date();
   const [data, setData] = useState<DeadlinesData>(DEFAULT_DATA);
   const [loading, setLoading] = useState(true);
   const [fetchLoading, setFetchLoading] = useState(false);
-  const [fetchStatus, setFetchStatus] = useState('');
   const [fetchError, setFetchError] = useState('');
+  const [viewYear, setViewYear] = useState(today.getFullYear());
+  const [viewMonth, setViewMonth] = useState(today.getMonth());
+  const [selectedDay, setSelectedDay] = useState<number | null>(null);
 
   useEffect(() => {
     fetch('/api/student/deadlines', { credentials: 'include' })
@@ -46,34 +65,70 @@ export default function Deadlines() {
 
   async function fetchDeadlines() {
     setFetchLoading(true);
-    setFetchStatus('');
     setFetchError('');
     try {
-      const res = await fetch('/api/ai/deadlines/scrape', {
-        method: 'POST',
-        credentials: 'include',
-      });
+      const res = await fetch('/api/ai/deadlines/scrape', { method: 'POST', credentials: 'include' });
       if (!res.ok) throw new Error('Server error');
-      const { result, deadlines } = await res.json();
-      if (deadlines && deadlines.length > 0) {
-        const merged = [
-          ...data.manualDeadlines.filter((d: any) => !deadlines.find((nd: any) => nd.school === d.school && nd.type === d.label)),
-          ...deadlines.map((d: any) => ({ school: d.school, label: d.type, date: d.date, variant: 'target' as const })),
-        ];
-        save({ manualDeadlines: merged });
+      const { deadlines, result } = await res.json();
+      if (!deadlines || deadlines.length === 0) {
+        setFetchError(result || 'No deadlines returned.');
+        return;
       }
-      setFetchStatus(result);
+      save({ manualDeadlines: deadlines as Deadline[] });
     } catch {
-      setFetchError('Could not generate recommendations — please try again.');
+      setFetchError('Could not fetch deadlines — please try again.');
     } finally {
       setFetchLoading(false);
     }
   }
 
-  const calendarCells: (number | null)[] = [];
-  for (let i = 0; i < NOVEMBER_START_DOW; i++) calendarCells.push(null);
-  for (let d = 1; d <= NOVEMBER_DAYS; d++) calendarCells.push(d);
-  while (calendarCells.length % 7 !== 0) calendarCells.push(null);
+  function removeDeadline(index: number) {
+    save({ manualDeadlines: data.manualDeadlines.filter((_, i) => i !== index) });
+  }
+
+  function prevMonth() {
+    if (viewMonth === 0) { setViewMonth(11); setViewYear(y => y - 1); }
+    else setViewMonth(m => m - 1);
+    setSelectedDay(null);
+  }
+
+  function nextMonth() {
+    if (viewMonth === 11) { setViewMonth(0); setViewYear(y => y + 1); }
+    else setViewMonth(m => m + 1);
+    setSelectedDay(null);
+  }
+
+  // Build calendar grid
+  const firstDow = new Date(viewYear, viewMonth, 1).getDay();
+  const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+  const cells: (number | null)[] = [];
+  for (let i = 0; i < firstDow; i++) cells.push(null);
+  for (let d = 1; d <= daysInMonth; d++) cells.push(d);
+  while (cells.length % 7 !== 0) cells.push(null);
+
+  // Map day → deadlines for this month
+  const deadlinesByDay = new Map<number, Deadline[]>();
+  for (const d of data.manualDeadlines) {
+    const parsed = parseDeadlineDate(d.date);
+    if (parsed && parsed.month === viewMonth) {
+      const list = deadlinesByDay.get(parsed.day) ?? [];
+      list.push(d);
+      deadlinesByDay.set(parsed.day, list);
+    }
+  }
+
+  // Deadlines for selected day or all in this month sorted by day
+  const selectedDeadlines = selectedDay
+    ? (deadlinesByDay.get(selectedDay) ?? [])
+    : [];
+
+  const monthDeadlines = data.manualDeadlines
+    .map(d => ({ deadline: d, parsed: parseDeadlineDate(d.date) }))
+    .filter(x => x.parsed && x.parsed.month === viewMonth)
+    .sort((a, b) => a.parsed!.day - b.parsed!.day);
+
+  const isToday = (day: number) =>
+    day === today.getDate() && viewMonth === today.getMonth() && viewYear === today.getFullYear();
 
   if (loading) return <div className={styles.page}><p>Loading…</p></div>;
 
@@ -83,72 +138,136 @@ export default function Deadlines() {
 
       <section className={styles.section}>
         <div className={styles.calHeader}>
-          <h2 className={styles.sectionTitle}>November 2025</h2>
-          <span className={styles.calNote}>(auto-populated from your college list)</span>
+          <button className={styles.navBtn} onClick={prevMonth}>‹</button>
+          <h2 className={styles.calTitle}>{MONTHS[viewMonth]} {viewYear}</h2>
+          <button className={styles.navBtn} onClick={nextMonth}>›</button>
+          <button
+            className={styles.fetchBtn}
+            onClick={fetchDeadlines}
+            disabled={fetchLoading}
+          >
+            {fetchLoading ? 'Fetching…' : 'Fetch from College List'}
+          </button>
         </div>
+        {fetchError && <p className={styles.fetchError}>{fetchError}</p>}
+
         <div className={styles.calGrid}>
-          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((d) => (
+          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(d => (
             <div key={d} className={styles.calDow}>{d}</div>
           ))}
-          {calendarCells.map((day, i) => (
-            <div
-              key={i}
-              className={
-                day === null
-                  ? styles.calEmpty
-                  : HIGHLIGHTED_DAYS.has(day)
-                  ? `${styles.calDay} ${styles.calDayHighlight}`
-                  : styles.calDay
-              }
-            >
-              {day}
-            </div>
-          ))}
+          {cells.map((day, i) => {
+            if (!day) return <div key={i} className={styles.calEmpty} />;
+            const dots = deadlinesByDay.get(day) ?? [];
+            const selected = selectedDay === day;
+            return (
+              <div
+                key={i}
+                className={`${styles.calDay} ${isToday(day) ? styles.calToday : ''} ${selected ? styles.calSelected : ''}`}
+                onClick={() => setSelectedDay(selected ? null : day)}
+              >
+                <span className={styles.calDayNum}>{day}</span>
+                {dots.length > 0 && (
+                  <div className={styles.dotRow}>
+                    {dots.slice(0, 3).map((d, j) => (
+                      <span key={j} className={styles.dot} style={{ background: VARIANT_COLOR[d.variant] }} />
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
+
+        {selectedDay && selectedDeadlines.length > 0 && (
+          <div className={styles.dayDetail}>
+            <div className={styles.dayDetailTitle}>{MONTHS[viewMonth]} {selectedDay}</div>
+            {selectedDeadlines.map((d, i) => (
+              <div key={i} className={styles.dayDetailItem}>
+                <span className={styles.dayDetailDot} style={{ background: VARIANT_COLOR[d.variant] }} />
+                <span className={styles.dayDetailSchool}>{d.school}</span>
+                <span className={styles.dayDetailLabel}>{d.label}</span>
+              </div>
+            ))}
+          </div>
+        )}
       </section>
 
       <section className={styles.section}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
-          <h2 className={styles.sectionTitle}>Upcoming Deadlines</h2>
-          <div style={{ display: 'flex', gap: '0.5rem' }}>
-            <button
-              style={{ background: '#0f3460', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.4rem 0.8rem', cursor: 'pointer' }}
-              onClick={fetchDeadlines}
-              disabled={fetchLoading}
-            >
-              {fetchLoading ? 'Fetching…' : 'Fetch Deadlines'}
-            </button>
-            <button
-              style={{ background: '#e94560', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.4rem 0.8rem', cursor: 'pointer' }}
-              onClick={() => save({ manualDeadlines: [...data.manualDeadlines, { school: 'School Name', label: 'Regular Decision', date: '', variant: 'target' }] })}
-            >
-              + Add Deadline
-            </button>
-          </div>
+        <div className={styles.listHeader}>
+          <h2 className={styles.sectionTitle}>
+            {monthDeadlines.length > 0 ? `${MONTHS[viewMonth]} Deadlines` : 'All Deadlines'}
+          </h2>
+          <button
+            className={styles.addBtn}
+            onClick={() => save({
+              manualDeadlines: [...data.manualDeadlines, { school: '', label: 'Regular Decision', date: '', variant: 'target' }],
+            })}
+          >
+            + Add
+          </button>
         </div>
-        {fetchError && <p style={{ color: '#e94560' }}>{fetchError}</p>}
-        {fetchStatus && <p style={{ color: '#aaa', fontSize: '0.85rem', marginTop: '0.5rem' }}>{fetchStatus}</p>}
         <div className={styles.deadlineList}>
           {data.manualDeadlines.length === 0 ? (
-            <p style={{ color: '#888' }}>No deadlines added yet.</p>
+            <p className={styles.emptyNote}>No deadlines yet — click "Fetch from College List" to import them automatically.</p>
           ) : (
-            data.manualDeadlines.map((item, i) => (
-              <div key={i} className={styles.deadlineCard}>
-                <div className={styles.deadlineLeft}>
-                  <div className={styles.deadlineSchool}>{item.school}</div>
-                  <div className={styles.deadlineType}>{item.label}</div>
+            data.manualDeadlines.map((item, i) => {
+              const parsed = parseDeadlineDate(item.date);
+              const inView = parsed && parsed.month === viewMonth;
+              return (
+                <div key={i} className={`${styles.deadlineCard} ${inView ? styles.deadlineCardActive : ''}`}>
+                  <div className={styles.dlDot} style={{ background: VARIANT_COLOR[item.variant] }} />
+                  <div className={styles.dlBody}>
+                    <input
+                      className={styles.dlInput}
+                      value={item.school}
+                      placeholder="School"
+                      onChange={e => {
+                        const updated = data.manualDeadlines.map((d, j) => j === i ? { ...d, school: e.target.value } : d);
+                        setData({ manualDeadlines: updated });
+                      }}
+                      onBlur={() => save(data)}
+                    />
+                    <div className={styles.dlMeta}>
+                      <input
+                        className={styles.dlInputSm}
+                        value={item.label}
+                        placeholder="Type (e.g. Early Decision)"
+                        onChange={e => {
+                          const updated = data.manualDeadlines.map((d, j) => j === i ? { ...d, label: e.target.value } : d);
+                          setData({ manualDeadlines: updated });
+                        }}
+                        onBlur={() => save(data)}
+                      />
+                      <input
+                        className={styles.dlInputSm}
+                        value={item.date}
+                        placeholder="Date (e.g. November 1)"
+                        onChange={e => {
+                          const updated = data.manualDeadlines.map((d, j) => j === i ? { ...d, date: e.target.value } : d);
+                          setData({ manualDeadlines: updated });
+                        }}
+                        onBlur={() => save(data)}
+                      />
+                      <select
+                        className={styles.dlSelect}
+                        value={item.variant}
+                        onChange={e => {
+                          const updated = data.manualDeadlines.map((d, j) => j === i ? { ...d, variant: e.target.value as Deadline['variant'] } : d);
+                          save({ manualDeadlines: updated });
+                        }}
+                      >
+                        <option value="reach">Reach</option>
+                        <option value="target">Target</option>
+                        <option value="safety">Safety</option>
+                      </select>
+                    </div>
+                  </div>
+                  <button className={styles.dlRemove} onClick={() => removeDeadline(i)} title="Remove">×</button>
                 </div>
-                <div className={styles.deadlineRight}>
-                  <BadgeLabel variant={item.variant} label={item.variant.charAt(0).toUpperCase() + item.variant.slice(1)} />
-                  <div className={styles.daysUntil}>{item.date || '—'}</div>
-                </div>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
-        <p className={styles.footNote}>
-          Click "Fetch Deadlines" to auto-populate from your college list. You can also add deadlines manually.
-        </p>
       </section>
     </div>
   );
