@@ -7,8 +7,20 @@ import styles from './FinancialAid.module.css';
 const PROFILE_TAGS = ['First-gen', 'STEM', 'California resident', 'Community service'];
 
 const FAFSA_ITEMS = [
-  { key: 'fafsa', label: 'Parents/guardian completed FAFSA', subtext: 'studentaid.gov — opens October 1' },
-  { key: 'css', label: 'Parents/guardian completed CSS Profile', subtext: 'cssprofile.collegeboard.org — required by many private colleges' },
+  {
+    key: 'fafsa',
+    label: 'Parents/guardian completed FAFSA',
+    subtext: 'Opens October 1 — file as early as possible',
+    linkLabel: 'studentaid.gov',
+    linkUrl: 'https://studentaid.gov/h/apply-for-aid/fafsa',
+  },
+  {
+    key: 'css',
+    label: 'Parents/guardian completed CSS Profile',
+    subtext: 'Required by most private colleges for institutional aid',
+    linkLabel: 'cssprofile.collegeboard.org',
+    linkUrl: 'https://cssprofile.collegeboard.org',
+  },
 ];
 
 interface FinancialAidData {
@@ -81,8 +93,67 @@ export default function FinancialAid() {
       <section className={styles.section}>
         <h2 className={styles.sectionTitle}>FAFSA &amp; CSS Checklist</h2>
         {FAFSA_ITEMS.map((item) => (
-          <ChecklistItem key={item.key} checked={data.fafsaChecklist[item.key] ?? false} label={item.label} subtext={item.subtext} onChange={(checked) => toggleFafsa(item.key, checked)} />
+          <div key={item.key} className={styles.fafsaRow}>
+            <ChecklistItem
+              checked={data.fafsaChecklist[item.key] ?? false}
+              label={item.label}
+              subtext={item.subtext}
+              onChange={(checked) => toggleFafsa(item.key, checked)}
+            />
+            <a href={item.linkUrl} target="_blank" rel="noopener noreferrer" className={styles.fafsaLink}>
+              {item.linkLabel} ↗
+            </a>
+          </div>
         ))}
+      </section>
+
+      <section className={styles.section}>
+        <h2 className={styles.sectionTitle}>Understanding Student Loans</h2>
+
+        <div className={styles.loanGrid}>
+          <div className={styles.loanCard}>
+            <div className={styles.loanCardTitle}>Should you take loans?</div>
+            <p className={styles.loanCardText}>
+              Only borrow what you need. Prefer <strong>federal loans</strong> over private — they have fixed rates, flexible repayment, and forgiveness options. Take <strong>subsidized loans first</strong> (government pays interest while you're in school), then unsubsidized. Avoid private loans unless federal limits are exhausted.
+            </p>
+          </div>
+
+          <div className={styles.loanCard}>
+            <div className={styles.loanCardTitle}>How much to borrow</div>
+            <p className={styles.loanCardText}>
+              Rule of thumb: <strong>total debt ≤ first year's expected salary.</strong> If you expect to earn $50k/year, borrow no more than $50k total. Federal annual limits: $5,500 (freshman) → $6,500 (sophomore) → $7,500 (junior/senior). Graduate students up to $20,500/year.
+            </p>
+          </div>
+
+          <div className={styles.loanCard}>
+            <div className={styles.loanCardTitle}>Repayment schedule</div>
+            <p className={styles.loanCardText}>
+              <strong>Standard plan:</strong> 10 years, ~$100/month per $10,000 borrowed. Income-driven plans (IBR, SAVE) cap payments at 5–10% of discretionary income. Repayment begins 6 months after graduation or dropping below half-time enrollment.
+            </p>
+          </div>
+
+          <div className={styles.loanCard}>
+            <div className={styles.loanCardTitle}>Forgiveness programs</div>
+            <p className={styles.loanCardText}>
+              <strong>Public Service Loan Forgiveness (PSLF):</strong> forgives remaining balance after 10 years of payments if you work for a government or nonprofit. <strong>Teacher Loan Forgiveness:</strong> up to $17,500 after 5 years in a low-income school. Income-driven plans forgive after 20–25 years.
+            </p>
+          </div>
+        </div>
+
+        <div className={styles.loanLinks}>
+          <a href="https://studentaid.gov/understand-aid/types/loans" target="_blank" rel="noopener noreferrer" className={styles.loanLink}>
+            Federal loan types ↗
+          </a>
+          <a href="https://studentaid.gov/aid-estimator/" target="_blank" rel="noopener noreferrer" className={styles.loanLink}>
+            Aid estimator ↗
+          </a>
+          <a href="https://studentaid.gov/repay-loans/understand/plans" target="_blank" rel="noopener noreferrer" className={styles.loanLink}>
+            Repayment plans ↗
+          </a>
+          <a href="https://studentaid.gov/manage-loans/forgiveness-cancellation/public-service" target="_blank" rel="noopener noreferrer" className={styles.loanLink}>
+            PSLF ↗
+          </a>
+        </div>
       </section>
 
       <section className={styles.section}>

@@ -24,6 +24,14 @@
   margin: 0 0 14px;
 }
 
+.sectionNote {
+  font-size: 12px;
+  color: #888;
+  margin: -8px 0 12px;
+}
+
+/* Key Dates */
+
 .dateCards {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -60,19 +68,58 @@
   line-height: 1.5;
 }
 
+/* Section header */
+
 .listHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 }
 
 .listHeader .sectionTitle {
   margin: 0;
 }
 
+/* Preset quick-add chips */
+
+.presetRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.presetChip {
+  font-size: 12px;
+  font-weight: 600;
+  color: #e94560;
+  background: #fdf0f2;
+  border: 1px solid #f5cdd4;
+  border-radius: 16px;
+  padding: 5px 12px;
+  cursor: pointer;
+}
+
+.presetChip:hover {
+  background: #fae0e5;
+}
+
+.presetChipAdded {
+  font-size: 12px;
+  font-weight: 600;
+  color: #888;
+  background: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 16px;
+  padding: 5px 12px;
+  cursor: default;
+}
+
+/* Add button */
+
 .addBtn {
-  padding: 6px 14px;
+  padding: 5px 12px;
   background: #e94560;
   color: white;
   border: none;
@@ -80,11 +127,14 @@
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
+  flex-shrink: 0;
 }
 
 .addBtn:hover {
   background: #c73652;
 }
+
+/* Portal cards */
 
 .emptyState {
   font-size: 13px;
@@ -95,30 +145,177 @@
 .portalList {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 
 .portalCard {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 12px;
   border: 1px solid #e8e8e8;
   border-radius: 6px;
   padding: 12px 16px;
 }
 
+.portalInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
 .portalName {
   font-size: 14px;
   font-weight: 600;
   color: #1a1a2e;
-  flex: 1;
 }
 
-.portalUrl {
+.portalLink {
+  font-size: 12px;
+  color: #e94560;
+  text-decoration: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 380px;
+}
+
+.portalLink:hover {
+  text-decoration: underline;
+}
+
+.cardActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* Inline edit form */
+
+.inlineForm {
+  border: 1px solid #e8e8e8;
+  border-radius: 6px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 8px;
+  background: #fafafa;
+}
+
+.formInput {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 7px 10px;
+  font-size: 13px;
+  color: #1a1a2e;
+  background: white;
+  outline: none;
+}
+
+.formInput:focus {
+  border-color: #e94560;
+}
+
+.formSelect {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 7px 10px;
+  font-size: 13px;
+  color: #1a1a2e;
+  background: white;
+  outline: none;
+  cursor: pointer;
+}
+
+.formSelect:focus {
+  border-color: #e94560;
+}
+
+.formActions {
+  display: flex;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+/* Buttons */
+
+.editBtn {
   font-size: 12px;
   color: #888;
-  flex: 1;
+  background: none;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 4px 10px;
+  cursor: pointer;
 }
+
+.editBtn:hover {
+  border-color: #aaa;
+  color: #555;
+}
+
+.deleteIconBtn {
+  font-size: 16px;
+  line-height: 1;
+  color: #bbb;
+  background: none;
+  border: none;
+  padding: 2px 4px;
+  cursor: pointer;
+}
+
+.deleteIconBtn:hover {
+  color: #e94560;
+}
+
+.saveBtn {
+  font-size: 13px;
+  font-weight: 600;
+  color: white;
+  background: #e94560;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 14px;
+  cursor: pointer;
+}
+
+.saveBtn:hover {
+  background: #c73652;
+}
+
+.cancelBtn {
+  font-size: 13px;
+  color: #555;
+  background: none;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 6px 14px;
+  cursor: pointer;
+}
+
+.cancelBtn:hover {
+  border-color: #aaa;
+}
+
+.deleteBtn {
+  font-size: 13px;
+  color: #e94560;
+  background: none;
+  border: 1px solid #e9c0c8;
+  border-radius: 4px;
+  padding: 6px 14px;
+  cursor: pointer;
+  margin-left: auto;
+}
+
+.deleteBtn:hover {
+  background: #fdf0f2;
+}
+
+/* Status badges */
 
 .statusTag {
   display: inline-block;
@@ -126,19 +323,14 @@
   border-radius: 12px;
   font-size: 12px;
   font-weight: 600;
+  white-space: nowrap;
 }
 
-.statusInProgress {
-  background: #e8f5e9;
-  color: #2e7d32;
-}
-
-.statusNotStarted {
-  background: #fff3e0;
-  color: #e65100;
-}
-
-.statusSubmitted {
-  background: #e3f2fd;
-  color: #1565c0;
-}
+.statusNotStarted  { background: #fff3e0; color: #e65100; }
+.statusInProgress  { background: #e8f5e9; color: #2e7d32; }
+.statusSubmitted   { background: #e3f2fd; color: #1565c0; }
+.statusPending     { background: #ede7f6; color: #4527a0; }
+.statusAccepted    { background: #e8f5e9; color: #1b5e20; }
+.statusWaitlisted  { background: #fff8e1; color: #f57f17; }
+.statusDenied      { background: #fce4ec; color: #880e4f; }
+.statusEnrolled    { background: #e3f2fd; color: #0d47a1; }

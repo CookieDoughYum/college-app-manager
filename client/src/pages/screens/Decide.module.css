@@ -57,12 +57,144 @@
 }
 
 .resultCard {
-  border-left: 4px solid;
+  border-left: 4px solid #e0e0e0;
   border-radius: 0 6px 6px 0;
   padding: 12px 16px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.pending {
+  border-left-color: #bbb;
+  background: #fafafa;
+}
+
+.cardRight {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Inline form */
+
+.inlineForm {
+  border: 1px solid #e8e8e8;
+  border-radius: 6px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 10px;
+  background: #fafafa;
+}
+
+.formInput {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 7px 10px;
+  font-size: 13px;
+  color: #1a1a2e;
+  background: white;
+  outline: none;
+}
+
+.formInput:focus {
+  border-color: #e94560;
+}
+
+.formSelect {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 7px 10px;
+  font-size: 13px;
+  color: #1a1a2e;
+  background: white;
+  outline: none;
+  cursor: pointer;
+}
+
+.formSelect:focus {
+  border-color: #e94560;
+}
+
+.formActions {
+  display: flex;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.editBtn {
+  font-size: 12px;
+  color: #888;
+  background: none;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 4px 10px;
+  cursor: pointer;
+}
+
+.editBtn:hover {
+  border-color: #aaa;
+  color: #555;
+}
+
+.saveBtn {
+  font-size: 13px;
+  font-weight: 600;
+  color: white;
+  background: #e94560;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 14px;
+  cursor: pointer;
+}
+
+.saveBtn:hover {
+  background: #c73652;
+}
+
+.cancelBtn {
+  font-size: 13px;
+  color: #555;
+  background: none;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 6px 14px;
+  cursor: pointer;
+}
+
+.cancelBtn:hover {
+  border-color: #aaa;
+}
+
+.deleteBtn {
+  font-size: 13px;
+  color: #e94560;
+  background: none;
+  border: 1px solid #e9c0c8;
+  border-radius: 4px;
+  padding: 6px 14px;
+  cursor: pointer;
+  margin-left: auto;
+}
+
+.deleteBtn:hover {
+  background: #fdf0f2;
+}
+
+.deleteIconBtn {
+  font-size: 16px;
+  line-height: 1;
+  color: #bbb;
+  background: none;
+  border: none;
+  padding: 2px 4px;
+  cursor: pointer;
+}
+
+.deleteIconBtn:hover {
+  color: #e94560;
 }
 
 .accepted {
@@ -149,8 +281,47 @@
 
 .honorsItem {
   font-size: 13px;
-  color: #333;
-  padding: 8px 12px;
-  background: #f5f5f5;
-  border-radius: 5px;
+  color: #888;
+  padding: 8px 0;
+}
+
+.honorsCard {
+  border: 1px solid #e8e8e8;
+  border-radius: 6px;
+  padding: 14px 16px;
+}
+
+.honorsCardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
+.honorsSchoolName {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a1a2e;
+}
+
+.honorsBtn {
+  font-size: 12px;
+  font-weight: 600;
+  color: #e94560;
+  background: #fdf0f2;
+  border: 1px solid #f5cdd4;
+  border-radius: 4px;
+  padding: 4px 10px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.honorsBtn:hover:not(:disabled) {
+  background: #fae0e5;
+}
+
+.honorsBtn:disabled {
+  opacity: 0.6;
+  cursor: default;
 }

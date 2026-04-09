@@ -80,16 +80,6 @@ export default function Essays() {
             <TagChip key={folder} label={folder} selected={true} onClick={() => {}} />
           ))}
         </div>
-        <div style={{ marginTop: '0.75rem' }}>
-          <input
-            className={styles.input}
-            type="text"
-            placeholder="Paste your Google Drive folder link"
-            value={data.driveLink ?? ''}
-            onChange={(e) => setData({ ...data, driveLink: e.target.value })}
-            onBlur={() => save(data)}
-          />
-        </div>
       </section>
 
       {/* Notes */}

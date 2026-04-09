@@ -173,24 +173,20 @@ aiRouter.post('/decide/compare', async (req: Request, res: Response, next: NextF
       return res.json({ result: 'Add at least 2 accepted schools to generate a comparison.' });
     }
 
-    const school1 = accepted[0];
-    const school2 = accepted[1];
+    const schoolList = accepted.map((s: string, i: number) => `School ${i + 1}: ${s}`).join('\n');
+    const schoolSections = accepted.map((s: string) => `## ${s} Pros\n(3–4 bullet points)`).join('\n\n');
 
-    const prompt = `You are a college counselor helping a student choose between two colleges.
-School 1: ${school1}
-School 2: ${school2}
+    const prompt = `You are a college counselor helping a student choose between colleges.
+${schoolList}
 Student's interest area: ${majorAnswers.interestArea || 'not specified'}
 Student's salary goal: ${majorAnswers.salaryGoal || 'not specified'}
 
-Compare these two schools for this student. Provide:
-## ${school1} Pros
-(3–4 bullet points)
+Compare these schools for this student. For each school provide a pros section, then end with a recommendation.
 
-## ${school2} Pros
-(3–4 bullet points)
+${schoolSections}
 
 ## Recommendation
-(1–2 sentences on which school better fits this student's goals, with specific reasons)`;
+(1–2 sentences on which school best fits this student's goals, with specific reasons)`;
 
     const result = await askClaude(prompt);
 
@@ -200,6 +196,29 @@ Compare these two schools for this student. Provide:
       update: { aiRecommendations: { comparison: result } },
     });
 
+    res.json({ result });
+  } catch (err) { next(err); }
+});
+
+// --- Decide: honors program info ---
+
+aiRouter.post('/decide/honors', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { school } = req.body as { school?: string };
+    if (!school?.trim()) return res.status(400).json({ error: 'school is required' });
+
+    const prompt = `You are a college counselor. Provide a brief, accurate summary of the honors program at ${school}.
+
+Include:
+- **Program name** (official name of the honors college or program, if it exists)
+- **Key benefits** (2–3 bullet points: small classes, research, housing, scholarships, etc.)
+- **How to apply** (1 sentence: application timing and any requirements like GPA or essay)
+- **Worth it?** (1 sentence honest assessment for a motivated student)
+
+If ${school} does not have a distinct honors program, say so briefly and mention any honors-track options or similar programs.
+Be specific and accurate. Keep it concise — 6–8 lines total.`;
+
+    const result = await askClaude(prompt);
     res.json({ result });
   } catch (err) { next(err); }
 });

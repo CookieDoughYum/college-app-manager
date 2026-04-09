@@ -47,6 +47,83 @@
   margin-bottom: 16px;
 }
 
+/* FAFSA link row */
+
+.fafsaRow {
+  position: relative;
+}
+
+.fafsaLink {
+  display: inline-block;
+  margin: 0 0 8px 28px;
+  font-size: 12px;
+  color: #e94560;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.fafsaLink:hover {
+  text-decoration: underline;
+}
+
+/* Loan section */
+
+.loanGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 12px 0 16px;
+}
+
+@media (max-width: 540px) {
+  .loanGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.loanCard {
+  border: 1px solid #e8e8e8;
+  border-radius: 6px;
+  padding: 14px 16px;
+}
+
+.loanCardTitle {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin-bottom: 6px;
+}
+
+.loanCardText {
+  font-size: 13px;
+  color: #555;
+  line-height: 1.55;
+  margin: 0;
+}
+
+.loanLinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  border-top: 1px solid #f0f0f0;
+  padding-top: 12px;
+}
+
+.loanLink {
+  font-size: 12px;
+  font-weight: 600;
+  color: #e94560;
+  text-decoration: none;
+  background: #fdf0f2;
+  border: 1px solid #f5cdd4;
+  border-radius: 4px;
+  padding: 4px 10px;
+}
+
+.loanLink:hover {
+  background: #fae0e5;
+}
+
 .scholarshipList {
   display: flex;
   flex-direction: column;
