@@ -2,7 +2,16 @@
   "permissions": {
     "allow": [
       "mcp__clasi__*",
-      "Bash(*)"
+      "Bash(*)",
+      "WebFetch(domain:www.bls.gov)",
+      "WebSearch",
+      "WebFetch(domain:api.bls.gov)",
+      "WebFetch(domain:services.onetcenter.org)",
+      "WebFetch(domain:data.ed.gov)",
+      "WebFetch(domain:collegescorecard.ed.gov)",
+      "WebFetch(domain:api.data.gov)",
+      "WebFetch(domain:valerieparhamthompson.com)",
+      "WebFetch(domain:nces.ed.gov)"
     ]
   }
 }

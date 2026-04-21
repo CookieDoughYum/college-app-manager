@@ -3,6 +3,7 @@ import { prisma } from '../services/prisma';
 import { requireAuth } from '../middleware/requireAuth';
 import { askClaude } from '../services/claude';
 import { fetchPageText } from '../services/webFetch';
+import { getMajorSalaries } from '../services/scorecard';
 
 export const aiRouter = Router();
 
@@ -93,13 +94,21 @@ aiRouter.post('/colleges/recommend', async (req: Request, res: Response, next: N
     const colleges = await prisma.studentColleges.findUnique({ where: { studentId } });
     const majorAnswers = (colleges?.majorAnswers as any) ?? {};
 
+    const salaryData = await getMajorSalaries();
+    const salaryLines = Object.entries(salaryData)
+      .map(([major, salary]) => `- ${major}: $${salary.toLocaleString()}/yr`)
+      .join('\n');
+    const salaryBlock = salaryLines
+      ? `\nVerified median earnings 4 years after graduation (U.S. Dept. of Education, College Scorecard):\n${salaryLines}\nUse these figures when citing salary for the majors listed above. For majors not listed, estimate based on similar fields.\n`
+      : '';
+
     const prompt = `You are a college counselor helping a student choose a college major.
 Salary goal: ${majorAnswers.salaryGoal || 'not specified'}
 Interest area: ${majorAnswers.interestArea || 'not specified'}
-
+${salaryBlock}
 Recommend 4–5 college majors that align with these goals. For each, include:
 - Major name
-- Average starting salary
+- Median salary (use verified figure above if available, otherwise estimate)
 - Why it fits this student's goals
 - 2–3 specific colleges known for this major
 
@@ -229,12 +238,23 @@ aiRouter.post('/financialaid/scholarships', async (req: Request, res: Response, 
   try {
     const studentId = sid(req);
     const aid = await prisma.studentFinancialAid.findUnique({ where: { studentId } });
-    const answers = (aid?.scholarshipAnswers as Record<string, boolean>) ?? {};
+    const answers = (aid?.scholarshipAnswers as Record<string, any>) ?? {};
 
-    const tags = Object.entries(answers).filter(([, v]) => v).map(([k]) => k.replace(/_/g, ' ')).join(', ');
+    const lines: string[] = [];
+    if (answers.firstGen === 'yes') lines.push('First-generation college student');
+    if (answers.financialNeed === 'yes') lines.push('Has demonstrated financial need');
+    if (answers.gpa) lines.push(`GPA range: ${answers.gpa}`);
+    if (answers.field) lines.push(`Intended field: ${answers.field}`);
+    if (answers.major) lines.push(`Specific major/goal: ${answers.major}`);
+    if (answers.state) lines.push(`State: ${answers.state}`);
+    if (Array.isArray(answers.activities) && answers.activities.length > 0)
+      lines.push(`Activities: ${answers.activities.join(', ')}`);
+    if (answers.background) lines.push(`Background: ${answers.background}`);
+    const profile = lines.length > 0 ? lines.join('\n') : 'no specific profile information provided';
 
     const prompt = `You are a college counselor helping a student find scholarships.
-Student profile tags: ${tags || 'no specific profile tags selected'}
+Student profile:
+${profile}
 
 Recommend 4–5 real scholarships that match this student's profile. For each, include:
 - Scholarship name
@@ -291,6 +311,77 @@ Format as a numbered list.`;
       update: { whyUsResults: updatedResults },
     });
 
+    res.json({ result });
+  } catch (err) { next(err); }
+});
+
+// --- Essays: brainstorm topics ---
+
+aiRouter.post('/essays/brainstorm', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const studentId = sid(req);
+    const student = req.user as any;
+    const { essayType, theme } = req.body as { essayType?: string; theme?: string };
+
+    const grade = student.grade ?? 11;
+    const acts = await prisma.studentActivities.findUnique({ where: { studentId } });
+    const interests = Array.isArray(acts?.interests) ? (acts.interests as string[]).join(', ') : 'not specified';
+
+    const essayTypeLabel = essayType || 'Personal Statement';
+    const themeNote = theme?.trim() ? `\nThe student is considering this theme or topic: ${theme}` : '';
+
+    const prompt = `You are a college essay coach helping a Grade ${grade} student brainstorm ideas for their ${essayTypeLabel}.
+Student's interests: ${interests}${themeNote}
+
+Generate 5–6 specific, compelling essay topic ideas. For each:
+- Give it a short title
+- Describe the core story or angle in 1–2 sentences
+- Note what quality or growth it could reveal about the student
+
+Format each as:
+**[Title]**
+Story: [description]
+Reveals: [what it shows about the student]`;
+
+    const result = await askClaude(prompt);
+    res.json({ result });
+  } catch (err) { next(err); }
+});
+
+// --- Essays: feedback on draft ---
+
+aiRouter.post('/essays/feedback', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { essayText, essayType, prompt: essayPrompt } = req.body as { essayText: string; essayType?: string; prompt?: string };
+
+    if (!essayText?.trim()) return res.status(400).json({ error: 'essayText is required' });
+
+    const wordCount = essayText.trim().split(/\s+/).length;
+    const essayTypeLabel = essayType || 'college essay';
+    const promptNote = essayPrompt?.trim() ? `\nEssay prompt: "${essayPrompt}"` : '';
+
+    const prompt = `You are a college essay coach reviewing a student's ${essayTypeLabel} draft (${wordCount} words).${promptNote}
+
+Essay:
+"""
+${essayText}
+"""
+
+Provide structured feedback:
+
+## Overall Impression
+1–2 sentences on the essay's current state and the single most important priority.
+
+## Strengths
+2–3 specific things that are working well, with examples from the text.
+
+## Areas to Improve
+3–4 specific, actionable suggestions. Be direct and encouraging.
+
+## Line-Level Notes
+2–3 specific sentences or phrases to revise, each with a suggested revision or direction.`;
+
+    const result = await askClaude(prompt);
     res.json({ result });
   } catch (err) { next(err); }
 });

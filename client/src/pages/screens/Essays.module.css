@@ -89,3 +89,113 @@
   font-size: 13px;
   box-sizing: border-box;
 }
+
+/* AI tool shared */
+.aiNote {
+  font-size: 13px;
+  color: #555;
+  margin: 0 0 14px;
+}
+
+.aiLabel {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #444;
+  margin-bottom: 4px;
+}
+
+.aiSelect,
+.aiInput {
+  width: 100%;
+  height: 36px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 0 10px;
+  font-size: 13px;
+  box-sizing: border-box;
+  background: #fff;
+  color: #213547;
+}
+
+.aiField {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.aiButton {
+  align-self: flex-end;
+  height: 36px;
+  padding: 0 18px;
+  background: #e94560;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.aiButton:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.aiError {
+  font-size: 13px;
+  color: #c62828;
+  margin: 8px 0 0;
+}
+
+.aiOutput {
+  margin-top: 14px;
+  padding: 14px 16px;
+  background: #f7f8fc;
+  border-radius: 6px;
+  border: 1px solid #e0e4ee;
+}
+
+/* Brainstormer layout */
+.aiRow {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+/* Feedback layout */
+.fbRow {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.fbMeta {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.fbMeta .aiField {
+  flex: 1;
+  min-width: 180px;
+}
+
+.aiTextarea {
+  width: 100%;
+  min-height: 160px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px 12px;
+  font-size: 13px;
+  font-family: inherit;
+  box-sizing: border-box;
+  resize: vertical;
+  line-height: 1.5;
+  background: #fff;
+  color: #213547;
+}

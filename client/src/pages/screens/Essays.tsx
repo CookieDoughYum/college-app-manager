@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import TagChip from '../../components/TagChip';
+import MarkdownOutput from '../../components/MarkdownOutput';
 import styles from './Essays.module.css';
 
 const TIMELINE = [
@@ -24,34 +25,78 @@ const DRIVE_FOLDERS = ['UC PIQs', 'Personal Statement', 'Supplementals', 'Honors
 
 interface EssaysData {
   driveLink: string | null;
-  notes: string | null;
 }
 
-const DEFAULT_DATA: EssaysData = { driveLink: null, notes: null };
+const DEFAULT_DATA: EssaysData = { driveLink: null };
 
 export default function Essays() {
   const [data, setData] = useState<EssaysData>(DEFAULT_DATA);
   const [loading, setLoading] = useState(true);
 
+  // Brainstormer state
+  const [bsPrompt, setBsPrompt] = useState('');
+  const [bsResult, setBsResult] = useState('');
+  const [bsLoading, setBsLoading] = useState(false);
+  const [bsError, setBsError] = useState('');
+
+  // Feedback state
+  const [fbEssayText, setFbEssayText] = useState('');
+  const [fbPrompt, setFbPrompt] = useState('');
+  const [fbResult, setFbResult] = useState('');
+  const [fbLoading, setFbLoading] = useState(false);
+  const [fbError, setFbError] = useState('');
+
   useEffect(() => {
     fetch('/api/student/essays', { credentials: 'include' })
       .then(r => r.json())
       .then(d => {
-        const loaded = d ?? DEFAULT_DATA;
-        setData(loaded);
+        setData({ driveLink: d?.driveLink ?? null });
         setLoading(false);
       })
       .catch(() => setLoading(false));
   }, []);
 
-  function save(updated: EssaysData) {
-    setData(updated);
-    fetch('/api/student/essays', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify(updated),
-    });
+  async function runBrainstorm() {
+    setBsLoading(true);
+    setBsError('');
+    setBsResult('');
+    try {
+      const res = await fetch('/api/ai/essays/brainstorm', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ theme: bsPrompt }),
+      });
+      if (!res.ok) throw new Error('Server error');
+      const { result } = await res.json();
+      setBsResult(result);
+    } catch {
+      setBsError('Could not generate ideas — please try again.');
+    } finally {
+      setBsLoading(false);
+    }
+  }
+
+  async function runFeedback() {
+    if (!fbEssayText.trim()) return;
+    setFbLoading(true);
+    setFbError('');
+    setFbResult('');
+    try {
+      const res = await fetch('/api/ai/essays/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ essayText: fbEssayText, prompt: fbPrompt }),
+      });
+      if (!res.ok) throw new Error('Server error');
+      const { result } = await res.json();
+      setFbResult(result);
+    } catch {
+      setFbError('Could not generate feedback — please try again.');
+    } finally {
+      setFbLoading(false);
+    }
   }
 
   if (loading) return <div className={styles.page}><p>Loading…</p></div>;
@@ -82,16 +127,67 @@ export default function Essays() {
         </div>
       </section>
 
-      {/* Notes */}
+      {/* AI Brainstormer */}
       <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Notes</h2>
-        <textarea
-          style={{ width: '100%', minHeight: '80px', padding: '0.5rem', borderRadius: '6px', border: '1px solid #333', background: '#16213e', color: '#fff', resize: 'vertical' }}
-          placeholder="Essay notes, ideas, or reminders…"
-          value={data.notes ?? ''}
-          onChange={(e) => setData({ ...data, notes: e.target.value })}
-          onBlur={() => save(data)}
-        />
+        <h2 className={styles.sectionTitle}>AI Essay Brainstormer</h2>
+        <p className={styles.aiNote}>Get personalized topic ideas based on your interests and activities.</p>
+        <div className={styles.aiRow}>
+          <div className={styles.aiField}>
+            <label className={styles.aiLabel}>What do you want to write about? (optional)</label>
+            <input
+              className={styles.aiInput}
+              type="text"
+              placeholder="e.g. overcoming a challenge, my passion for robotics, a defining moment…"
+              value={bsPrompt}
+              onChange={(e) => setBsPrompt(e.target.value)}
+            />
+          </div>
+          <button
+            className={styles.aiButton}
+            onClick={runBrainstorm}
+            disabled={bsLoading}
+          >
+            {bsLoading ? 'Generating…' : 'Generate Ideas'}
+          </button>
+        </div>
+        {bsError && <p className={styles.aiError}>{bsError}</p>}
+        {bsResult && <div className={styles.aiOutput}><MarkdownOutput>{bsResult}</MarkdownOutput></div>}
+      </section>
+
+      {/* AI Feedback Tool */}
+      <section className={styles.section}>
+        <h2 className={styles.sectionTitle}>AI Essay Feedback</h2>
+        <p className={styles.aiNote}>Paste your draft to get structured feedback on strengths, areas to improve, and line-level edits.</p>
+        <div className={styles.fbRow}>
+          <div className={styles.aiField}>
+            <label className={styles.aiLabel}>Essay prompt or title (optional)</label>
+            <input
+              className={styles.aiInput}
+              type="text"
+              placeholder="e.g. Describe a challenge you've faced and how you overcame it"
+              value={fbPrompt}
+              onChange={(e) => setFbPrompt(e.target.value)}
+            />
+          </div>
+          <div className={styles.aiField}>
+            <label className={styles.aiLabel}>Paste your essay draft</label>
+            <textarea
+              className={styles.aiTextarea}
+              placeholder="Paste your essay here…"
+              value={fbEssayText}
+              onChange={(e) => setFbEssayText(e.target.value)}
+            />
+          </div>
+          <button
+            className={styles.aiButton}
+            onClick={runFeedback}
+            disabled={fbLoading || !fbEssayText.trim()}
+          >
+            {fbLoading ? 'Analyzing…' : 'Get Feedback'}
+          </button>
+        </div>
+        {fbError && <p className={styles.aiError}>{fbError}</p>}
+        {fbResult && <div className={styles.aiOutput}><MarkdownOutput>{fbResult}</MarkdownOutput></div>}
       </section>
     </div>
   );

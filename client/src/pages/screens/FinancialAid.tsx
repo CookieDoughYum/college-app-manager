@@ -1,10 +1,7 @@
 import { useState, useEffect } from 'react';
 import ChecklistItem from '../../components/ChecklistItem';
-import TagChip from '../../components/TagChip';
 import MarkdownOutput from '../../components/MarkdownOutput';
 import styles from './FinancialAid.module.css';
-
-const PROFILE_TAGS = ['First-gen', 'STEM', 'California resident', 'Community service'];
 
 const FAFSA_ITEMS = [
   {
@@ -23,13 +20,32 @@ const FAFSA_ITEMS = [
   },
 ];
 
+const GPA_OPTIONS = ['4.0+', '3.5–3.99', '3.0–3.49', '2.5–2.99', 'Below 2.5'];
+const FIELD_OPTIONS = ['STEM', 'Arts / Humanities', 'Business', 'Health / Medicine', 'Social Sciences', 'Education', 'Trade / Technical', 'Undecided'];
+const ACTIVITY_OPTIONS = ['Community service', 'Sports / Athletics', 'Student government', 'Arts / Music / Theater', 'Debate / Speech', 'STEM club / Robotics', 'Religious / Faith', 'Part-time work'];
+
+interface QuizAnswers {
+  firstGen?: string;
+  major?: string;
+  state?: string;
+  gpa?: string;
+  field?: string;
+  financialNeed?: string;
+  activities?: string[];
+  background?: string;
+}
+
 interface FinancialAidData {
   fafsaChecklist: Record<string, boolean>;
-  scholarshipAnswers: Record<string, boolean>;
+  scholarshipAnswers: QuizAnswers;
   aiRecommendations: Record<string, string>;
 }
 
-const DEFAULT_DATA: FinancialAidData = { fafsaChecklist: {}, scholarshipAnswers: {}, aiRecommendations: {} };
+const DEFAULT_DATA: FinancialAidData = {
+  fafsaChecklist: {},
+  scholarshipAnswers: {},
+  aiRecommendations: {},
+};
 
 export default function FinancialAid() {
   const [data, setData] = useState<FinancialAidData>(DEFAULT_DATA);
@@ -58,9 +74,17 @@ export default function FinancialAid() {
     save({ ...data, fafsaChecklist: { ...data.fafsaChecklist, [key]: checked } });
   }
 
-  function toggleScholarshipTag(tag: string) {
-    const key = tag.toLowerCase().replace(/\s+/g, '_');
-    save({ ...data, scholarshipAnswers: { ...data.scholarshipAnswers, [key]: !data.scholarshipAnswers[key] } });
+  function setQuiz(patch: Partial<QuizAnswers>) {
+    const updated = { ...data, scholarshipAnswers: { ...data.scholarshipAnswers, ...patch } };
+    save(updated);
+  }
+
+  function toggleActivity(activity: string) {
+    const current = data.scholarshipAnswers?.activities ?? [];
+    const next = current.includes(activity)
+      ? current.filter(a => a !== activity)
+      : [...current, activity];
+    setQuiz({ activities: next });
   }
 
   async function findScholarships() {
@@ -80,7 +104,9 @@ export default function FinancialAid() {
 
   if (loading) return <div className={styles.page}><p>Loading…</p></div>;
 
+  const quiz = data.scholarshipAnswers ?? {};
   const aiText = data.aiRecommendations?.scholarships;
+  const activities = quiz.activities ?? [];
 
   return (
     <div className={styles.page}>
@@ -156,25 +182,143 @@ export default function FinancialAid() {
         </div>
       </section>
 
+      {/* Scholarship Quiz */}
       <section className={styles.section}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h2 className={styles.sectionTitle}>Recommended Scholarships</h2>
-          <button onClick={findScholarships} disabled={aiLoading} style={{ background: '#e94560', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.4rem 0.8rem', cursor: 'pointer' }}>
-            {aiLoading ? 'Finding…' : 'Find Scholarships'}
+        <h2 className={styles.sectionTitle}>Scholarship Matcher</h2>
+        <p className={styles.quizIntro}>Answer a few questions so we can match you with scholarships that fit your profile.</p>
+
+        <div className={styles.quizGrid}>
+          {/* First-gen */}
+          <div className={styles.quizQuestion}>
+            <div className={styles.quizLabel}>Are you a first-generation college student?</div>
+            <div className={styles.quizOptions}>
+              {['Yes', 'No'].map(opt => (
+                <button
+                  key={opt}
+                  className={`${styles.quizOption} ${quiz.firstGen === opt.toLowerCase() ? styles.quizOptionSelected : ''}`}
+                  onClick={() => setQuiz({ firstGen: opt.toLowerCase() })}
+                >
+                  {opt}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Financial need */}
+          <div className={styles.quizQuestion}>
+            <div className={styles.quizLabel}>Do you have demonstrated financial need?</div>
+            <div className={styles.quizOptions}>
+              {['Yes', 'No', 'Not sure'].map(opt => (
+                <button
+                  key={opt}
+                  className={`${styles.quizOption} ${quiz.financialNeed === opt.toLowerCase() ? styles.quizOptionSelected : ''}`}
+                  onClick={() => setQuiz({ financialNeed: opt.toLowerCase() })}
+                >
+                  {opt}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* GPA */}
+          <div className={styles.quizQuestion}>
+            <div className={styles.quizLabel}>GPA range</div>
+            <div className={styles.quizOptions}>
+              {GPA_OPTIONS.map(opt => (
+                <button
+                  key={opt}
+                  className={`${styles.quizOption} ${quiz.gpa === opt ? styles.quizOptionSelected : ''}`}
+                  onClick={() => setQuiz({ gpa: opt })}
+                >
+                  {opt}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Field of interest */}
+          <div className={styles.quizQuestion}>
+            <div className={styles.quizLabel}>Intended field of study</div>
+            <div className={styles.quizOptions}>
+              {FIELD_OPTIONS.map(opt => (
+                <button
+                  key={opt}
+                  className={`${styles.quizOption} ${quiz.field === opt ? styles.quizOptionSelected : ''}`}
+                  onClick={() => setQuiz({ field: opt })}
+                >
+                  {opt}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Major (text) */}
+          <div className={`${styles.quizQuestion} ${styles.quizQuestionWide}`}>
+            <div className={styles.quizLabel}>Specific major or career goal (optional)</div>
+            <input
+              className={styles.quizInput}
+              type="text"
+              placeholder="e.g. Nursing, Computer Engineering, Undecided"
+              value={quiz.major ?? ''}
+              onChange={(e) => setQuiz({ major: e.target.value })}
+              onBlur={() => setQuiz({ major: quiz.major })}
+            />
+          </div>
+
+          {/* State */}
+          <div className={`${styles.quizQuestion} ${styles.quizQuestionWide}`}>
+            <div className={styles.quizLabel}>State of residence</div>
+            <input
+              className={styles.quizInput}
+              type="text"
+              placeholder="e.g. California"
+              value={quiz.state ?? ''}
+              onChange={(e) => setQuiz({ state: e.target.value })}
+              onBlur={() => setQuiz({ state: quiz.state })}
+            />
+          </div>
+
+          {/* Activities */}
+          <div className={`${styles.quizQuestion} ${styles.quizQuestionWide}`}>
+            <div className={styles.quizLabel}>Key activities (select all that apply)</div>
+            <div className={styles.quizOptions}>
+              {ACTIVITY_OPTIONS.map(opt => (
+                <button
+                  key={opt}
+                  className={`${styles.quizOption} ${activities.includes(opt) ? styles.quizOptionSelected : ''}`}
+                  onClick={() => toggleActivity(opt)}
+                >
+                  {opt}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Background */}
+          <div className={`${styles.quizQuestion} ${styles.quizQuestionWide}`}>
+            <div className={styles.quizLabel}>Any special background or identity? (optional)</div>
+            <input
+              className={styles.quizInput}
+              type="text"
+              placeholder="e.g. military family, disability, LGBTQ+, immigrant, religious affiliation"
+              value={quiz.background ?? ''}
+              onChange={(e) => setQuiz({ background: e.target.value })}
+              onBlur={() => setQuiz({ background: quiz.background })}
+            />
+          </div>
+        </div>
+
+        <div className={styles.quizActions}>
+          <button className={styles.findButton} onClick={findScholarships} disabled={aiLoading}>
+            {aiLoading ? 'Finding…' : 'Find Matching Scholarships'}
           </button>
         </div>
-        <p className={styles.profileNote}>Select your profile tags to get matched scholarships:</p>
-        <div className={styles.chipRow}>
-          {PROFILE_TAGS.map((tag) => {
-            const key = tag.toLowerCase().replace(/\s+/g, '_');
-            return <TagChip key={tag} label={tag} selected={data.scholarshipAnswers[key] ?? false} onClick={() => toggleScholarshipTag(tag)} />;
-          })}
-        </div>
-        {aiError && <p style={{ color: '#e94560' }}>{aiError}</p>}
+
+        {aiError && <p className={styles.aiError}>{aiError}</p>}
         {aiText ? (
-          <MarkdownOutput>{aiText}</MarkdownOutput>
+          <div className={styles.aiOutput}><MarkdownOutput>{aiText}</MarkdownOutput></div>
         ) : (
-          <p style={{ color: '#888', marginTop: '0.75rem' }}>Select your profile tags and click "Find Scholarships" to see AI-matched scholarships.</p>
+          <p className={styles.aiPlaceholder}>Complete the quiz above and click "Find Matching Scholarships" to see AI-matched results.</p>
         )}
       </section>
     </div>

@@ -34,17 +34,126 @@
   margin: 0 0 8px;
 }
 
-.profileNote {
+/* Quiz */
+
+.quizIntro {
   font-size: 13px;
   color: #555;
-  margin: 0 0 10px;
+  margin: 0 0 16px;
 }
 
-.chipRow {
+.quizGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+@media (max-width: 560px) {
+  .quizGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.quizQuestion {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.quizQuestionWide {
+  grid-column: 1 / -1;
+}
+
+.quizLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: #444;
+}
+
+.quizOptions {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 16px;
+  gap: 6px;
+}
+
+.quizOption {
+  padding: 5px 12px;
+  border: 1px solid #ccc;
+  border-radius: 16px;
+  background: #fff;
+  color: #444;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.quizOption:hover {
+  border-color: #e94560;
+  color: #e94560;
+}
+
+.quizOptionSelected {
+  background: #e94560;
+  border-color: #e94560;
+  color: #fff;
+}
+
+.quizOptionSelected:hover {
+  background: #c73550;
+  color: #fff;
+}
+
+.quizInput {
+  height: 34px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 0 10px;
+  font-size: 13px;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.quizActions {
+  display: flex;
+  justify-content: flex-start;
+  margin: 4px 0 16px;
+}
+
+.findButton {
+  background: #e94560;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.45rem 1rem;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.findButton:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.aiError {
+  font-size: 13px;
+  color: #c62828;
+  margin: 8px 0 0;
+}
+
+.aiOutput {
+  margin-top: 4px;
+  padding: 14px 16px;
+  background: #f7f8fc;
+  border-radius: 6px;
+  border: 1px solid #e0e4ee;
+}
+
+.aiPlaceholder {
+  font-size: 13px;
+  color: #999;
+  margin: 0;
 }
 
 /* FAFSA link row */

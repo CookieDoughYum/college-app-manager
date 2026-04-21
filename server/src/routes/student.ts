@@ -292,8 +292,8 @@ studentRouter.get('/progress', async (req: Request, res: Response, next: NextFun
     const collegesPct = pct(collegeListLen, 20);
 
     const essaysPct = pct(
-      (essays?.driveLink ? 1 : 0) + (essays?.notes ? 1 : 0),
-      2
+      (essays?.driveLink ? 1 : 0),
+      1
     );
 
     const checklist = (recs?.checklist as Record<string, boolean>) ?? {};
