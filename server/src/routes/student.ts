@@ -41,17 +41,21 @@ studentRouter.get('/activities', async (req: Request, res: Response, next: NextF
       create: { studentId: studentId(req) },
       update: {},
     });
-    res.json({ interests: data.interests, coursePlan: data.coursePlan, aiRecommendations: data.aiRecommendations });
+    res.json({ interests: data.interests, coursePlan: data.coursePlan, aiRecommendations: (data.aiRecommendations as any) ?? {} });
   } catch (err) { next(err); }
 });
 
 studentRouter.put('/activities', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { interests, coursePlan } = req.body;
+    const { interests, coursePlan, aiRecommendations } = req.body;
+    const updateData: any = {};
+    if (interests !== undefined) updateData.interests = interests;
+    if (coursePlan !== undefined) updateData.coursePlan = coursePlan;
+    if (aiRecommendations !== undefined) updateData.aiRecommendations = aiRecommendations;
     await prisma.studentActivities.upsert({
       where: { studentId: studentId(req) },
-      create: { studentId: studentId(req), interests, coursePlan },
-      update: { interests, coursePlan },
+      create: { studentId: studentId(req), ...updateData },
+      update: updateData,
     });
     res.json({ ok: true });
   } catch (err) { next(err); }

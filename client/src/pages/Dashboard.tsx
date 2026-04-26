@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useStudent } from '../contexts/StudentContext';
 import ProgressCard from '../components/ProgressCard';
 import OnboardingOverlay from '../components/OnboardingOverlay';
@@ -34,8 +35,21 @@ const URGENCY_COLORS: Record<string, string> = {
   green: '#22c55e',
 };
 
+const CARD_ROUTES: Record<string, string> = {
+  'Activities & Courses': '/activities',
+  'Exam Prep': '/exams',
+  'Colleges': '/colleges',
+  'Essays': '/essays',
+  'Rec Letters': '/recs',
+  'App Portals': '/portals',
+  'Decide': '/decide',
+  'Financial Aid': '/aid',
+  'Deadlines': '/deadlines',
+};
+
 export default function Dashboard() {
   const { student } = useStudent();
+  const navigate = useNavigate();
   const [progress, setProgress] = useState<Progress>(DEFAULT_PROGRESS);
   const [reminders, setReminders] = useState<Reminder[]>([]);
 
@@ -50,62 +64,77 @@ export default function Dashboard() {
       .catch(() => {});
   }, []);
 
+  function nav(title: string) {
+    const route = CARD_ROUTES[title];
+    if (route) navigate(route);
+  }
+
   return (
     <div className={styles.page}>
       <OnboardingOverlay grade={student?.grade ?? 9} />
       <div className={styles.header}>
-        <h1 className={styles.welcome}>Welcome back, {student?.name ?? 'Student'}</h1>
+        <h1 className={styles.welcome}>Welcome back, {student?.name ?? 'Student'} 👋</h1>
         <p className={styles.subtitle}>{student?.highSchool}</p>
         {student?.grade && (
           <span className={styles.gradePill}>Grade {student.grade}</span>
         )}
       </div>
 
+      <p className={styles.sectionLabel}>Your Progress</p>
       <div className={styles.cards}>
         <ProgressCard
           title="Activities & Courses"
           percent={progress.activities}
-          subtitle={progress.activities === 0 ? 'No activities recorded yet' : `${progress.activities}% complete`}
+          subtitle={progress.activities === 0 ? 'Start planning your activities' : `${progress.activities}% complete`}
+          onClick={() => nav('Activities & Courses')}
         />
         <ProgressCard
           title="Exam Prep"
           percent={progress.exams}
-          subtitle={progress.exams === 0 ? 'No exams scheduled yet' : `${progress.exams}% complete`}
+          subtitle={progress.exams === 0 ? 'Plan your SAT, ACT & APs' : `${progress.exams}% complete`}
+          onClick={() => nav('Exam Prep')}
         />
         <ProgressCard
           title="Colleges"
           percent={progress.colleges}
-          subtitle={progress.colleges === 0 ? 'No colleges added yet' : `${progress.colleges}% complete`}
+          subtitle={progress.colleges === 0 ? 'Build your college list' : `${progress.colleges}% complete`}
+          onClick={() => nav('Colleges')}
         />
         <ProgressCard
           title="Essays"
           percent={progress.essays}
           subtitle={`${progress.essays}% complete`}
+          onClick={() => nav('Essays')}
         />
         <ProgressCard
           title="Rec Letters"
           percent={progress.recletters}
           subtitle={`${progress.recletters}% complete`}
+          onClick={() => nav('Rec Letters')}
         />
         <ProgressCard
           title="App Portals"
           percent={progress.portals}
           subtitle={`${progress.portals}% complete`}
+          onClick={() => nav('App Portals')}
         />
         <ProgressCard
           title="Decide"
           percent={progress.decide}
           subtitle={`${progress.decide}% complete`}
+          onClick={() => nav('Decide')}
         />
         <ProgressCard
           title="Financial Aid"
           percent={progress.financialaid}
           subtitle={`${progress.financialaid}% complete`}
+          onClick={() => nav('Financial Aid')}
         />
         <ProgressCard
           title="Deadlines"
           percent={progress.deadlines}
           subtitle={`${progress.deadlines}% complete`}
+          onClick={() => nav('Deadlines')}
         />
       </div>
 
@@ -117,10 +146,10 @@ export default function Dashboard() {
               key={i}
               style={{
                 borderLeft: `4px solid ${URGENCY_COLORS[r.urgency] ?? '#888'}`,
-                background: '#16213e',
+                background: '#f9fafb',
                 padding: '0.6rem 1rem',
                 marginBottom: '0.5rem',
-                borderRadius: '4px',
+                borderRadius: '6px',
                 fontSize: '0.9rem',
               }}
             >

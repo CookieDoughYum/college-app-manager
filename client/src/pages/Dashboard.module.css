@@ -1,58 +1,74 @@
 .page {
-  max-width: 860px;
+  max-width: 900px;
 }
 
 .header {
-  margin-bottom: 28px;
+  margin-bottom: 32px;
+  padding: 24px 28px;
+  background: linear-gradient(135deg, #1a1a2e 0%, #0f3460 100%);
+  border-radius: 16px;
+  color: white;
+  box-shadow: 0 4px 20px rgba(26, 26, 46, 0.25);
 }
 
 .welcome {
-  font-size: 24px;
-  font-weight: 700;
-  color: #1a1a2e;
+  font-size: 26px;
+  font-weight: 800;
+  color: white;
   margin: 0 0 4px;
 }
 
 .subtitle {
   font-size: 14px;
-  color: #888;
-  margin: 0 0 10px;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0 0 12px;
 }
 
 .gradePill {
   display: inline-block;
-  background: #fff0f2;
-  color: #e94560;
+  background: #e94560;
+  color: white;
   font-size: 12px;
-  font-weight: 600;
-  padding: 3px 10px;
+  font-weight: 700;
+  padding: 4px 12px;
   border-radius: 12px;
+  letter-spacing: 0.03em;
+}
+
+.sectionLabel {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #6b7280;
+  margin: 0 0 14px;
 }
 
 .cards {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
+  gap: 14px;
   margin-bottom: 32px;
 }
 
 .actionItems {
   background: white;
-  border-radius: 8px;
-  padding: 20px 24px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  border-radius: 12px;
+  padding: 22px 26px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e5e7eb;
 }
 
 .sectionTitle {
   font-size: 16px;
-  font-weight: 600;
-  color: #1a1a2e;
-  margin: 0 0 12px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 14px;
 }
 
 .placeholder {
   font-size: 14px;
-  color: #888;
+  color: #9ca3af;
   margin: 0;
 }
 

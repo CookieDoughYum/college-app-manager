@@ -293,6 +293,9 @@ export default function Colleges() {
   const [quizOpen, setQuizOpen] = useState(false);
   const [quizAnswers, setQuizAnswers] = useState<Record<number, InterestArea>>({});
   const [quizResult, setQuizResult] = useState<{ area: InterestArea; count: number }[] | null>(null);
+  const [collegeRecLoading, setCollegeRecLoading] = useState(false);
+  const [collegeRecText, setCollegeRecText] = useState('');
+  const [collegeRecError, setCollegeRecError] = useState('');
 
   useEffect(() => {
     fetch('/api/student/colleges', { credentials: 'include' })
@@ -359,6 +362,21 @@ export default function Colleges() {
     setQuizOpen(false);
     setQuizAnswers({});
     setQuizResult(null);
+  }
+
+  async function getCollegeRecommendations() {
+    setCollegeRecLoading(true);
+    setCollegeRecError('');
+    try {
+      const res = await fetch('/api/ai/colleges/recommendcolleges', { method: 'POST', credentials: 'include' });
+      if (!res.ok) throw new Error('Server error');
+      const { result } = await res.json();
+      setCollegeRecText(result);
+    } catch {
+      setCollegeRecError('Could not generate recommendations — please try again.');
+    } finally {
+      setCollegeRecLoading(false);
+    }
   }
 
   async function getMajorRecommendations() {
@@ -461,6 +479,27 @@ export default function Colleges() {
           <MarkdownOutput>{aiText}</MarkdownOutput>
         ) : (
           <p style={{ color: '#888', marginTop: '0.5rem' }}>Complete the interest quiz above and enter a salary goal, then click "Get Major Recommendations" for specific majors matched to your profile.</p>
+        )}
+      </section>
+
+      <section className={styles.section}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+          <h2 className={styles.sectionTitle} style={{ margin: 0 }}>Recommended Colleges</h2>
+          <button
+            onClick={getCollegeRecommendations}
+            disabled={collegeRecLoading}
+            style={{ background: 'linear-gradient(135deg, #0f3460, #1a56db)', color: '#fff', border: 'none', borderRadius: '8px', padding: '0.55rem 1.2rem', fontSize: '14px', fontWeight: 700, cursor: 'pointer', boxShadow: '0 2px 8px rgba(15,52,96,0.3)' }}
+          >
+            {collegeRecLoading ? 'Generating…' : 'Recommend Colleges For Me'}
+          </button>
+        </div>
+        {collegeRecError && <p style={{ color: '#e94560', fontSize: '13px' }}>{collegeRecError}</p>}
+        {collegeRecText ? (
+          <MarkdownOutput>{collegeRecText}</MarkdownOutput>
+        ) : (
+          <p style={{ color: '#9ca3af', fontSize: '13px', background: '#f9fafb', borderRadius: '6px', padding: '14px 16px', margin: 0 }}>
+            Complete the Professional Interest Quiz and enter your salary goal, then click the button to get college recommendations matched to your profile.
+          </p>
         )}
       </section>
 

@@ -11,7 +11,270 @@ aiRouter.use(requireAuth);
 
 const sid = (req: Request) => (req.user as any).id as number;
 
-// --- Activities: extracurricular recommendations + course load warning ---
+// --- Structured-data parsing helpers ---
+
+function parseSuggestions(text: string): { result: string; suggestions: string[] } {
+  const marker = '\nSUGGESTIONS_JSON:';
+  const idx = text.lastIndexOf(marker);
+  if (idx === -1) return { result: text.trim(), suggestions: [] };
+  const jsonStr = text.slice(idx + marker.length).trim();
+  const result = text.slice(0, idx).trim();
+  try {
+    const parsed = JSON.parse(jsonStr);
+    return { result, suggestions: Array.isArray(parsed) ? parsed.filter((s: any) => typeof s === 'string') : [] };
+  } catch {
+    return { result, suggestions: [] };
+  }
+}
+
+function parseFeedbackItems(text: string): { result: string; toAdd: string[]; toRemove: string[] } {
+  const marker = '\nITEMS_JSON:';
+  const idx = text.lastIndexOf(marker);
+  if (idx === -1) return { result: text.trim(), toAdd: [], toRemove: [] };
+  const jsonStr = text.slice(idx + marker.length).trim();
+  const result = text.slice(0, idx).trim();
+  try {
+    const parsed = JSON.parse(jsonStr);
+    return {
+      result,
+      toAdd: Array.isArray(parsed.toAdd) ? parsed.toAdd.filter((s: any) => typeof s === 'string') : [],
+      toRemove: Array.isArray(parsed.toRemove) ? parsed.toRemove.filter((s: any) => typeof s === 'string') : [],
+    };
+  } catch {
+    return { result, toAdd: [], toRemove: [] };
+  }
+}
+
+// Helper: compute top activity categories from quiz answers stored in interests field
+function getTopActivityCategories(interests: any): string[] {
+  const catLabels: Record<string, string> = {
+    stem: 'STEM & Technology',
+    arts: 'Arts, Music & Creative',
+    sports: 'Sports & Athletics',
+    leadership: 'Leadership & Organizing',
+    service: 'Community Service & Advocacy',
+    academic: 'Academic Competitions & Debate',
+  };
+  if (interests && typeof interests === 'object' && !Array.isArray(interests) && interests.quizAnswers) {
+    const counts: Record<string, number> = {};
+    Object.values(interests.quizAnswers).forEach((v: any) => {
+      counts[v] = (counts[v] ?? 0) + 1;
+    });
+    return Object.entries(counts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3)
+      .map(([cat]) => catLabels[cat] ?? cat);
+  }
+  if (Array.isArray(interests)) return interests as string[];
+  return [];
+}
+
+// --- Activities: extracurricular recommendations based on quiz ---
+
+aiRouter.post('/activities/extracurriculars', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const studentId = sid(req);
+    const student = req.user as any;
+    const acts = await prisma.studentActivities.findUnique({ where: { studentId } });
+
+    const topCategories = getTopActivityCategories(acts?.interests);
+    const grade = student.grade ?? 11;
+    const highSchool = student.highSchool ?? 'their high school';
+    const categoryList = topCategories.join(', ') || 'not specified';
+
+    const prompt = `You are a college counselor helping a Grade ${grade} student at ${highSchool}.
+Based on their interests quiz, their top activity categories are: ${categoryList}.
+
+Recommend 5–6 specific extracurricular activities that would:
+1. Align with their interests
+2. Strengthen their college applications
+3. Be realistically available at a typical high school or online
+
+For each activity, include:
+- Activity name
+- Why it fits this student (1 sentence)
+- How to get started (1 sentence)
+
+Format as a numbered list.
+
+After your numbered list, on a new line, write exactly (no other text after this):
+SUGGESTIONS_JSON: ["ActivityName1", "ActivityName2", "ActivityName3", "ActivityName4", "ActivityName5"]
+Use only the short activity name (not the description). Include 5–6 names.`;
+
+    const rawText = await askClaude(prompt);
+    const { result, suggestions } = parseSuggestions(rawText);
+
+    const existing = await prisma.studentActivities.findUnique({ where: { studentId } });
+    const currentRecs = (existing?.aiRecommendations as Record<string, any>) ?? {};
+    await prisma.studentActivities.upsert({
+      where: { studentId },
+      create: { studentId, aiRecommendations: { ...currentRecs, extracurriculars: result } },
+      update: { aiRecommendations: { ...currentRecs, extracurriculars: result } },
+    });
+
+    res.json({ result, suggestions });
+  } catch (err) { next(err); }
+});
+
+// --- Activities: course recommendations based on quiz + stats ---
+
+aiRouter.post('/activities/courses', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const studentId = sid(req);
+    const student = req.user as any;
+    const acts = await prisma.studentActivities.findUnique({ where: { studentId } });
+    const { gpa, sat, act } = req.body as { gpa?: string; sat?: string; act?: string };
+
+    const topCategories = getTopActivityCategories(acts?.interests);
+    const grade = student.grade ?? 11;
+    const categoryList = topCategories.join(', ') || 'not specified';
+    const statsLine = [gpa && `GPA: ${gpa}`, sat && `SAT: ${sat}`, act && `ACT: ${act}`].filter(Boolean).join(', ') || 'not provided';
+
+    const prompt = `You are a college counselor helping a Grade ${grade} student.
+Student interest areas: ${categoryList}
+Academic stats: ${statsLine}
+Current 4-year course plan: ${JSON.stringify(acts?.coursePlan ?? {})}
+
+Recommend 6–8 specific courses for their remaining high school years that:
+1. Align with their interests and likely college major
+2. Are appropriate for their academic level
+3. Will strengthen their college applications
+
+Include a mix of core academic courses (AP or honors where appropriate) and electives that match their interests.
+For each course, give a 1-sentence explanation of why it fits this student.
+Format as a numbered list.
+
+After your numbered list, on a new line, write exactly (no other text after this):
+SUGGESTIONS_JSON: ["CourseName1", "CourseName2", "CourseName3", "CourseName4", "CourseName5", "CourseName6"]
+Use only the short course name (not the description). Include 6–8 names.`;
+
+    const rawText = await askClaude(prompt);
+    const { result, suggestions } = parseSuggestions(rawText);
+
+    const existing = await prisma.studentActivities.findUnique({ where: { studentId } });
+    const currentRecs = (existing?.aiRecommendations as Record<string, any>) ?? {};
+    await prisma.studentActivities.upsert({
+      where: { studentId },
+      create: { studentId, aiRecommendations: { ...currentRecs, courses: result } },
+      update: { aiRecommendations: { ...currentRecs, courses: result } },
+    });
+
+    res.json({ result, suggestions });
+  } catch (err) { next(err); }
+});
+
+// --- Activities: extracurricular feedback ---
+
+aiRouter.post('/activities/extracurricularfeedback', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const studentId = sid(req);
+    const student = req.user as any;
+    const acts = await prisma.studentActivities.findUnique({ where: { studentId } });
+    const { targetSchool } = req.body as { targetSchool?: string };
+
+    const grade = student.grade ?? 11;
+    const highSchool = student.highSchool ?? 'their high school';
+
+    const raw = acts?.interests as any;
+    const extracurricularPlan = (raw?.extracurricularPlan as Record<string, string[]>) ?? {};
+    const topCategories = getTopActivityCategories(acts?.interests);
+
+    const planLines = Object.entries(extracurricularPlan)
+      .map(([g, activities]) => `Grade ${g}: ${(activities as string[]).join(', ') || 'none'}`)
+      .join('\n') || 'No activities added yet';
+
+    const totalCount = Object.values(extracurricularPlan).reduce((sum, arr) => sum + (arr as string[]).length, 0);
+    const schoolLine = targetSchool?.trim()
+      ? `\n## Fit for ${targetSchool}\nIs this extracurricular profile competitive for ${targetSchool}? What do they typically look for?`
+      : '';
+
+    const prompt = `You are a college admissions counselor reviewing a student's extracurricular profile.
+
+Student: Grade ${grade} at ${highSchool}
+${targetSchool ? `Target school: ${targetSchool}` : ''}
+Student's top interest areas: ${topCategories.join(', ') || 'not specified'}
+4-Year Extracurricular Plan (${totalCount} activities total):
+${planLines}
+
+Analyze this extracurricular profile and provide:
+
+## Overall Assessment
+Rate the profile as "Too Thin", "Well-Rounded", "Overloaded", or "Unfocused" — with 2–3 sentences explaining why.
+${schoolLine}
+## Activities to Add
+Recommend 2–3 specific activities this student should consider adding to strengthen their profile. Explain why each one helps.
+
+## Activities to Reconsider
+If any activities seem like filler or the list is too scattered, name 1–2 to consider dropping or replacing, with brief reasoning.
+
+## Depth vs. Breadth
+One paragraph of advice on whether to go deeper in a few areas or maintain a broader mix — specific to this student's current list.
+
+## Bottom Line
+One direct sentence of advice.
+
+After the Bottom Line, on a new line, write exactly (no other text after this):
+ITEMS_JSON: {"toAdd": ["ActivityName1", "ActivityName2"], "toRemove": ["ActivityName3"]}
+List only short activity names from the sections above. Use empty arrays if none apply.`;
+
+    const rawText = await askClaude(prompt);
+    const { result, toAdd, toRemove } = parseFeedbackItems(rawText);
+    res.json({ result, toAdd, toRemove });
+  } catch (err) { next(err); }
+});
+
+// --- Activities: course rigor feedback ---
+
+aiRouter.post('/activities/coursefeedback', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const studentId = sid(req);
+    const student = req.user as any;
+    const acts = await prisma.studentActivities.findUnique({ where: { studentId } });
+    const { targetUniversity } = req.body as { targetUniversity?: string };
+
+    const highSchool = student.highSchool ?? 'their high school';
+    const grade = student.grade ?? 11;
+    const coursePlan = (acts?.coursePlan as Record<string, string[]>) ?? {};
+    const planLines = Object.entries(coursePlan)
+      .map(([g, courses]) => `Grade ${g}: ${(courses as string[]).join(', ') || 'none'}`)
+      .join('\n') || 'No courses added yet';
+
+    const universityLine = targetUniversity?.trim()
+      ? `\n## Fit for ${targetUniversity}\nIs this course load appropriate for admission to ${targetUniversity}? What is their typical expectation for academic rigor?`
+      : '';
+
+    const prompt = `You are a college admissions expert analyzing a student's course rigor.
+
+Student: Grade ${grade} at ${highSchool}
+${targetUniversity ? `Target university: ${targetUniversity}` : ''}
+4-Year Course Plan:
+${planLines}
+
+Provide:
+
+## Overall Rigor Assessment
+Rate the rigor as "Too Low", "Appropriate", or "Too High" with 2–3 sentences of explanation.
+${universityLine}
+## Courses to Add
+List 2–3 specific courses (AP, honors, or electives) this student should consider adding to strengthen their profile.
+
+## Courses to Reconsider
+If the load seems too heavy or mismatched, suggest 1–2 courses to swap or remove.
+
+## Bottom Line
+One direct sentence of advice.
+
+After the Bottom Line, on a new line, write exactly (no other text after this):
+ITEMS_JSON: {"toAdd": ["CourseName1", "CourseName2"], "toRemove": ["CourseName3"]}
+List only short course names from the sections above. Use empty arrays if none apply.`;
+
+    const rawText = await askClaude(prompt);
+    const { result, toAdd, toRemove } = parseFeedbackItems(rawText);
+    res.json({ result, toAdd, toRemove });
+  } catch (err) { next(err); }
+});
+
+// --- Activities: extracurricular recommendations + course load warning (legacy) ---
 
 aiRouter.post('/activities/recommend', async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -19,7 +282,8 @@ aiRouter.post('/activities/recommend', async (req: Request, res: Response, next:
     const student = req.user as any;
     const acts = await prisma.studentActivities.findUnique({ where: { studentId } });
 
-    const interests = Array.isArray(acts?.interests) ? (acts.interests as string[]).join(', ') : 'not specified';
+    const topCategories = getTopActivityCategories(acts?.interests);
+    const interests = topCategories.length > 0 ? topCategories.join(', ') : 'not specified';
     const grade = student.grade ?? 11;
 
     const prompt = `You are a college counselor helping a high school student (Grade ${grade}).
@@ -386,6 +650,46 @@ Provide structured feedback:
   } catch (err) { next(err); }
 });
 
+// --- Colleges: college recommendations based on profile ---
+
+aiRouter.post('/colleges/recommendcolleges', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const studentId = sid(req);
+    const student = req.user as any;
+    const colleges = await prisma.studentColleges.findUnique({ where: { studentId } });
+    const acts = await prisma.studentActivities.findUnique({ where: { studentId } });
+
+    const grade = student.grade ?? 11;
+    const highSchool = student.highSchool ?? 'their high school';
+    const majorAnswers = (colleges?.majorAnswers as any) ?? {};
+    const existingList = Array.isArray(colleges?.collegeList) ? (colleges.collegeList as any[]) : [];
+
+    const topCategories = getTopActivityCategories(acts?.interests);
+    const activityAreas = topCategories.join(', ') || 'not specified';
+    const existingNames = existingList.map((c: any) => c.name).filter(Boolean).join(', ');
+
+    const prompt = `You are a college counselor recommending schools for a student.
+
+Student Profile:
+- Grade ${grade} at ${highSchool}
+- Professional interest areas: ${majorAnswers.interestArea || activityAreas || 'not specified'}
+- Salary goal: ${majorAnswers.salaryGoal || 'not specified'}
+- Activity areas: ${activityAreas}
+${existingNames ? `- Already considering: ${existingNames}` : ''}
+
+Recommend 8–10 colleges across reach, target, and safety categories that match this student's profile.
+Include a good geographic and size mix. Focus on fit for their interests, not just prestige.
+
+Format each as:
+**[School Name]** — [City, State]
+Category: Reach / Target / Safety
+Why: [1–2 sentences on why this school fits this student's interests and goals]`;
+
+    const result = await askClaude(prompt);
+    res.json({ result });
+  } catch (err) { next(err); }
+});
+
 // --- Deadlines: look up deadlines from college list using Claude's knowledge ---
 
 aiRouter.post('/deadlines/scrape', async (req: Request, res: Response, next: NextFunction) => {
@@ -442,6 +746,45 @@ Return ONLY the JSON array with no explanation or markdown fences.`;
     });
 
     res.json({ result: `Loaded ${enriched.length} deadlines for ${collegeList.length} schools.`, deadlines: enriched });
+  } catch (err) { next(err); }
+});
+
+// --- Exams: target scores for SAT, ACT, and AP ---
+
+aiRouter.post('/exams/targets', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const studentId = sid(req);
+    const student = req.user as any;
+    const exams = await prisma.studentExams.findUnique({ where: { studentId } });
+    const { targetCollege } = req.body as { targetCollege?: string };
+
+    const grade = student.grade ?? 11;
+    const highSchool = student.highSchool ?? 'their high school';
+    const apCourses = Array.isArray(exams?.apCourses) ? (exams.apCourses as string[]) : [];
+    const apLine = apCourses.length > 0 ? apCourses.join(', ') : 'none listed yet';
+    const collegeLine = targetCollege?.trim() ? `Target college: ${targetCollege}` : 'No specific target college provided';
+
+    const prompt = `You are a college admissions expert helping a Grade ${grade} student at ${highSchool}.
+${collegeLine}
+Current AP courses: ${apLine}
+
+Provide specific score targets:
+
+## SAT Target Score
+${targetCollege ? `What SAT score range gives a strong application to ${targetCollege}? State the median and 75th percentile if known.` : 'Recommend a competitive SAT score range for college-bound students.'}
+
+## ACT Target Score
+${targetCollege ? `What ACT composite score range is competitive for ${targetCollege}?` : 'Recommend a competitive ACT score range for college-bound students.'}
+
+## AP Exam Targets
+For each AP course listed (${apLine}), what score (1–5) should this student aim for${targetCollege ? ` to stand out at ${targetCollege}` : ''}?
+If no AP courses are listed, give general guidance on which AP scores matter most to colleges.
+
+## Study Priority
+Which test or exam should this student focus on first, and why? (2 sentences)`;
+
+    const result = await askClaude(prompt);
+    res.json({ result });
   } catch (err) { next(err); }
 });
 

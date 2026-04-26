@@ -3,6 +3,7 @@ import TagChip from '../../components/TagChip';
 import MarkdownOutput from '../../components/MarkdownOutput';
 import styles from './Exams.module.css';
 
+
 const QUIZ_QUESTIONS = [
   {
     q: 'How would you describe your test-taking pace?',
@@ -72,6 +73,10 @@ export default function Exams() {
   const [scheduleError, setScheduleError] = useState('');
   const [addingAp, setAddingAp] = useState(false);
   const [apInput, setApInput] = useState('');
+  const [targetCollege, setTargetCollege] = useState('');
+  const [targetScoresLoading, setTargetScoresLoading] = useState(false);
+  const [targetScoresText, setTargetScoresText] = useState('');
+  const [targetScoresError, setTargetScoresError] = useState('');
 
   useEffect(() => {
     fetch('/api/student/exams', { credentials: 'include' })
@@ -105,6 +110,26 @@ export default function Exams() {
     const sat = Object.values(quizAnswers).filter(a => a === 'sat').length;
     const act = Object.values(quizAnswers).filter(a => a === 'act').length;
     setQuizResult(sat >= act ? 'sat' : 'act');
+  }
+
+  async function getTargetScores() {
+    setTargetScoresLoading(true);
+    setTargetScoresError('');
+    try {
+      const res = await fetch('/api/ai/exams/targets', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ targetCollege }),
+      });
+      if (!res.ok) throw new Error('Server error');
+      const { result } = await res.json();
+      setTargetScoresText(result);
+    } catch {
+      setTargetScoresError('Could not generate score targets — please try again.');
+    } finally {
+      setTargetScoresLoading(false);
+    }
   }
 
   async function generateSchedule() {
@@ -226,6 +251,35 @@ export default function Exams() {
             <button className={styles.addChip} onClick={() => setAddingAp(true)}>+ Add</button>
           )}
         </div>
+      </section>
+
+      <section className={styles.section}>
+        <h2 className={styles.sectionTitle}>Target Score Guide</h2>
+        <div className={styles.targetRow}>
+          <div className={styles.targetInputWrap}>
+            <label className={styles.targetLabel}>Target College (optional)</label>
+            <input
+              className={styles.targetInput}
+              type="text"
+              placeholder="e.g. UCLA, Ohio State, UT Austin"
+              value={targetCollege}
+              onChange={e => setTargetCollege(e.target.value)}
+            />
+          </div>
+          <button
+            className={styles.targetBtn}
+            onClick={getTargetScores}
+            disabled={targetScoresLoading}
+          >
+            {targetScoresLoading ? 'Generating…' : 'Get Score Targets'}
+          </button>
+        </div>
+        {targetScoresError && <p style={{ color: '#e94560', fontSize: '13px' }}>{targetScoresError}</p>}
+        {targetScoresText ? (
+          <MarkdownOutput>{targetScoresText}</MarkdownOutput>
+        ) : (
+          <p className={styles.placeholder}>Enter a target college to get personalized SAT, ACT, and AP score goals — or leave it blank for general guidance.</p>
+        )}
       </section>
 
       <section className={styles.section}>
