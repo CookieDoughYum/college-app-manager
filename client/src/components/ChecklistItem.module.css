@@ -28,15 +28,15 @@
 
 .label {
   font-size: 14px;
-  color: #1a1a2e;
+  color: #1e293b;
 }
 
 .labelChecked {
-  color: #888;
+  color: #1e293b;
   text-decoration: line-through;
 }
 
 .subtext {
   font-size: 12px;
-  color: #888;
+  color: #1e293b;
 }

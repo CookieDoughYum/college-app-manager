@@ -2,7 +2,7 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { prisma } from '../services/prisma';
 import { requireAuth } from '../middleware/requireAuth';
 import { askClaude } from '../services/claude';
-import { fetchPageText } from '../services/webFetch';
+import { fetchUniversityPage } from '../services/webFetch';
 import { getMajorSalaries } from '../services/scorecard';
 
 export const aiRouter = Router();
@@ -546,22 +546,34 @@ Format as a numbered list.`;
 aiRouter.post('/essays/whyus', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const studentId = sid(req);
-    const { schoolName, url } = req.body as { schoolName: string; url?: string };
+    const { schoolName, includeHonors } = req.body as { schoolName: string; includeHonors?: boolean };
+    if (!schoolName) return res.status(400).json({ error: 'schoolName is required' });
 
-    const fetchUrl = url || `https://www.google.com/search?q=${encodeURIComponent(schoolName + ' admissions why attend')}`;
-    let pageText = '';
-    try {
-      pageText = await fetchPageText(fetchUrl);
-    } catch {
-      pageText = '';
-    }
+    // Fetch from PrepScholar/CollegeVine/admissions pages which publish real prompts
+    const pageText = await fetchUniversityPage(schoolName);
 
-    const prompt = `You are a college admissions counselor.
-A student is writing a "Why Us?" essay for ${schoolName}.
-${pageText ? `Here is text from the school's website:\n\n${pageText}\n\n` : ''}
-List 3–5 specific programs, values, or opportunities the student should mention in their "Why Us?" essay for ${schoolName}.
-Be specific — use actual program names and details${pageText ? ' from the text above' : ''}.
-Format as a numbered list.`;
+    const honorsNote = includeHonors
+      ? `\n\nAlso list the Honors or Scholars program essay prompts for ${schoolName} if they exist.`
+      : '';
+
+    const prompt = pageText
+      ? `The following text was fetched from a college essay guide for ${schoolName}. Extract and list every supplemental essay prompt mentioned. For each prompt include the exact question text, word limit, and whether it is required or optional.
+
+Format each as:
+**Prompt N** (Required/Optional, X words)
+[question text]
+
+Here is the fetched content:
+---
+${pageText}
+---${honorsNote}`
+      : `You are a college admissions expert. List the supplemental essay prompts for ${schoolName} for the 2024–2025 application cycle. State every prompt you know — include the exact question text, word limit, and whether it is required or optional.
+
+Format each prompt as:
+**Prompt N** (Required/Optional, X words)
+[question text]
+
+If ${schoolName} uses only the Common App personal statement with no school-specific supplements, say so. List all prompts you know. Do not add disclaimers, caveats, or suggestions to visit websites.${honorsNote}`;
 
     const result = await askClaude(prompt);
 
@@ -585,21 +597,55 @@ aiRouter.post('/essays/brainstorm', async (req: Request, res: Response, next: Ne
   try {
     const studentId = sid(req);
     const student = req.user as any;
-    const { essayType, theme } = req.body as { essayType?: string; theme?: string };
+    const { essayType, theme, profileAnswers } = req.body as {
+      essayType?: string;
+      theme?: string;
+      profileAnswers?: Record<string, string>;
+    };
 
     const grade = student.grade ?? 11;
     const acts = await prisma.studentActivities.findUnique({ where: { studentId } });
-    const interests = Array.isArray(acts?.interests) ? (acts.interests as string[]).join(', ') : 'not specified';
+
+    const topCategories = getTopActivityCategories(acts?.interests);
+    const activityAreas = topCategories.join(', ') || 'not specified';
+
+    // Build course list from course plan
+    const coursePlan = (acts?.coursePlan as Record<string, string[]>) ?? {};
+    const allCourses = Object.values(coursePlan).flat();
+    const courseList = allCourses.length > 0 ? allCourses.join(', ') : 'not specified';
+
+    // Build extracurricular list from interests.extracurricularPlan
+    const rawInterests = acts?.interests as any;
+    const extracurricularPlan = (rawInterests?.extracurricularPlan as Record<string, string[]>) ?? {};
+    const allActivities = Object.values(extracurricularPlan).flat();
+    const activityList = allActivities.length > 0 ? allActivities.join(', ') : 'not specified';
 
     const essayTypeLabel = essayType || 'Personal Statement';
-    const themeNote = theme?.trim() ? `\nThe student is considering this theme or topic: ${theme}` : '';
+    const themeNote = theme?.trim() ? `\nEssay prompt or theme the student is considering: ${theme}` : '';
+
+    // Build profile answers block
+    const profileLines: string[] = [];
+    if (profileAnswers) {
+      if (profileAnswers.challenge?.trim()) profileLines.push(`Challenge overcome: ${profileAnswers.challenge.trim()}`);
+      if (profileAnswers.passion?.trim()) profileLines.push(`Key passion/activity: ${profileAnswers.passion.trim()}`);
+      if (profileAnswers.quality?.trim()) profileLines.push(`Defining quality/value: ${profileAnswers.quality.trim()}`);
+      if (profileAnswers.goal?.trim()) profileLines.push(`College goal/major: ${profileAnswers.goal.trim()}`);
+      if (profileAnswers.unique?.trim()) profileLines.push(`Unique background/story: ${profileAnswers.unique.trim()}`);
+    }
+    const profileBlock = profileLines.length > 0
+      ? `\nStudent's self-described profile:\n${profileLines.map(l => `- ${l}`).join('\n')}`
+      : '';
 
     const prompt = `You are a college essay coach helping a Grade ${grade} student brainstorm ideas for their ${essayTypeLabel}.
-Student's interests: ${interests}${themeNote}
 
-Generate 5–6 specific, compelling essay topic ideas. For each:
+Student profile:
+- Activity interest areas: ${activityAreas}
+- Courses taken/planned: ${courseList}
+- Extracurricular activities: ${activityList}${profileBlock}${themeNote}
+
+Generate 5–6 specific, compelling essay topic ideas that draw from this student's real experiences, courses, and activities. For each:
 - Give it a short title
-- Describe the core story or angle in 1–2 sentences
+- Describe the core story or angle in 1–2 sentences, referencing specific activities or courses where relevant
 - Note what quality or growth it could reveal about the student
 
 Format each as:
@@ -658,6 +704,16 @@ aiRouter.post('/colleges/recommendcolleges', async (req: Request, res: Response,
     const student = req.user as any;
     const colleges = await prisma.studentColleges.findUnique({ where: { studentId } });
     const acts = await prisma.studentActivities.findUnique({ where: { studentId } });
+    const { matchQuizAnswers, location } = req.body as {
+      matchQuizAnswers?: Record<string, string>;
+      location?: string;
+    };
+
+    // Read academic stats from saved Activities & Courses profile
+    const actsInterests = (acts?.interests as any) ?? {};
+    const gpa = actsInterests.gpa as string | undefined;
+    const sat = actsInterests.sat as string | undefined;
+    const act = actsInterests.act as string | undefined;
 
     const grade = student.grade ?? 11;
     const highSchool = student.highSchool ?? 'their high school';
@@ -668,22 +724,48 @@ aiRouter.post('/colleges/recommendcolleges', async (req: Request, res: Response,
     const activityAreas = topCategories.join(', ') || 'not specified';
     const existingNames = existingList.map((c: any) => c.name).filter(Boolean).join(', ');
 
+    // Build stats line
+    const statsLine = [gpa && `GPA: ${gpa}`, sat && `SAT: ${sat}`, act && `ACT: ${act}`].filter(Boolean).join(', ');
+
+    // Build college match quiz preferences
+    const prefLabels: Record<string, Record<string, string>> = {
+      size: { small: 'small (under 3,000)', medium: 'medium (3,000–15,000)', large: 'large (15,000+)' },
+      setting: { urban: 'urban', suburban: 'suburban', rural: 'rural' },
+      distance: { close: 'close to home', moderate: 'moderate distance', far: 'far from home' },
+      type: { public: 'public', private: 'private', either: 'public or private' },
+      focus: { research: 'research university', liberalarts: 'liberal arts college', technical: 'technical/specialized' },
+      social: { greek: 'Greek life culture', clubs: 'strong club/org culture', sports: 'athletics-focused', lowkey: 'laid-back/study-focused' },
+      selectivity: { elite: 'highly selective', selective: 'selective', accessible: 'accessible' },
+      aid: { high: 'strong financial aid', medium: 'some financial aid', low: 'cost not primary concern' },
+    };
+
+    const prefLines: string[] = [];
+    if (matchQuizAnswers) {
+      for (const [key, val] of Object.entries(matchQuizAnswers)) {
+        const label = prefLabels[key]?.[val];
+        if (label) prefLines.push(`- ${key.charAt(0).toUpperCase() + key.slice(1)}: ${label}`);
+      }
+    }
+    const prefBlock = prefLines.length > 0 ? `\nCollege preferences:\n${prefLines.join('\n')}` : '';
+
     const prompt = `You are a college counselor recommending schools for a student.
 
 Student Profile:
 - Grade ${grade} at ${highSchool}
+- Location: ${location || 'not specified'}
 - Professional interest areas: ${majorAnswers.interestArea || activityAreas || 'not specified'}
 - Salary goal: ${majorAnswers.salaryGoal || 'not specified'}
 - Activity areas: ${activityAreas}
+${statsLine ? `- Academic stats: ${statsLine}` : ''}${prefBlock}
 ${existingNames ? `- Already considering: ${existingNames}` : ''}
 
-Recommend 8–10 colleges across reach, target, and safety categories that match this student's profile.
-Include a good geographic and size mix. Focus on fit for their interests, not just prestige.
+Recommend 8–10 colleges across reach, target, and safety categories that closely match this student's stated preferences and academic stats.
+Include a good geographic and size mix. Focus on genuine fit — not just prestige.
 
 Format each as:
 **[School Name]** — [City, State]
 Category: Reach / Target / Safety
-Why: [1–2 sentences on why this school fits this student's interests and goals]`;
+Why: [1–2 sentences on why this school fits this student's preferences and goals]`;
 
     const result = await askClaude(prompt);
     res.json({ result });

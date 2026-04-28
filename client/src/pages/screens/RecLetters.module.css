@@ -5,7 +5,7 @@
 .title {
   font-size: 22px;
   font-weight: 700;
-  color: #1a1a2e;
+  color: #1e293b;
   margin: 0 0 24px;
 }
 
@@ -27,7 +27,7 @@
 .sectionTitle {
   font-size: 15px;
   font-weight: 600;
-  color: #1a1a2e;
+  color: #1e293b;
   margin: 0;
 }
 
@@ -55,25 +55,25 @@
 }
 
 .teacherName {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
-  color: #1a1a2e;
+  color: #1e293b;
 }
 
 .teacherSubject {
-  font-size: 12px;
-  color: #888;
+  font-size: 15px;
+  color: #1e293b;
 }
 
 .teacherStatus {
-  font-size: 12px;
+  font-size: 15px;
   font-weight: 500;
   margin-top: 4px;
   display: inline-block;
   padding: 2px 8px;
   border-radius: 12px;
   background: #f0f0f0;
-  color: #555;
+  color: #1e293b;
 }
 
 /* Status color variants */
@@ -101,8 +101,8 @@
   border: 1px solid #ddd;
   border-radius: 4px;
   padding: 7px 10px;
-  font-size: 13px;
-  color: #1a1a2e;
+  font-size: 15px;
+  color: #1e293b;
   background: white;
   outline: none;
 }
@@ -115,8 +115,8 @@
   border: 1px solid #ddd;
   border-radius: 4px;
   padding: 7px 10px;
-  font-size: 13px;
-  color: #1a1a2e;
+  font-size: 15px;
+  color: #1e293b;
   background: white;
   outline: none;
   cursor: pointer;
@@ -135,7 +135,7 @@
 /* Buttons */
 
 .addBtn {
-  font-size: 12px;
+  font-size: 15px;
   font-weight: 600;
   color: #e94560;
   background: none;
@@ -150,8 +150,8 @@
 }
 
 .editBtn {
-  font-size: 12px;
-  color: #888;
+  font-size: 15px;
+  color: #1e293b;
   background: none;
   border: 1px solid #ddd;
   border-radius: 4px;
@@ -162,11 +162,11 @@
 
 .editBtn:hover {
   border-color: #aaa;
-  color: #555;
+  color: #1e293b;
 }
 
 .saveBtn {
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 600;
   color: white;
   background: #e94560;
@@ -181,8 +181,8 @@
 }
 
 .cancelBtn {
-  font-size: 13px;
-  color: #555;
+  font-size: 15px;
+  color: #1e293b;
   background: none;
   border: 1px solid #ddd;
   border-radius: 4px;
@@ -195,7 +195,7 @@
 }
 
 .deleteBtn {
-  font-size: 13px;
+  font-size: 15px;
   color: #e94560;
   background: none;
   border: 1px solid #e9c0c8;

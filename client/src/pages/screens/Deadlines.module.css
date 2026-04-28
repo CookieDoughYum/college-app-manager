@@ -5,7 +5,7 @@
 .title {
   font-size: 22px;
   font-weight: 700;
-  color: #1a1a2e;
+  color: #1e293b;
   margin: 0 0 24px;
 }
 
@@ -20,7 +20,7 @@
 .sectionTitle {
   font-size: 15px;
   font-weight: 600;
-  color: #1a1a2e;
+  color: #1e293b;
   margin: 0;
 }
 
@@ -36,7 +36,7 @@
 .calTitle {
   font-size: 15px;
   font-weight: 600;
-  color: #1a1a2e;
+  color: #1e293b;
   margin: 0;
   min-width: 160px;
   text-align: center;
@@ -51,7 +51,7 @@
   font-size: 16px;
   line-height: 1;
   cursor: pointer;
-  color: #444;
+  color: #1e293b;
   flex-shrink: 0;
 }
 
@@ -66,7 +66,7 @@
   border: none;
   border-radius: 6px;
   padding: 0.35rem 0.8rem;
-  font-size: 12px;
+  font-size: 15px;
   cursor: pointer;
   white-space: nowrap;
 }
@@ -82,7 +82,7 @@
 
 .fetchError {
   color: #e94560;
-  font-size: 13px;
+  font-size: 15px;
   margin: 0 0 10px;
 }
 
@@ -98,7 +98,7 @@
   text-align: center;
   font-size: 11px;
   font-weight: 600;
-  color: #aaa;
+  color: #1e293b;
   padding: 4px 0 6px;
   text-transform: uppercase;
 }
@@ -123,8 +123,8 @@
 }
 
 .calDayNum {
-  font-size: 13px;
-  color: #444;
+  font-size: 15px;
+  color: #1e293b;
   line-height: 1;
 }
 
@@ -137,7 +137,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
+  font-size: 15px;
 }
 
 .calSelected {
@@ -168,9 +168,9 @@
 }
 
 .dayDetailTitle {
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 600;
-  color: #1a1a2e;
+  color: #1e293b;
   margin-bottom: 8px;
 }
 
@@ -189,14 +189,14 @@
 }
 
 .dayDetailSchool {
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 600;
-  color: #1a1a2e;
+  color: #1e293b;
 }
 
 .dayDetailLabel {
-  font-size: 12px;
-  color: #888;
+  font-size: 15px;
+  color: #1e293b;
 }
 
 /* Deadline list */
@@ -214,7 +214,7 @@
   border: none;
   border-radius: 6px;
   padding: 0.35rem 0.8rem;
-  font-size: 12px;
+  font-size: 15px;
   cursor: pointer;
 }
 
@@ -223,8 +223,8 @@
 }
 
 .emptyNote {
-  font-size: 13px;
-  color: #888;
+  font-size: 15px;
+  color: #1e293b;
   margin: 0;
 }
 
@@ -265,9 +265,9 @@
 }
 
 .dlInput {
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 600;
-  color: #1a1a2e;
+  color: #1e293b;
   border: none;
   border-bottom: 1px solid transparent;
   padding: 0;
@@ -287,8 +287,8 @@
 }
 
 .dlInputSm {
-  font-size: 12px;
-  color: #555;
+  font-size: 15px;
+  color: #1e293b;
   border: none;
   border-bottom: 1px solid transparent;
   padding: 0;
@@ -303,8 +303,8 @@
 }
 
 .dlSelect {
-  font-size: 12px;
-  color: #555;
+  font-size: 15px;
+  color: #1e293b;
   border: none;
   background: transparent;
   cursor: pointer;
@@ -313,7 +313,7 @@
 .dlRemove {
   background: none;
   border: none;
-  color: #ccc;
+  color: #1e293b;
   font-size: 16px;
   cursor: pointer;
   padding: 0;

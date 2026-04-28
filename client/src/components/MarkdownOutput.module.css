@@ -1,5 +1,5 @@
 .md {
-  color: #1f2937;
+  color: #1e293b;
   line-height: 1.7;
   margin-top: 0.75rem;
 }
@@ -7,7 +7,7 @@
 .md h1,
 .md h2,
 .md h3 {
-  color: #111827;
+  color: #1e293b;
   margin: 1rem 0 0.4rem;
 }
 
@@ -30,7 +30,7 @@
 }
 
 .md strong {
-  color: #111827;
+  color: #1e293b;
   font-weight: 700;
 }
 
@@ -65,5 +65,5 @@
   border-left: 3px solid #e94560;
   margin: 0.5rem 0;
   padding: 0.25rem 0.75rem;
-  color: #374151;
+  color: #1e293b;
 }

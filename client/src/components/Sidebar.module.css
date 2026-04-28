@@ -27,7 +27,7 @@
   display: block;
   padding: 10px 16px;
   font-size: 13px;
-  color: #aaa;
+  color: rgba(255, 255, 255, 0.82);
   text-decoration: none;
   border-left: 3px solid transparent;
   transition: background 0.15s, color 0.15s;
@@ -48,7 +48,7 @@
   margin: 12px;
   padding: 8px;
   background: transparent;
-  color: #aaa;
+  color: rgba(255, 255, 255, 0.65);
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 5px;
   font-size: 13px;
@@ -65,7 +65,7 @@
   display: block;
   padding: 10px 16px;
   font-size: 13px;
-  color: #555;
+  color: rgba(255, 255, 255, 0.82);
   opacity: 0.4;
   cursor: default;
   border-left: 3px solid transparent;
@@ -75,7 +75,7 @@
   display: none;
   background: none;
   border: none;
-  color: #aaa;
+  color: rgba(255, 255, 255, 0.82);
   font-size: 16px;
   cursor: pointer;
   margin-left: auto;

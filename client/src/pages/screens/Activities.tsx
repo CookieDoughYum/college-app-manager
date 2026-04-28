@@ -241,14 +241,18 @@ const ACTIVITY_LABELS: Record<ActivityCategory, string> = {
   academic: 'Academic Competitions & Debate',
 };
 
-function scoreActivityQuiz(answers: Record<string, ActivityCategory>): { area: ActivityCategory; count: number }[] {
+function scoreActivityQuiz(answers: Record<number, ActivityCategory[]>): { area: ActivityCategory; count: number }[] {
   const counts: Record<ActivityCategory, number> = { stem: 0, arts: 0, sports: 0, leadership: 0, service: 0, academic: 0 };
-  Object.values(answers).forEach(a => counts[a]++);
+  Object.values(answers).forEach(selected => {
+    selected.forEach(a => counts[a]++);
+  });
+  const total = Object.values(counts).reduce((s, n) => s + n, 0) || 1;
   return (Object.keys(counts) as ActivityCategory[])
     .map(k => ({ area: k, count: counts[k] }))
     .filter(x => x.count > 0)
     .sort((a, b) => b.count - a.count)
-    .slice(0, 3);
+    .slice(0, 3)
+    .map(x => ({ ...x, total }));
 }
 
 const GRADE_COLUMNS = [
@@ -274,6 +278,12 @@ function getCourseAlerts(courses: string[]): string[] {
   return [];
 }
 
+function toggleAnswer(prev: Record<number, ActivityCategory[]>, qi: number, value: ActivityCategory): Record<number, ActivityCategory[]> {
+  const current = prev[qi] ?? [];
+  const has = current.includes(value);
+  return { ...prev, [qi]: has ? current.filter(v => v !== value) : [...current, value] };
+}
+
 export default function Activities() {
   const [data, setData] = useState<ActivitiesData>(DEFAULT_DATA);
   const [loading, setLoading] = useState(true);
@@ -283,7 +293,7 @@ export default function Activities() {
   const [newCourse, setNewCourse] = useState<Record<string, string>>({});
 
   const [quizOpen, setQuizOpen] = useState(false);
-  const [quizAnswers, setQuizAnswers] = useState<Record<number, ActivityCategory>>({});
+  const [quizAnswers, setQuizAnswers] = useState<Record<number, ActivityCategory[]>>({});
   const [quizResult, setQuizResult] = useState<{ area: ActivityCategory; count: number }[] | null>(null);
 
   const [extracurricularPlan, setExtracurricularPlan] = useState<Record<string, string[]>>({});
@@ -299,7 +309,6 @@ export default function Activities() {
   const [targetSchoolForActivities, setTargetSchoolForActivities] = useState('');
   const [extracurricularFeedbackText, setExtracurricularFeedbackText] = useState('');
 
-  // Structured suggestion/feedback items from AI
   const [extracurricularSuggestions, setExtracurricularSuggestions] = useState<string[]>([]);
   const [courseSuggestions, setCourseSuggestions] = useState<string[]>([]);
   const [extracurricularFeedbackToAdd, setExtracurricularFeedbackToAdd] = useState<string[]>([]);
@@ -307,7 +316,6 @@ export default function Activities() {
   const [courseFeedbackToAdd, setCourseFeedbackToAdd] = useState<string[]>([]);
   const [courseFeedbackToRemove, setCourseFeedbackToRemove] = useState<string[]>([]);
 
-  // Grade picker: stores "sectionPrefix:itemName" for the item whose picker is open
   const [openPicker, setOpenPicker] = useState<string | null>(null);
 
   useEffect(() => {
@@ -319,11 +327,21 @@ export default function Activities() {
           const raw = d.interests;
           if (raw && typeof raw === 'object' && !Array.isArray(raw)) {
             if (raw.quizAnswers) {
-              setQuizAnswers(raw.quizAnswers);
-              const result = scoreActivityQuiz(raw.quizAnswers);
+              const qa = raw.quizAnswers;
+              // Migrate old single-value format to array format
+              const migrated: Record<number, ActivityCategory[]> = {};
+              for (const k of Object.keys(qa)) {
+                const v = qa[k];
+                migrated[Number(k)] = Array.isArray(v) ? v : [v];
+              }
+              setQuizAnswers(migrated);
+              const result = scoreActivityQuiz(migrated);
               if (result.length > 0) setQuizResult(result);
             }
             if (raw.extracurricularPlan) setExtracurricularPlan(raw.extracurricularPlan);
+            if (raw.gpa) setGpa(raw.gpa);
+            if (raw.sat) setSat(raw.sat);
+            if (raw.act) setAct(raw.act);
           }
         }
         setLoading(false);
@@ -341,8 +359,24 @@ export default function Activities() {
     });
   }
 
+  function saveAcademicStats(field: 'gpa' | 'sat' | 'act', value: string) {
+    const interests = {
+      quizAnswers,
+      extracurricularPlan,
+      gpa: field === 'gpa' ? value : gpa,
+      sat: field === 'sat' ? value : sat,
+      act: field === 'act' ? value : act,
+    };
+    fetch('/api/student/activities', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ interests }),
+    });
+  }
+
   function submitQuiz() {
-    const result = scoreActivityQuiz(quizAnswers as Record<string, ActivityCategory>);
+    const result = scoreActivityQuiz(quizAnswers);
     setQuizResult(result);
     setQuizOpen(false);
     save({ ...data, interests: { quizAnswers, extracurricularPlan } });
@@ -354,6 +388,8 @@ export default function Activities() {
     setQuizResult(null);
     save({ ...data, interests: { quizAnswers: {}, extracurricularPlan } });
   }
+
+  const allAnswered = ACTIVITY_QUIZ.every((_, qi) => (quizAnswers[qi] ?? []).length > 0);
 
   async function getExtracurriculars() {
     setExtracurricularLoading(true);
@@ -540,6 +576,7 @@ export default function Activities() {
             <button className={styles.quizToggle} onClick={resetQuiz}>Reset</button>
           )}
         </div>
+        <p className={styles.quizNote}>Select all options that apply to you for each question.</p>
         {quizResult ? (
           <div className={styles.quizResult}>
             <div className={styles.quizResultLabel}>Your top activity areas</div>
@@ -549,10 +586,10 @@ export default function Activities() {
                 <div className={styles.quizResultBarWrap}>
                   <div className={styles.quizResultBarLabel}>{ACTIVITY_LABELS[r.area]}</div>
                   <div className={styles.quizResultBar}>
-                    <div className={styles.quizResultBarFill} style={{ width: `${Math.round((r.count / ACTIVITY_QUIZ.length) * 100)}%` }} />
+                    <div className={styles.quizResultBarFill} style={{ width: `${Math.round((r.count / (Object.values(quizAnswers).reduce((s, a) => s + a.length, 0) || 1)) * 100)}%` }} />
                   </div>
                 </div>
-                <span className={styles.quizResultPct}>{Math.round((r.count / ACTIVITY_QUIZ.length) * 100)}%</span>
+                <span className={styles.quizResultPct}>{Math.round((r.count / (Object.values(quizAnswers).reduce((s, a) => s + a.length, 0) || 1)) * 100)}%</span>
               </div>
             ))}
             <p className={styles.quizResultDetail}>Results saved — use the buttons below to get personalized recommendations.</p>
@@ -563,31 +600,34 @@ export default function Activities() {
               <div key={qi} className={styles.quizQuestion}>
                 <p className={styles.quizQ}>{qi + 1}. {q.q}</p>
                 <div className={styles.quizOptions}>
-                  {q.options.map(opt => (
-                    <label key={opt.value} className={`${styles.quizOption} ${quizAnswers[qi] === opt.value ? styles.quizOptionSelected : ''}`}>
-                      <input
-                        type="radio"
-                        name={`aq${qi}`}
-                        value={opt.value}
-                        checked={quizAnswers[qi] === opt.value}
-                        onChange={() => setQuizAnswers(prev => ({ ...prev, [qi]: opt.value }))}
-                      />
-                      {opt.label}
-                    </label>
-                  ))}
+                  {q.options.map(opt => {
+                    const selected = (quizAnswers[qi] ?? []).includes(opt.value);
+                    return (
+                      <label key={opt.value} className={`${styles.quizOption} ${selected ? styles.quizOptionSelected : ''}`}>
+                        <input
+                          type="checkbox"
+                          name={`aq${qi}`}
+                          value={opt.value}
+                          checked={selected}
+                          onChange={() => setQuizAnswers(prev => toggleAnswer(prev, qi, opt.value))}
+                        />
+                        {opt.label}
+                      </label>
+                    );
+                  })}
                 </div>
               </div>
             ))}
             <button
               className={styles.quizSubmit}
-              disabled={Object.keys(quizAnswers).length < ACTIVITY_QUIZ.length}
+              disabled={!allAnswered}
               onClick={submitQuiz}
             >
-              See My Results ({Object.keys(quizAnswers).length}/{ACTIVITY_QUIZ.length} answered)
+              See My Results ({Object.values(quizAnswers).filter(a => a.length > 0).length}/{ACTIVITY_QUIZ.length} answered)
             </button>
           </div>
         ) : (
-          <p className={styles.placeholder}>Answer 20 questions to discover your top activity areas. Your results drive the recommendations below.</p>
+          <p className={styles.placeholder}>Answer 20 questions to discover your top activity areas. You can select multiple options per question. Your results drive the recommendations below.</p>
         )}
       </section>
 
@@ -597,15 +637,15 @@ export default function Activities() {
         <div className={styles.fieldRow}>
           <div className={styles.field}>
             <label className={styles.label}>GPA</label>
-            <input className={styles.input} type="text" placeholder="e.g. 3.8" value={gpa} onChange={e => setGpa(e.target.value)} />
+            <input className={styles.input} type="text" placeholder="e.g. 3.8" value={gpa} onChange={e => setGpa(e.target.value)} onBlur={e => saveAcademicStats('gpa', e.target.value)} />
           </div>
           <div className={styles.field}>
             <label className={styles.label}>SAT Score</label>
-            <input className={styles.input} type="text" placeholder="e.g. 1400" value={sat} onChange={e => setSat(e.target.value)} />
+            <input className={styles.input} type="text" placeholder="e.g. 1400" value={sat} onChange={e => setSat(e.target.value)} onBlur={e => saveAcademicStats('sat', e.target.value)} />
           </div>
           <div className={styles.field}>
             <label className={styles.label}>ACT Score</label>
-            <input className={styles.input} type="text" placeholder="e.g. 31" value={act} onChange={e => setAct(e.target.value)} />
+            <input className={styles.input} type="text" placeholder="e.g. 31" value={act} onChange={e => setAct(e.target.value)} onBlur={e => saveAcademicStats('act', e.target.value)} />
           </div>
         </div>
       </section>

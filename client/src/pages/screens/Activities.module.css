@@ -5,7 +5,7 @@
 .title {
   font-size: 24px;
   font-weight: 800;
-  color: #111827;
+  color: #1e293b;
   margin: 0 0 24px;
 }
 
@@ -21,7 +21,7 @@
 .sectionTitle {
   font-size: 16px;
   font-weight: 700;
-  color: #111827;
+  color: #1e293b;
   margin: 0 0 14px;
 }
 
@@ -44,7 +44,7 @@
   border: none;
   border-radius: 8px;
   padding: 0.55rem 1.2rem;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
@@ -71,7 +71,7 @@
 
 .errorText {
   color: #e94560;
-  font-size: 13px;
+  font-size: 15px;
   margin: 0 0 8px;
 }
 
@@ -89,9 +89,9 @@
 }
 
 .label {
-  font-size: 12px;
+  font-size: 15px;
   font-weight: 600;
-  color: #374151;
+  color: #1e293b;
 }
 
 .input {
@@ -99,7 +99,7 @@
   border: 1.5px solid #d1d5db;
   border-radius: 6px;
   padding: 0 10px;
-  font-size: 13px;
+  font-size: 15px;
   box-sizing: border-box;
   transition: border-color 0.15s;
 }
@@ -110,8 +110,8 @@
 }
 
 .placeholder {
-  font-size: 13px;
-  color: #9ca3af;
+  font-size: 15px;
+  color: #4b5568;
   background: #f9fafb;
   border-radius: 6px;
   padding: 14px 16px;
@@ -131,19 +131,20 @@
 }
 
 .quizToggle {
-  background: none;
-  border: 2px solid #e94560;
-  color: #e94560;
+  background: #e94560;
+  border: none;
+  color: #fff;
   border-radius: 8px;
   padding: 0.4rem 0.9rem;
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 15px;
+  font-weight: 700;
   cursor: pointer;
+  box-shadow: 0 2px 6px rgba(233, 69, 96, 0.3);
   transition: background 0.15s;
 }
 
 .quizToggle:hover {
-  background: #fff0f2;
+  background: #c62828;
 }
 
 .quizBody {
@@ -159,9 +160,9 @@
 }
 
 .quizQ {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 700;
-  color: #111827;
+  color: #1e293b;
   margin: 0;
 }
 
@@ -175,8 +176,8 @@
   display: flex;
   align-items: flex-start;
   gap: 8px;
-  font-size: 13px;
-  color: #374151;
+  font-size: 15px;
+  color: #1e293b;
   background: #f9fafb;
   border: 1.5px solid #e5e7eb;
   border-radius: 8px;
@@ -185,16 +186,26 @@
   transition: background 0.1s, border-color 0.1s;
 }
 
+.quizNote {
+  font-size: 15px;
+  color: #4b5568;
+  margin: -8px 0 12px;
+  font-style: italic;
+}
+
+.quizOption input[type="checkbox"],
 .quizOption input[type="radio"] {
   margin-top: 2px;
   flex-shrink: 0;
-  accent-color: #e94560;
+  accent-color: #4f46e5;
+  width: 16px;
+  height: 16px;
 }
 
 .quizOptionSelected {
   background: #fff0f2;
   border-color: #e94560;
-  color: #111827;
+  color: #1e293b;
 }
 
 .quizSubmit {
@@ -204,7 +215,7 @@
   border: none;
   border-radius: 8px;
   padding: 0.6rem 1.4rem;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 700;
   cursor: pointer;
   box-shadow: 0 2px 8px rgba(233, 69, 96, 0.3);
@@ -229,7 +240,7 @@
 }
 
 .quizResultLabel {
-  font-size: 12px;
+  font-size: 15px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -245,9 +256,9 @@
 }
 
 .quizResultRank {
-  font-size: 12px;
+  font-size: 15px;
   font-weight: 700;
-  color: #6b7280;
+  color: #1e293b;
   width: 24px;
   flex-shrink: 0;
 }
@@ -258,9 +269,9 @@
 }
 
 .quizResultBarLabel {
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 600;
-  color: #111827;
+  color: #1e293b;
   margin-bottom: 4px;
 }
 
@@ -279,7 +290,7 @@
 }
 
 .quizResultPct {
-  font-size: 12px;
+  font-size: 15px;
   font-weight: 700;
   color: #059669;
   width: 36px;
@@ -288,8 +299,8 @@
 }
 
 .quizResultDetail {
-  font-size: 13px;
-  color: #374151;
+  font-size: 15px;
+  color: #4b5568;
   margin: 10px 0 0;
 }
 
@@ -315,7 +326,7 @@
   border: 1.5px solid #d1d5db;
   border-radius: 6px;
   padding: 0 12px;
-  font-size: 14px;
+  font-size: 16px;
   box-sizing: border-box;
   transition: border-color 0.15s;
 }
@@ -340,9 +351,9 @@
 
 .planColHeader {
   background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
-  font-size: 12px;
+  font-size: 15px;
   font-weight: 700;
-  color: #374151;
+  color: #1e293b;
   padding: 9px 12px;
   border-bottom: 1px solid #e5e7eb;
 }
@@ -353,8 +364,8 @@
 }
 
 .planPlaceholder {
-  font-size: 12px;
-  color: #9ca3af;
+  font-size: 15px;
+  color: #4b5568;
   margin: 0;
 }
 
@@ -367,8 +378,8 @@
 }
 
 .planCourse {
-  font-size: 12px;
-  color: #111827;
+  font-size: 15px;
+  color: #1e293b;
   flex: 1;
   min-width: 0;
   overflow: hidden;
@@ -379,8 +390,8 @@
 .planRemoveBtn {
   background: none;
   border: none;
-  color: #9ca3af;
-  font-size: 14px;
+  color: #1e293b;
+  font-size: 16px;
   line-height: 1;
   cursor: pointer;
   padding: 0 2px;
@@ -451,9 +462,9 @@
 }
 
 .actionableSectionTitle {
-  font-size: 12px;
+  font-size: 15px;
   font-weight: 700;
-  color: #374151;
+  color: #1e293b;
   text-transform: uppercase;
   letter-spacing: 0.04em;
   margin: 0 0 10px;
@@ -478,8 +489,8 @@
 }
 
 .actionableItemName {
-  font-size: 13px;
-  color: #1a1a2e;
+  font-size: 15px;
+  color: #1e293b;
   font-weight: 500;
   flex: 1;
   min-width: 120px;
@@ -491,7 +502,7 @@
   border: none;
   border-radius: 6px;
   padding: 5px 12px;
-  font-size: 12px;
+  font-size: 15px;
   font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
@@ -508,7 +519,7 @@
   border: none;
   border-radius: 6px;
   padding: 5px 12px;
-  font-size: 12px;
+  font-size: 15px;
   font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
@@ -528,8 +539,8 @@
 }
 
 .gradePickerLabel {
-  font-size: 12px;
-  color: #374151;
+  font-size: 15px;
+  color: #1e293b;
   font-weight: 600;
   white-space: nowrap;
 }
@@ -552,7 +563,7 @@
 
 .gradePickerCancel {
   background: none;
-  color: #6b7280;
+  color: #1e293b;
   border: 1px solid #d1d5db;
   border-radius: 5px;
   padding: 5px 9px;
@@ -563,5 +574,5 @@
 
 .gradePickerCancel:hover {
   border-color: #9ca3af;
-  color: #374151;
+  color: #1e293b;
 }

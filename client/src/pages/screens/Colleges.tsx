@@ -2,6 +2,83 @@ import { useState, useEffect } from 'react';
 import MarkdownOutput from '../../components/MarkdownOutput';
 import styles from './Colleges.module.css';
 
+// College match quiz
+const COLLEGE_MATCH_QUIZ = [
+  {
+    key: 'size',
+    q: 'What size college do you prefer?',
+    options: [
+      { label: 'Small (under 3,000 students) — tight-knit, everyone knows everyone', value: 'small' },
+      { label: 'Medium (3,000–15,000) — balanced community and resources', value: 'medium' },
+      { label: 'Large (15,000+) — big campus energy, lots of options', value: 'large' },
+    ],
+  },
+  {
+    key: 'setting',
+    q: 'What campus setting appeals to you most?',
+    options: [
+      { label: 'Urban — in or near a major city, easy access to internships and culture', value: 'urban' },
+      { label: 'Suburban — mid-sized city with campus feel but city nearby', value: 'suburban' },
+      { label: 'Rural — traditional college town, beautiful campus, close community', value: 'rural' },
+    ],
+  },
+  {
+    key: 'distance',
+    q: 'How far from home do you want to go?',
+    options: [
+      { label: 'Close — within 2 hours, easy to visit home', value: 'close' },
+      { label: 'Moderate — same region or state, occasional trips home', value: 'moderate' },
+      { label: 'Far — across the country or out of state, full independence', value: 'far' },
+    ],
+  },
+  {
+    key: 'type',
+    q: 'Do you prefer public or private?',
+    options: [
+      { label: 'Public university — larger, lower cost (especially in-state), big sports culture', value: 'public' },
+      { label: 'Private university — often smaller, more financial aid, diverse geography', value: 'private' },
+      { label: 'No preference — open to either', value: 'either' },
+    ],
+  },
+  {
+    key: 'focus',
+    q: 'What is your academic focus preference?',
+    options: [
+      { label: 'Research university — major research programs, graduate school pathway', value: 'research' },
+      { label: 'Liberal arts college — broad education, small classes, writing-intensive', value: 'liberalarts' },
+      { label: 'Technical / specialized — engineering, arts, business, or STEM focus', value: 'technical' },
+    ],
+  },
+  {
+    key: 'social',
+    q: 'What campus social life matters most to you?',
+    options: [
+      { label: 'Greek life — fraternities and sororities are important to me', value: 'greek' },
+      { label: 'Club and org culture — lots of student groups and activities', value: 'clubs' },
+      { label: 'Athletics — strong sports culture, attending games is a big deal', value: 'sports' },
+      { label: 'Laid-back — I prefer a more low-key, study-focused environment', value: 'lowkey' },
+    ],
+  },
+  {
+    key: 'selectivity',
+    q: 'What selectivity level are you targeting?',
+    options: [
+      { label: 'Highly selective (under 20% acceptance rate) — Ivies, top-10 schools', value: 'elite' },
+      { label: 'Selective (20–40% acceptance rate) — strong regional and national schools', value: 'selective' },
+      { label: 'Less selective (40%+) — broad access, good match for my stats', value: 'accessible' },
+    ],
+  },
+  {
+    key: 'aid',
+    q: 'How important is financial aid or merit scholarships?',
+    options: [
+      { label: 'Very important — cost is a major factor in my decision', value: 'high' },
+      { label: 'Somewhat important — I want options but cost is not the only factor', value: 'medium' },
+      { label: 'Not a primary concern — family can handle most costs', value: 'low' },
+    ],
+  },
+] as const;
+
 type InterestArea = 'stem' | 'healthcare' | 'business' | 'arts' | 'social' | 'law' | 'trades';
 
 const INTEREST_QUIZ = [
@@ -297,11 +374,35 @@ export default function Colleges() {
   const [collegeRecText, setCollegeRecText] = useState('');
   const [collegeRecError, setCollegeRecError] = useState('');
 
+  // College match quiz
+  const [matchQuizOpen, setMatchQuizOpen] = useState(false);
+  const [matchQuizAnswers, setMatchQuizAnswers] = useState<Record<string, string>>({});
+  const [matchLocation, setMatchLocation] = useState('');
+  const [matchQuizDone, setMatchQuizDone] = useState(false);
+  const [actGpa, setActGpa] = useState('');
+  const [actSat, setActSat] = useState('');
+  const [actAct, setActAct] = useState('');
+  const [matchRecLoading, setMatchRecLoading] = useState(false);
+  const [matchRecText, setMatchRecText] = useState('');
+  const [matchRecError, setMatchRecError] = useState('');
+
   useEffect(() => {
     fetch('/api/student/colleges', { credentials: 'include' })
       .then(r => r.json())
       .then(d => { setData(d ?? DEFAULT_DATA); setLoading(false); })
       .catch(() => setLoading(false));
+    // Load academic stats from Activities & Courses
+    fetch('/api/student/activities', { credentials: 'include' })
+      .then(r => r.json())
+      .then(d => {
+        const raw = d?.interests;
+        if (raw && typeof raw === 'object') {
+          if (raw.gpa) setActGpa(raw.gpa);
+          if (raw.sat) setActSat(raw.sat);
+          if (raw.act) setActAct(raw.act);
+        }
+      })
+      .catch(() => {});
   }, []);
 
   function save(updated: CollegesData) {
@@ -362,6 +463,26 @@ export default function Colleges() {
     setQuizOpen(false);
     setQuizAnswers({});
     setQuizResult(null);
+  }
+
+  async function getMatchRecommendations() {
+    setMatchRecLoading(true);
+    setMatchRecError('');
+    try {
+      const res = await fetch('/api/ai/colleges/recommendcolleges', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ matchQuizAnswers, location: matchLocation }),
+      });
+      if (!res.ok) throw new Error('Server error');
+      const { result } = await res.json();
+      setMatchRecText(result);
+    } catch {
+      setMatchRecError('Could not generate recommendations — please try again.');
+    } finally {
+      setMatchRecLoading(false);
+    }
   }
 
   async function getCollegeRecommendations() {
@@ -463,6 +584,86 @@ export default function Colleges() {
         )}
       </section>
 
+      {/* College Match Quiz */}
+      <section className={styles.section}>
+        <div className={styles.quizHeader}>
+          <h2 className={styles.sectionTitle}>College Match Quiz</h2>
+          {!matchQuizOpen && !matchQuizDone && (
+            <button className={styles.quizToggle} onClick={() => setMatchQuizOpen(true)}>Take the Quiz</button>
+          )}
+          {(matchQuizOpen || matchQuizDone) && (
+            <button className={styles.quizToggle} onClick={() => { setMatchQuizOpen(false); setMatchQuizAnswers({}); setMatchQuizDone(false); setMatchRecText(''); }}>Reset</button>
+          )}
+        </div>
+        <p style={{ fontSize: '15px', color: '#374151', margin: '0 0 12px', fontWeight: 700 }}>Answer 8 questions about your preferences and share your location to get college recommendations tailored to you.</p>
+        {matchQuizDone ? (
+          <div className={styles.quizResult}>
+            <div className={styles.quizResultLabel}>Preferences saved</div>
+            {(actGpa || actSat || actAct) && (
+              <p style={{ fontSize: '15px', color: '#374151', margin: '0 0 10px', fontWeight: 700 }}>
+                Academic stats from Activities &amp; Courses: {[actGpa && `GPA ${actGpa}`, actSat && `SAT ${actSat}`, actAct && `ACT ${actAct}`].filter(Boolean).join(' · ')}
+              </p>
+            )}
+            {matchLocation && (
+              <p style={{ fontSize: '15px', color: '#374151', margin: '0 0 14px', fontWeight: 700 }}>
+                Location: {matchLocation}
+              </p>
+            )}
+            <button
+              className={styles.matchRecBtn}
+              onClick={getMatchRecommendations}
+              disabled={matchRecLoading}
+            >
+              {matchRecLoading ? 'Generating…' : 'Get My Matched Colleges'}
+            </button>
+            {matchRecError && <p style={{ color: '#c62828', fontSize: '15px', marginTop: '8px', fontWeight: 700 }}>{matchRecError}</p>}
+            {matchRecText && <div style={{ marginTop: '14px' }}><MarkdownOutput>{matchRecText}</MarkdownOutput></div>}
+          </div>
+        ) : matchQuizOpen ? (
+          <div className={styles.quizBody}>
+            {COLLEGE_MATCH_QUIZ.map((q) => (
+              <div key={q.key} className={styles.quizQuestion}>
+                <p className={styles.quizQ}>{q.q}</p>
+                <div className={styles.quizOptions}>
+                  {q.options.map(opt => (
+                    <label key={opt.value} className={`${styles.quizOption} ${matchQuizAnswers[q.key] === opt.value ? styles.quizOptionSelected : ''}`}>
+                      <input
+                        type="radio"
+                        name={`mq_${q.key}`}
+                        value={opt.value}
+                        checked={matchQuizAnswers[q.key] === opt.value}
+                        onChange={() => setMatchQuizAnswers(prev => ({ ...prev, [q.key]: opt.value }))}
+                      />
+                      {opt.label}
+                    </label>
+                  ))}
+                </div>
+              </div>
+            ))}
+            <div className={styles.quizQuestion}>
+              <p className={styles.quizQ}>Where are you located? (e.g. "California" or "Chicago, IL")</p>
+              <input
+                className={styles.matchStatInput}
+                type="text"
+                placeholder="Your city or state"
+                value={matchLocation}
+                onChange={e => setMatchLocation(e.target.value)}
+                style={{ width: '280px' }}
+              />
+            </div>
+            <button
+              className={styles.quizSubmit}
+              disabled={Object.keys(matchQuizAnswers).length < COLLEGE_MATCH_QUIZ.length}
+              onClick={() => { setMatchQuizDone(true); setMatchQuizOpen(false); }}
+            >
+              Save My Preferences ({Object.keys(matchQuizAnswers).length}/{COLLEGE_MATCH_QUIZ.length} answered)
+            </button>
+          </div>
+        ) : (
+          <p className={styles.placeholder}>Answer 8 questions about your college preferences plus your location, and get colleges matched specifically to you.</p>
+        )}
+      </section>
+
       <section className={styles.section}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <h2 className={styles.sectionTitle}>Recommended Majors</h2>
@@ -478,7 +679,7 @@ export default function Colleges() {
         {aiText ? (
           <MarkdownOutput>{aiText}</MarkdownOutput>
         ) : (
-          <p style={{ color: '#888', marginTop: '0.5rem' }}>Complete the interest quiz above and enter a salary goal, then click "Get Major Recommendations" for specific majors matched to your profile.</p>
+          <p style={{ color: '#374151', marginTop: '0.5rem', fontWeight: 700 }}>Complete the interest quiz above and enter a salary goal, then click "Get Major Recommendations" for specific majors matched to your profile.</p>
         )}
       </section>
 
@@ -497,7 +698,7 @@ export default function Colleges() {
         {collegeRecText ? (
           <MarkdownOutput>{collegeRecText}</MarkdownOutput>
         ) : (
-          <p style={{ color: '#9ca3af', fontSize: '13px', background: '#f9fafb', borderRadius: '6px', padding: '14px 16px', margin: 0 }}>
+          <p style={{ color: '#374151', fontSize: '15px', background: '#f0f4ff', borderRadius: '6px', padding: '14px 16px', margin: 0, fontWeight: 700 }}>
             Complete the Professional Interest Quiz and enter your salary goal, then click the button to get college recommendations matched to your profile.
           </p>
         )}

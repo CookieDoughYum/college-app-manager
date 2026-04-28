@@ -5,7 +5,7 @@
 .title {
   font-size: 24px;
   font-weight: 800;
-  color: #111827;
+  color: #1e293b;
   margin: 0 0 24px;
 }
 
@@ -21,20 +21,20 @@
 .sectionTitle {
   font-size: 16px;
   font-weight: 700;
-  color: #111827;
+  color: #1e293b;
   margin: 0 0 14px;
 }
 
 .psatBody {
-  font-size: 13px;
-  color: #444;
+  font-size: 15px;
+  color: #4b5568;
   margin: 0 0 12px;
   line-height: 1.6;
 }
 
 .psatList {
-  font-size: 13px;
-  color: #444;
+  font-size: 15px;
+  color: #4b5568;
   margin: 0;
   padding-left: 20px;
   line-height: 1.8;
@@ -52,17 +52,19 @@
 }
 
 .quizToggle {
-  background: none;
-  border: 1px solid #e94560;
-  color: #e94560;
+  background: #e94560;
+  border: none;
+  color: #fff;
   border-radius: 6px;
-  padding: 0.3rem 0.7rem;
-  font-size: 12px;
+  padding: 0.3rem 0.9rem;
+  font-size: 15px;
+  font-weight: 700;
   cursor: pointer;
+  box-shadow: 0 2px 6px rgba(233, 69, 96, 0.3);
 }
 
 .quizToggle:hover {
-  background: #fff0f2;
+  background: #c62828;
 }
 
 .quizBody {
@@ -78,9 +80,9 @@
 }
 
 .quizQ {
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 600;
-  color: #1a1a2e;
+  color: #1e293b;
   margin: 0;
 }
 
@@ -94,8 +96,8 @@
   display: flex;
   align-items: flex-start;
   gap: 8px;
-  font-size: 13px;
-  color: #444;
+  font-size: 15px;
+  color: #1e293b;
   background: #f9f9f9;
   border: 1px solid #e0e0e0;
   border-radius: 6px;
@@ -112,7 +114,7 @@
 .quizOptionSelected {
   background: #fff0f2;
   border-color: #e94560;
-  color: #1a1a2e;
+  color: #1e293b;
 }
 
 .quizSubmit {
@@ -122,7 +124,7 @@
   border: none;
   border-radius: 6px;
   padding: 0.45rem 1rem;
-  font-size: 13px;
+  font-size: 15px;
   cursor: pointer;
 }
 
@@ -150,15 +152,15 @@
 }
 
 .quizResultSummary {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
-  color: #1a1a2e;
+  color: #1e293b;
   margin: 0 0 6px;
 }
 
 .quizResultDetail {
-  font-size: 13px;
-  color: #555;
+  font-size: 15px;
+  color: #4b5568;
   margin: 0;
   line-height: 1.5;
 }
@@ -178,20 +180,20 @@
 }
 
 .cardTitle {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
-  color: #1a1a2e;
+  color: #1e293b;
   margin-bottom: 8px;
 }
 
 .cardBody {
-  font-size: 13px;
-  color: #555;
+  font-size: 15px;
+  color: #4b5568;
   margin: 0 0 10px;
 }
 
 .cardLink {
-  font-size: 13px;
+  font-size: 15px;
   color: #e94560;
   font-weight: 600;
 }
@@ -214,7 +216,7 @@
   border: 1px solid #ccc;
   border-radius: 5px;
   padding: 0 8px;
-  font-size: 13px;
+  font-size: 15px;
 }
 
 .apAddBtn {
@@ -224,7 +226,7 @@
   color: white;
   border: none;
   border-radius: 5px;
-  font-size: 13px;
+  font-size: 15px;
   cursor: pointer;
 }
 
@@ -232,11 +234,11 @@
   display: inline-block;
   padding: 5px 12px;
   border-radius: 16px;
-  font-size: 13px;
+  font-size: 15px;
   cursor: pointer;
   border: 1px dashed #bbb;
   background: transparent;
-  color: #888;
+  color: #1e293b;
 }
 
 .addChip:hover {
@@ -245,8 +247,8 @@
 }
 
 .placeholder {
-  font-size: 13px;
-  color: #888;
+  font-size: 15px;
+  color: #4b5568;
   margin: 0;
 }
 
@@ -255,14 +257,14 @@
   border-left: 3px solid #e65100;
   border-radius: 0 6px 6px 0;
   padding: 12px 16px;
-  font-size: 13px;
-  color: #374151;
+  font-size: 15px;
+  color: #1e293b;
 }
 
 .targetRow {
   display: flex;
   gap: 14px;
-  align-items: flex-end;
+  align-items: center;
   margin-bottom: 16px;
   flex-wrap: wrap;
 }
@@ -273,12 +275,13 @@
   gap: 4px;
   flex: 1;
   min-width: 200px;
+  max-width: 480px;
 }
 
 .targetLabel {
-  font-size: 12px;
+  font-size: 15px;
   font-weight: 600;
-  color: #374151;
+  color: #1e293b;
 }
 
 .targetInput {
@@ -286,7 +289,7 @@
   border: 1.5px solid #d1d5db;
   border-radius: 6px;
   padding: 0 12px;
-  font-size: 14px;
+  font-size: 16px;
   box-sizing: border-box;
   transition: border-color 0.15s;
 }
@@ -303,7 +306,7 @@
   color: white;
   border: none;
   border-radius: 8px;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 700;
   cursor: pointer;
   white-space: nowrap;

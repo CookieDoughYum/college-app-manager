@@ -3,24 +3,25 @@
 }
 
 .title {
-  font-size: 22px;
-  font-weight: 700;
-  color: #1a1a2e;
+  font-size: 24px;
+  font-weight: 800;
+  color: #1e293b;
   margin: 0 0 24px;
 }
 
 .section {
   background: white;
-  border-radius: 8px;
-  padding: 20px 24px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  border-radius: 10px;
+  padding: 22px 26px;
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.07);
+  border: 1px solid #e0e7ff;
   margin-bottom: 20px;
 }
 
 .sectionTitle {
-  font-size: 15px;
-  font-weight: 600;
-  color: #1a1a2e;
+  font-size: 16px;
+  font-weight: 700;
+  color: #1e293b;
   margin: 0 0 14px;
 }
 
@@ -52,8 +53,8 @@
 }
 
 .timelinePeriod {
-  font-size: 13px;
-  font-weight: 700;
+  font-size: 15px;
+  font-weight: 800;
   margin-bottom: 6px;
 }
 
@@ -62,16 +63,18 @@
 .green .timelinePeriod { color: #2e7d32; }
 
 .timelineDesc {
-  font-size: 12px;
-  color: #555;
+  font-size: 15px;
+  color: #1e293b;
   margin: 0;
   line-height: 1.5;
+  font-weight: 600;
 }
 
 .driveNote {
-  font-size: 13px;
-  color: #555;
+  font-size: 16px;
+  color: #4b5568;
   margin: 0 0 12px;
+  font-weight: 600;
 }
 
 .chipRow {
@@ -80,42 +83,104 @@
   gap: 8px;
 }
 
-.input {
-  flex: 1;
-  height: 36px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  padding: 0 12px;
-  font-size: 13px;
+/* Profile quiz */
+.profileQuiz {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.profileField {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.profileTextarea {
+  width: 100%;
+  min-height: 72px;
+  border: 1.5px solid #c7d2fe;
+  border-radius: 6px;
+  padding: 10px 12px;
+  font-size: 16px;
+  font-family: inherit;
+  font-weight: 600;
   box-sizing: border-box;
+  resize: vertical;
+  line-height: 1.5;
+  background: #fafbff;
+  color: #1e293b;
+  transition: border-color 0.15s;
+}
+
+.profileTextarea:focus {
+  outline: none;
+  border-color: #4f46e5;
+}
+
+.profileSaveBtn {
+  align-self: flex-start;
+  height: 38px;
+  padding: 0 20px;
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.profileSaveBtn:disabled {
+  background: #d1d5db;
+  cursor: default;
+}
+
+.profileSaveBtn:not(:disabled):hover {
+  opacity: 0.9;
+}
+
+.profileHint {
+  font-size: 15px;
+  color: #4b5568;
+  margin: 0;
 }
 
 /* AI tool shared */
 .aiNote {
-  font-size: 13px;
-  color: #555;
+  font-size: 16px;
+  color: #4b5568;
   margin: 0 0 14px;
+  font-weight: 600;
 }
 
 .aiLabel {
   display: block;
-  font-size: 12px;
-  font-weight: 600;
-  color: #444;
-  margin-bottom: 4px;
+  font-size: 15px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 5px;
 }
 
 .aiSelect,
 .aiInput {
   width: 100%;
-  height: 36px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  padding: 0 10px;
-  font-size: 13px;
+  height: 38px;
+  border: 1.5px solid #c7d2fe;
+  border-radius: 6px;
+  padding: 0 12px;
+  font-size: 16px;
+  font-weight: 600;
   box-sizing: border-box;
-  background: #fff;
-  color: #213547;
+  background: #fafbff;
+  color: #1e293b;
+  transition: border-color 0.15s;
+}
+
+.aiInput:focus {
+  outline: none;
+  border-color: #4f46e5;
 }
 
 .aiField {
@@ -127,36 +192,42 @@
 
 .aiButton {
   align-self: flex-end;
-  height: 36px;
-  padding: 0 18px;
-  background: #e94560;
+  height: 38px;
+  padding: 0 20px;
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
   color: #fff;
   border: none;
-  border-radius: 5px;
-  font-size: 13px;
-  font-weight: 600;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 700;
   cursor: pointer;
   white-space: nowrap;
   flex-shrink: 0;
+  transition: opacity 0.2s;
 }
 
 .aiButton:disabled {
-  opacity: 0.55;
+  background: #d1d5db;
   cursor: not-allowed;
 }
 
+.aiButton:not(:disabled):hover {
+  opacity: 0.9;
+}
+
 .aiError {
-  font-size: 13px;
+  font-size: 15px;
   color: #c62828;
   margin: 8px 0 0;
+  font-weight: 700;
 }
 
 .aiOutput {
   margin-top: 14px;
   padding: 14px 16px;
-  background: #f7f8fc;
-  border-radius: 6px;
-  border: 1px solid #e0e4ee;
+  background: #f8faff;
+  border-radius: 8px;
+  border: 1px solid #e0e7ff;
 }
 
 /* Brainstormer layout */
@@ -174,28 +245,150 @@
   gap: 12px;
 }
 
-.fbMeta {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.fbMeta .aiField {
-  flex: 1;
-  min-width: 180px;
-}
-
 .aiTextarea {
   width: 100%;
   min-height: 160px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
+  border: 1.5px solid #c7d2fe;
+  border-radius: 6px;
   padding: 10px 12px;
-  font-size: 13px;
+  font-size: 16px;
   font-family: inherit;
+  font-weight: 600;
   box-sizing: border-box;
   resize: vertical;
   line-height: 1.5;
-  background: #fff;
-  color: #213547;
+  background: #fafbff;
+  color: #1e293b;
+  transition: border-color 0.15s;
+}
+
+.aiTextarea:focus {
+  outline: none;
+  border-color: #4f46e5;
+}
+
+/* University prompt lookup */
+.devNote {
+  background: #fff8e1;
+  border: 1px solid #f59e0b;
+  border-left: 4px solid #f59e0b;
+  border-radius: 6px;
+  padding: 10px 14px;
+  margin-bottom: 14px;
+  font-size: 14px;
+  color: #78350f;
+  line-height: 1.5;
+}
+
+.promptNote {
+  background: #f0f4ff;
+  border: 1px solid #c7d2fe;
+  border-radius: 8px;
+  padding: 14px 18px;
+  margin-bottom: 16px;
+}
+
+.promptNote p {
+  margin: 0 0 8px;
+  font-size: 16px;
+  color: #1e293b;
+}
+
+.promptNoteList {
+  margin: 0;
+  padding-left: 20px;
+  font-size: 15px;
+  color: #1e293b;
+  line-height: 1.8;
+  font-weight: 600;
+}
+
+.promptRow {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.promptInput {
+  flex: 1;
+  min-width: 220px;
+  height: 40px;
+  border: 1.5px solid #c7d2fe;
+  border-radius: 8px;
+  padding: 0 14px;
+  font-size: 16px;
+  font-weight: 600;
+  box-sizing: border-box;
+  background: #fafbff;
+  color: #1e293b;
+  transition: border-color 0.15s;
+}
+
+.promptInput:focus {
+  outline: none;
+  border-color: #4f46e5;
+}
+
+.promptBtn {
+  height: 40px;
+  padding: 0 20px;
+  background: linear-gradient(135deg, #0ea5e9, #2563eb);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.2s;
+  box-shadow: 0 2px 8px rgba(14, 165, 233, 0.3);
+}
+
+.promptBtn:disabled {
+  background: #d1d5db;
+  box-shadow: none;
+  cursor: default;
+}
+
+.promptBtn:not(:disabled):hover {
+  opacity: 0.9;
+}
+
+.promptResult {
+  margin-top: 4px;
+  padding: 18px 20px;
+  background: #f8faff;
+  border: 1px solid #e0e7ff;
+  border-radius: 8px;
+}
+
+.promptResultTitle {
+  font-size: 15px;
+  font-weight: 800;
+  color: #1e293b;
+  margin-bottom: 8px;
+}
+
+.promptResultNote {
+  font-size: 15px;
+  color: #4b5568;
+  margin: 0 0 14px;
+  font-weight: 600;
+}
+
+.promptList {
+  margin: 0;
+  padding-left: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.promptItem {
+  font-size: 16px;
+  color: #1e293b;
+  line-height: 1.6;
+  font-weight: 600;
 }

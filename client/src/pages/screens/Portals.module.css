@@ -5,7 +5,7 @@
 .title {
   font-size: 22px;
   font-weight: 700;
-  color: #1a1a2e;
+  color: #1e293b;
   margin: 0 0 24px;
 }
 
@@ -20,13 +20,13 @@
 .sectionTitle {
   font-size: 15px;
   font-weight: 600;
-  color: #1a1a2e;
+  color: #1e293b;
   margin: 0 0 14px;
 }
 
 .sectionNote {
-  font-size: 12px;
-  color: #888;
+  font-size: 15px;
+  color: #1e293b;
   margin: -8px 0 12px;
 }
 
@@ -55,15 +55,15 @@
 }
 
 .dateCardTitle {
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 700;
-  color: #1a1a2e;
+  color: #1e293b;
   margin-bottom: 6px;
 }
 
 .dateCardBody {
-  font-size: 12px;
-  color: #555;
+  font-size: 15px;
+  color: #1e293b;
   margin: 0;
   line-height: 1.5;
 }
@@ -91,7 +91,7 @@
 }
 
 .presetChip {
-  font-size: 12px;
+  font-size: 15px;
   font-weight: 600;
   color: #e94560;
   background: #fdf0f2;
@@ -106,9 +106,9 @@
 }
 
 .presetChipAdded {
-  font-size: 12px;
+  font-size: 15px;
   font-weight: 600;
-  color: #888;
+  color: #1e293b;
   background: #f5f5f5;
   border: 1px solid #ddd;
   border-radius: 16px;
@@ -124,7 +124,7 @@
   color: white;
   border: none;
   border-radius: 5px;
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 600;
   cursor: pointer;
   flex-shrink: 0;
@@ -137,8 +137,8 @@
 /* Portal cards */
 
 .emptyState {
-  font-size: 13px;
-  color: #888;
+  font-size: 15px;
+  color: #1e293b;
   margin: 0;
 }
 
@@ -166,13 +166,13 @@
 }
 
 .portalName {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
-  color: #1a1a2e;
+  color: #1e293b;
 }
 
 .portalLink {
-  font-size: 12px;
+  font-size: 15px;
   color: #e94560;
   text-decoration: none;
   white-space: nowrap;
@@ -209,8 +209,8 @@
   border: 1px solid #ddd;
   border-radius: 4px;
   padding: 7px 10px;
-  font-size: 13px;
-  color: #1a1a2e;
+  font-size: 15px;
+  color: #1e293b;
   background: white;
   outline: none;
 }
@@ -223,8 +223,8 @@
   border: 1px solid #ddd;
   border-radius: 4px;
   padding: 7px 10px;
-  font-size: 13px;
-  color: #1a1a2e;
+  font-size: 15px;
+  color: #1e293b;
   background: white;
   outline: none;
   cursor: pointer;
@@ -243,8 +243,8 @@
 /* Buttons */
 
 .editBtn {
-  font-size: 12px;
-  color: #888;
+  font-size: 15px;
+  color: #1e293b;
   background: none;
   border: 1px solid #ddd;
   border-radius: 4px;
@@ -254,13 +254,13 @@
 
 .editBtn:hover {
   border-color: #aaa;
-  color: #555;
+  color: #1e293b;
 }
 
 .deleteIconBtn {
   font-size: 16px;
   line-height: 1;
-  color: #bbb;
+  color: #1e293b;
   background: none;
   border: none;
   padding: 2px 4px;
@@ -272,7 +272,7 @@
 }
 
 .saveBtn {
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 600;
   color: white;
   background: #e94560;
@@ -287,8 +287,8 @@
 }
 
 .cancelBtn {
-  font-size: 13px;
-  color: #555;
+  font-size: 15px;
+  color: #1e293b;
   background: none;
   border: 1px solid #ddd;
   border-radius: 4px;
@@ -301,7 +301,7 @@
 }
 
 .deleteBtn {
-  font-size: 13px;
+  font-size: 15px;
   color: #e94560;
   background: none;
   border: 1px solid #e9c0c8;
@@ -321,7 +321,7 @@
   display: inline-block;
   padding: 3px 10px;
   border-radius: 12px;
-  font-size: 12px;
+  font-size: 15px;
   font-weight: 600;
   white-space: nowrap;
 }
