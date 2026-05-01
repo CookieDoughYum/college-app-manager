@@ -5,10 +5,10 @@
 .header {
   margin-bottom: 32px;
   padding: 24px 28px;
-  background: linear-gradient(135deg, #1a1a2e 0%, #0f3460 100%);
+  background: linear-gradient(135deg, #1a1a2e 0%, #2d1b69 40%, #0f3460 75%, #0d6e6e 100%);
   border-radius: 16px;
   color: white;
-  box-shadow: 0 4px 20px rgba(26, 26, 46, 0.25);
+  box-shadow: 0 4px 20px rgba(26, 26, 46, 0.3), 0 0 0 1px rgba(139, 92, 246, 0.15);
 }
 
 .welcome {
@@ -26,13 +26,14 @@
 
 .gradePill {
   display: inline-block;
-  background: #e94560;
+  background: linear-gradient(135deg, #f97316, #ea580c);
   color: white;
   font-size: 12px;
   font-weight: 700;
   padding: 4px 12px;
   border-radius: 12px;
   letter-spacing: 0.03em;
+  box-shadow: 0 2px 6px rgba(249, 115, 22, 0.4);
 }
 
 .sectionLabel {

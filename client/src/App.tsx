@@ -11,6 +11,7 @@ import Activities from './pages/screens/Activities';
 import Exams from './pages/screens/Exams';
 import Colleges from './pages/screens/Colleges';
 import Essays from './pages/screens/Essays';
+import AppActivities from './pages/screens/AppActivities';
 import RecLetters from './pages/screens/RecLetters';
 import Portals from './pages/screens/Portals';
 import Decide from './pages/screens/Decide';
@@ -45,6 +46,7 @@ function App() {
               <Route path="/exams" element={<Exams />} />
               <Route path="/colleges" element={<Colleges />} />
               <Route path="/essays" element={<Essays />} />
+              <Route path="/app-activities" element={<AppActivities />} />
               <Route path="/recs" element={<RecLetters />} />
               <Route path="/portals" element={<Portals />} />
               <Route path="/decide" element={<Decide />} />

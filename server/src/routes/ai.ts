@@ -696,6 +696,43 @@ Provide structured feedback:
   } catch (err) { next(err); }
 });
 
+// --- Activities: activity description feedback for Common App / UC ---
+
+aiRouter.post('/activities/actdescfeedback', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { activityText, appType } = req.body as { activityText: string; appType: 'commonapp' | 'uc' };
+
+    if (!activityText?.trim()) return res.status(400).json({ error: 'activityText is required' });
+
+    const charCount = activityText.length;
+    const limit = appType === 'commonapp' ? 150 : 350;
+    const platform = appType === 'commonapp' ? 'Common App' : 'UC Application';
+
+    const prompt = `You are a college admissions expert reviewing a student's ${platform} activity description.
+Character limit: ${limit} characters. Current length: ${charCount} characters.
+
+Activity description:
+"${activityText}"
+
+Provide feedback in this exact format:
+
+## Character Count
+State whether the description is within the ${limit}-character limit. If over, say how many characters over. If under, say how many remain.
+
+## Condensed Version
+Rewrite this description to fit within ${limit} characters while maximizing impact. Lead with an active verb. Quantify results if possible. Show the character count of your rewrite in parentheses at the end.
+
+## Strengths
+1–2 specific things this description does well (be brief).
+
+## Improvements
+2–3 concrete, actionable ways to make it stronger: stronger verbs, quantified results, more specificity, or cutting filler phrases.`;
+
+    const result = await askClaude(prompt);
+    res.json({ result });
+  } catch (err) { next(err); }
+});
+
 // --- Colleges: college recommendations based on profile ---
 
 aiRouter.post('/colleges/recommendcolleges', async (req: Request, res: Response, next: NextFunction) => {

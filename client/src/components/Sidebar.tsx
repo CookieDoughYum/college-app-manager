@@ -8,6 +8,7 @@ const navItems = [
   { label: 'Exam Prep', path: '/exams', minGrade: 8 },
   { label: 'College & Major', path: '/colleges', minGrade: 10 },
   { label: 'Essays', path: '/essays', minGrade: 11 },
+  { label: 'Writing Activities', path: '/app-activities', minGrade: 11 },
   { label: 'Rec Letters', path: '/recs', minGrade: 11 },
   { label: 'Financial Aid', path: '/aid', minGrade: 11 },
   { label: 'Deadlines', path: '/deadlines', minGrade: 11 },

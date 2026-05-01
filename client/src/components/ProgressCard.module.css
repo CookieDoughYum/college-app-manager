@@ -13,8 +13,8 @@
 
 .clickable:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 24px rgba(233, 69, 96, 0.18);
-  border-color: #f9a8b8;
+  box-shadow: 0 8px 24px var(--accent-shadow, rgba(233, 69, 96, 0.18));
+  border-color: var(--accent, #e94560);
 }
 
 .header {
@@ -32,7 +32,7 @@
 
 .percent {
   font-size: 14px;
-  color: #e94560;
+  color: var(--accent, #e94560);
   font-weight: 700;
 }
 
@@ -46,7 +46,7 @@
 
 .barFill {
   height: 100%;
-  background: linear-gradient(90deg, #e94560, #ff6b8a);
+  background: var(--accent, #e94560);
   border-radius: 4px;
   transition: width 0.4s ease;
 }
@@ -61,7 +61,7 @@
   display: inline-block;
   margin-left: 4px;
   font-size: 11px;
-  color: #e94560;
+  color: var(--accent, #e94560);
   opacity: 0;
   transition: opacity 0.15s ease;
 }

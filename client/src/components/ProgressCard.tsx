@@ -5,11 +5,17 @@ interface Props {
   percent: number;
   subtitle: string;
   onClick?: () => void;
+  accentColor?: string;
+  accentShadow?: string;
 }
 
-export default function ProgressCard({ title, percent, subtitle, onClick }: Props) {
+export default function ProgressCard({ title, percent, subtitle, onClick, accentColor = '#e94560', accentShadow = 'rgba(233,69,96,0.18)' }: Props) {
   return (
-    <div className={`${styles.card} ${onClick ? styles.clickable : ''}`} onClick={onClick}>
+    <div
+      className={`${styles.card} ${onClick ? styles.clickable : ''}`}
+      onClick={onClick}
+      style={{ '--accent': accentColor, '--accent-shadow': accentShadow } as React.CSSProperties}
+    >
       <div className={styles.header}>
         <span className={styles.title}>{title}</span>
         <span className={styles.percent}>{percent}%</span>
