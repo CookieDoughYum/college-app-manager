@@ -386,6 +386,11 @@ export default function Colleges() {
   const [matchRecText, setMatchRecText] = useState('');
   const [matchRecError, setMatchRecError] = useState('');
 
+  const [admissionCollege, setAdmissionCollege] = useState('');
+  const [admissionResult, setAdmissionResult] = useState('');
+  const [admissionLoading, setAdmissionLoading] = useState(false);
+  const [admissionError, setAdmissionError] = useState('');
+
   useEffect(() => {
     fetch('/api/student/colleges', { credentials: 'include' })
       .then(r => r.json())
@@ -482,6 +487,28 @@ export default function Colleges() {
       setMatchRecError('Could not generate recommendations — please try again.');
     } finally {
       setMatchRecLoading(false);
+    }
+  }
+
+  async function getAdmissionChance() {
+    if (!admissionCollege.trim()) return;
+    setAdmissionLoading(true);
+    setAdmissionError('');
+    setAdmissionResult('');
+    try {
+      const res = await fetch('/api/ai/colleges/admissionchance', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ college: admissionCollege.trim() }),
+      });
+      if (!res.ok) throw new Error();
+      const { result } = await res.json();
+      setAdmissionResult(result);
+    } catch {
+      setAdmissionError('Could not generate assessment — please try again.');
+    } finally {
+      setAdmissionLoading(false);
     }
   }
 
@@ -700,6 +727,38 @@ export default function Colleges() {
         ) : (
           <p style={{ color: '#374151', fontSize: '15px', background: '#f0f4ff', borderRadius: '6px', padding: '14px 16px', margin: 0, fontWeight: 700 }}>
             Complete the Professional Interest Quiz and enter your salary goal, then click the button to get college recommendations matched to your profile.
+          </p>
+        )}
+      </section>
+
+      <section className={styles.section}>
+        <h2 className={styles.sectionTitle}>Admission Chances</h2>
+        <p style={{ color: '#374151', fontSize: '14px', margin: '0 0 14px' }}>
+          Enter any college to get a personalized assessment of your admission chances based on your GPA, test scores, course rigor, and interests.
+        </p>
+        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '14px' }}>
+          <input
+            className={styles.input}
+            style={{ flex: 1, minWidth: '200px' }}
+            placeholder="e.g. UCLA, MIT, University of Michigan…"
+            value={admissionCollege}
+            onChange={e => setAdmissionCollege(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && getAdmissionChance()}
+          />
+          <button
+            onClick={getAdmissionChance}
+            disabled={admissionLoading || !admissionCollege.trim()}
+            style={{ background: 'linear-gradient(135deg, #0f3460, #1a56db)', color: '#fff', border: 'none', borderRadius: '8px', padding: '0.55rem 1.2rem', fontSize: '14px', fontWeight: 700, cursor: admissionLoading || !admissionCollege.trim() ? 'not-allowed' : 'pointer', boxShadow: '0 2px 8px rgba(15,52,96,0.3)', whiteSpace: 'nowrap', opacity: admissionLoading || !admissionCollege.trim() ? 0.7 : 1 }}
+          >
+            {admissionLoading ? 'Assessing…' : 'Check My Chances'}
+          </button>
+        </div>
+        {admissionError && <p style={{ color: '#e94560', fontSize: '13px', margin: '0 0 10px' }}>{admissionError}</p>}
+        {admissionResult ? (
+          <MarkdownOutput>{admissionResult}</MarkdownOutput>
+        ) : !admissionLoading && (
+          <p style={{ color: '#374151', fontSize: '15px', background: '#f0f4ff', borderRadius: '6px', padding: '14px 16px', margin: 0, fontWeight: 700 }}>
+            Add your academic stats in the Activities &amp; Courses section for the most accurate assessment.
           </p>
         )}
       </section>

@@ -230,11 +230,11 @@ aiRouter.post('/activities/coursefeedback', async (req: Request, res: Response, 
     const studentId = sid(req);
     const student = req.user as any;
     const acts = await prisma.studentActivities.findUnique({ where: { studentId } });
-    const { targetUniversity } = req.body as { targetUniversity?: string };
+    const { targetUniversity, coursePlan: clientCoursePlan } = req.body as { targetUniversity?: string; coursePlan?: Record<string, string[]> };
 
     const highSchool = student.highSchool ?? 'their high school';
     const grade = student.grade ?? 11;
-    const coursePlan = (acts?.coursePlan as Record<string, string[]>) ?? {};
+    const coursePlan = clientCoursePlan ?? (acts?.coursePlan as Record<string, string[]>) ?? {};
     const planLines = Object.entries(coursePlan)
       .map(([g, courses]) => `Grade ${g}: ${(courses as string[]).join(', ') || 'none'}`)
       .join('\n') || 'No courses added yet';
@@ -766,6 +766,76 @@ Format each as:
 **[School Name]** — [City, State]
 Category: Reach / Target / Safety
 Why: [1–2 sentences on why this school fits this student's preferences and goals]`;
+
+    const result = await askClaude(prompt);
+    res.json({ result });
+  } catch (err) { next(err); }
+});
+
+// --- Colleges: admission chance assessment ---
+
+aiRouter.post('/colleges/admissionchance', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const studentId = sid(req);
+    const student = req.user as any;
+    const { college } = req.body as { college: string };
+    if (!college?.trim()) return res.status(400).json({ error: 'college is required' });
+
+    const [acts, exams, colleges] = await Promise.all([
+      prisma.studentActivities.findUnique({ where: { studentId } }),
+      prisma.studentExams.findUnique({ where: { studentId } }),
+      prisma.studentColleges.findUnique({ where: { studentId } }),
+    ]);
+
+    const grade = student.grade ?? 11;
+    const highSchool = student.highSchool ?? 'their high school';
+    const actsInterests = (acts?.interests as any) ?? {};
+    const gpa = actsInterests.gpa as string | undefined;
+    const sat = actsInterests.sat as string | undefined;
+    const act = actsInterests.act as string | undefined;
+    const coursePlan = (acts?.coursePlan as Record<string, string[]>) ?? {};
+    const apCourses = Array.isArray(exams?.apCourses) ? (exams.apCourses as string[]) : [];
+    const topCategories = getTopActivityCategories(acts?.interests);
+    const activityAreas = topCategories.join(', ') || 'not specified';
+    const majorAnswers = (colleges?.majorAnswers as any) ?? {};
+
+    const planLines = Object.entries(coursePlan)
+      .map(([g, courses]) => `  Grade ${g}: ${(courses as string[]).join(', ') || 'none'}`)
+      .join('\n');
+
+    const statsLines = [
+      gpa && `- GPA: ${gpa}`,
+      sat && `- SAT: ${sat}`,
+      act && `- ACT: ${act}`,
+      apCourses.length > 0 && `- AP Courses: ${apCourses.join(', ')}`,
+      planLines && `- Course Plan:\n${planLines}`,
+    ].filter(Boolean).join('\n');
+
+    const prompt = `You are a college admissions expert. Assess a student's admission chances at ${college}.
+
+Student Profile:
+- Grade ${grade} at ${highSchool}
+- Interest areas: ${majorAnswers.interestArea || activityAreas || 'not specified'}
+- Activity areas: ${activityAreas || 'not specified'}
+${majorAnswers.salaryGoal ? `- Career goal: ${majorAnswers.salaryGoal}` : ''}
+${statsLines || '- Academic stats: not provided'}
+
+Using your knowledge of ${college}'s typical admitted student profile (average GPA, test scores, course rigor, extracurriculars), assess this student's admission chances.
+
+## Admission Chances: [one of: Very Likely | Likely | Competitive | Challenging | Reach]
+
+[2–3 sentences comparing this student's profile to the school's typical admitted student.]
+
+## Strengths
+[2–3 specific things working in the student's favor for this school.]
+
+## Areas to Strengthen
+[2–3 specific gaps compared to what ${college} typically looks for.]
+
+## Recommendation
+[One direct sentence: whether this school fits as a reach, target, or safety, and the single most important thing the student should do before applying.]
+
+If key stats are missing, note that and base your assessment on what is available.`;
 
     const result = await askClaude(prompt);
     res.json({ result });

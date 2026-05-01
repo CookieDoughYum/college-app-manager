@@ -436,7 +436,7 @@ export default function Activities() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ targetUniversity }),
+        body: JSON.stringify({ targetUniversity, coursePlan: data.coursePlan }),
       });
       if (!res.ok) throw new Error();
       const { result, toAdd, toRemove } = await res.json();
