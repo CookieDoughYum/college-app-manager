@@ -10,12 +10,12 @@ export default defineConfig({
     __APP_DOMAIN__: JSON.stringify(process.env.APP_DOMAIN || 'myapp.jtlapp.net'),
   },
   server: {
+    host: '0.0.0.0',
+    port: 5000,
+    allowedHosts: true,
     proxy: {
       '/api': {
         target: apiTarget,
-        // Keep the browser's Host header (localhost:5173) so Passport
-        // constructs OAuth callback URLs through the Vite proxy,
-        // not directly to the backend (localhost:3000).
         changeOrigin: false,
       },
     },
