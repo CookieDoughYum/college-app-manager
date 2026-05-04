@@ -26,13 +26,13 @@
 
 .card p {
   margin: 0 0 0.75rem;
-  color: #1e293b;
+  color: #e0e0e0;
 }
 
 .card ul {
   margin: 0 0 1.5rem;
   padding-left: 1.25rem;
-  color: #1e293b;
+  color: #e0e0e0;
   line-height: 1.8;
 }
 
