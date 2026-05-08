@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import styles from './adminTable.module.css';
 
 interface SessionInfo {
   sid: string;
@@ -23,98 +24,78 @@ export default function SessionViewer() {
 
   useEffect(() => { loadSessions(); }, []);
 
-  if (error) return <div style={{ color: 'red' }}>{error}</div>;
+  if (error) return <div style={{ color: '#dc2626', padding: 16 }}>{error}</div>;
 
   const isExpiringSoon = (expire: string) => {
     const diff = new Date(expire).getTime() - Date.now();
-    return diff > 0 && diff < 60 * 60 * 1000; // within 1 hour
+    return diff > 0 && diff < 60 * 60 * 1000;
   };
 
-  const formatExpiry = (expire: string) => {
-    const d = new Date(expire);
-    return d.toLocaleString();
-  };
+  const formatExpiry = (expire: string) => new Date(expire).toLocaleString();
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h1>Sessions</h1>
-        <button onClick={loadSessions} disabled={loading} style={{ padding: '4px 12px', cursor: 'pointer' }}>
-          {loading ? 'Loading...' : 'Refresh'}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <h1 style={{ margin: 0 }}>Sessions</h1>
+          {sessions.length > 0 && (
+            <span className={styles.countBadge}>{sessions.length} active</span>
+          )}
+        </div>
+        <button className={styles.refreshBtn} onClick={loadSessions} disabled={loading}>
+          {loading ? 'Loading…' : '↻ Refresh'}
         </button>
       </div>
 
-      {sessions.length === 0 ? (
-        <p style={{ color: '#666' }}>No active sessions.</p>
+      {sessions.length === 0 && !loading ? (
+        <p className={styles.empty}>No active sessions.</p>
       ) : (
-        <>
-          <p style={{ color: '#666', fontSize: 13 }}>{sessions.length} active session{sessions.length !== 1 ? 's' : ''}</p>
-          <table style={{ borderCollapse: 'collapse', width: '100%', fontSize: 13 }}>
+        <div className={styles.wrap}>
+          <table className={styles.table}>
             <thead>
               <tr>
-                <th style={{ textAlign: 'left', padding: '6px 10px', borderBottom: '2px solid #ddd' }}>Session ID</th>
-                <th style={{ textAlign: 'left', padding: '6px 10px', borderBottom: '2px solid #ddd' }}>Admin</th>
-                <th style={{ textAlign: 'left', padding: '6px 10px', borderBottom: '2px solid #ddd' }}>User</th>
-                <th style={{ textAlign: 'left', padding: '6px 10px', borderBottom: '2px solid #ddd' }}>Expires</th>
+                <th>Session ID</th>
+                <th>Role</th>
+                <th>User</th>
+                <th>Expires</th>
               </tr>
             </thead>
             <tbody>
               {sessions.map((s) => (
-                <tr
-                  key={s.sid}
-                  style={{
-                    borderBottom: '1px solid #eee',
-                    background: isExpiringSoon(s.expire) ? '#fff8e1' : 'transparent',
-                  }}
-                >
-                  <td style={{ padding: '6px 10px', fontFamily: 'monospace' }}>{s.sid}...</td>
-                  <td style={{ padding: '6px 10px' }}>
-                    {s.isAdmin && (
-                      <span style={{
-                        fontSize: 11,
-                        padding: '1px 6px',
-                        borderRadius: 3,
-                        background: '#e8f0fe',
-                        color: '#1a73e8',
-                        fontWeight: 600,
-                      }}>
-                        admin
-                      </span>
+                <tr key={s.sid} className={isExpiringSoon(s.expire) ? styles.expiringRow : ''}>
+                  <td className={styles.mono}>{s.sid.slice(0, 20)}…</td>
+                  <td>
+                    {s.isAdmin ? (
+                      <span className={`${styles.badge} ${styles.badgeAdmin}`}>Admin</span>
+                    ) : (
+                      <span style={{ color: '#9ca3af', fontSize: 12 }}>—</span>
                     )}
                   </td>
-                  <td style={{ padding: '6px 10px' }}>
+                  <td>
                     {s.hasUser ? (
                       <span>
                         {s.provider && (
-                          <span style={{
-                            fontSize: 11,
-                            padding: '1px 6px',
-                            borderRadius: 3,
-                            background: '#e6f4ea',
-                            color: '#1e7e34',
-                            fontWeight: 600,
-                            marginRight: 4,
-                          }}>
+                          <span className={`${styles.badge} ${styles.badgeProvider}`} style={{ marginRight: 6 }}>
                             {s.provider}
                           </span>
                         )}
                         Authenticated
                       </span>
                     ) : (
-                      <span style={{ color: '#999' }}>Anonymous</span>
+                      <span style={{ color: '#9ca3af' }}>Anonymous</span>
                     )}
                   </td>
-                  <td style={{ padding: '6px 10px', color: isExpiringSoon(s.expire) ? '#e65100' : '#333' }}>
+                  <td style={{ color: isExpiringSoon(s.expire) ? '#c2410c' : 'inherit' }}>
                     {formatExpiry(s.expire)}
                     {isExpiringSoon(s.expire) && (
-                      <span style={{ marginLeft: 6, fontSize: 11, color: '#e65100' }}>expiring soon</span>
+                      <span className={styles.expiring}>⚠ expiring soon</span>
                     )}
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
-        </>
+        </div>
       )}
     </div>
   );
