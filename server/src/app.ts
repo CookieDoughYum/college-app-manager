@@ -1,4 +1,5 @@
 import path from 'path';
+import fs from 'fs';
 import express from 'express';
 import session from 'express-session';
 import pgSimple from 'connect-pg-simple';
@@ -95,10 +96,10 @@ app.use('/api', adminRouter);
 
 app.use(errorHandler);
 
-// In production, serve the built React app from /app/public.
+// Serve the built React app whenever the public directory exists.
 // All non-API routes fall through to index.html for SPA routing.
-if (process.env.NODE_ENV === 'production') {
-  const publicDir = path.resolve(process.cwd(), 'public');
+const publicDir = path.resolve(process.cwd(), 'public');
+if (fs.existsSync(publicDir)) {
   app.use(express.static(publicDir));
   app.get('*', (_req: express.Request, res: express.Response) => {
     res.sendFile(path.join(publicDir, 'index.html'));
