@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getCounter, incrementCounter, decrementCounter } from '../services/counter';
+import { getCounter, incrementCounter, decrementCounter } from '../services/counter.js';
 
 export const counterRouter = Router();
 

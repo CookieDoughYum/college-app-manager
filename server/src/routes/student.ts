@@ -1,6 +1,6 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import { prisma } from '../services/prisma';
-import { requireAuth } from '../middleware/requireAuth';
+import { prisma } from '../services/prisma.js';
+import { requireAuth } from '../middleware/requireAuth.js';
 
 export const studentRouter = Router();
 

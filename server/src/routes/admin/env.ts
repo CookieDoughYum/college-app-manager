@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { prisma } from '../../services/prisma';
-import { getConfig } from '../../services/config';
+import { prisma } from '../../services/prisma.js';
+import { getConfig } from '../../services/config.js';
 
 export const adminEnvRouter = Router();
 

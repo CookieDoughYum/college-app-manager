@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { logBuffer } from '../../services/logBuffer';
+import { logBuffer } from '../../services/logBuffer.js';
 
 export const adminLogsRouter = Router();
 

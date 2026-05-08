@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getConfig } from '../services/config';
+import { getConfig } from '../services/config.js';
 
 export const integrationsRouter = Router();
 

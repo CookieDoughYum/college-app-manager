@@ -5,7 +5,7 @@ let _prisma: any;
 
 async function getPrismaClient() {
   if (!_prisma) {
-    const { PrismaClient } = await import('../generated/prisma/client');
+    const { PrismaClient } = await import('../generated/prisma/client.js');
     const { PrismaPg } = await import('@prisma/adapter-pg');
     const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
     _prisma = new PrismaClient({ adapter });

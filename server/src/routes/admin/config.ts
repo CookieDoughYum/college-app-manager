@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getAllConfig, setConfig, exportConfig } from '../../services/config';
+import { getAllConfig, setConfig, exportConfig } from '../../services/config.js';
 
 export const adminConfigRouter = Router();
 

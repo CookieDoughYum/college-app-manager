@@ -1,9 +1,9 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import { prisma } from '../services/prisma';
-import { requireAuth } from '../middleware/requireAuth';
-import { askClaude } from '../services/claude';
-import { fetchUniversityPage } from '../services/webFetch';
-import { getMajorSalaries } from '../services/scorecard';
+import { prisma } from '../services/prisma.js';
+import { requireAuth } from '../middleware/requireAuth.js';
+import { askClaude } from '../services/claude.js';
+import { fetchUniversityPage } from '../services/webFetch.js';
+import { getMajorSalaries } from '../services/scorecard.js';
 
 export const aiRouter = Router();
 

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { prisma } from '../../services/prisma';
+import { prisma } from '../../services/prisma.js';
 
 export const adminDbRouter = Router();
 

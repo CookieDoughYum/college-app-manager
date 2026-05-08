@@ -1,11 +1,11 @@
 import { Router } from 'express';
-import { requireAdmin } from '../../middleware/requireAdmin';
-import { adminAuthRouter } from './auth';
-import { adminEnvRouter } from './env';
-import { adminDbRouter } from './db';
-import { adminConfigRouter } from './config';
-import { adminLogsRouter } from './logs';
-import { adminSessionsRouter } from './sessions';
+import { requireAdmin } from '../../middleware/requireAdmin.js';
+import { adminAuthRouter } from './auth.js';
+import { adminEnvRouter } from './env.js';
+import { adminDbRouter } from './db.js';
+import { adminConfigRouter } from './config.js';
+import { adminLogsRouter } from './logs.js';
+import { adminSessionsRouter } from './sessions.js';
 
 export const adminRouter = Router();
 

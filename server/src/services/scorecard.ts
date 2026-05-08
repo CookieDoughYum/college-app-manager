@@ -1,4 +1,4 @@
-import { getConfig } from './config';
+import { getConfig } from './config.js';
 
 const SCORECARD_BASE = 'https://api.data.gov/ed/collegescorecard/v1/fields-of-study.json';
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours

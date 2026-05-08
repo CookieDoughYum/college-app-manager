@@ -4,7 +4,7 @@ import pkg_github2 from 'passport-github2';
 import pkg_google from 'passport-google-oauth20';
 import { Strategy as LocalStrategy } from 'passport-local';
 import bcrypt from 'bcryptjs';
-import { prisma } from '../services/prisma';
+import { prisma } from '../services/prisma.js';
 
 export const authRouter = Router();
 

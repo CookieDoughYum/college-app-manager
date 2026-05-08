@@ -12,9 +12,9 @@ if (fs.existsSync(envPath)) {
   dotenv.config({ path: envPath });
 }
 
-import app from './app';
-import { initPrisma } from './services/prisma';
-import { initConfigCache } from './services/config';
+import app from './app.js';
+import { initPrisma } from './services/prisma.js';
+import { initConfigCache } from './services/config.js';
 
 const port = parseInt(process.env.PORT || '3000', 10);
 
