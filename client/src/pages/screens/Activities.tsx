@@ -549,7 +549,7 @@ export default function Activities() {
   const extracurricularRecs = data.aiRecommendations?.extracurriculars;
   const courseRecs = data.aiRecommendations?.courses;
 
-  function GradePicker({ pickerKey, onAdd }: { pickerKey: string; onAdd: (gradeKey: string) => void }) {
+  function GradePicker({ pickerKey: _pickerKey, onAdd }: { pickerKey: string; onAdd: (gradeKey: string) => void }) {
     return (
       <div className={styles.gradePicker}>
         <span className={styles.gradePickerLabel}>Add to:</span>

@@ -25,9 +25,9 @@ adminDbRouter.get('/db/tables', async (_req, res, next) => {
 
     const result = await Promise.all(
       tables.map(async (t: TableInfo) => {
-        const countResult = await prisma.$queryRawUnsafe<[{ count: bigint }]>(
+        const countResult = await prisma.$queryRawUnsafe(
           `SELECT count(*) FROM "${t.table_name}"`
-        );
+        ) as [{ count: bigint }];
         return {
           name: t.table_name,
           rowCount: Number(countResult[0].count),
@@ -70,9 +70,9 @@ adminDbRouter.get('/db/tables/:name', async (req, res, next) => {
     `;
 
     // Get total row count
-    const countResult = await prisma.$queryRawUnsafe<[{ count: bigint }]>(
+    const countResult = await prisma.$queryRawUnsafe(
       `SELECT count(*) FROM "${name}"`
-    );
+    ) as [{ count: bigint }];
     const total = Number(countResult[0].count);
 
     // Get rows

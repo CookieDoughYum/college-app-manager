@@ -77,7 +77,7 @@ interface EssaysData {
 const DEFAULT_DATA: EssaysData = { driveLink: null };
 
 export default function Essays() {
-  const [data, setData] = useState<EssaysData>(DEFAULT_DATA);
+  const [_data, setData] = useState<EssaysData>(DEFAULT_DATA);
   const [loading, setLoading] = useState(true);
 
   // Profile quiz state

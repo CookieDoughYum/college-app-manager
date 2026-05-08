@@ -1,4 +1,5 @@
-import { useState, FormEvent } from 'react';
+import { useState } from 'react';
+import type { FormEvent } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useStudent } from '../../contexts/StudentContext';
 import type { Student } from '../../contexts/StudentContext';
