@@ -303,6 +303,15 @@
   font-weight: 600;
 }
 
+.promptDisclaimer {
+  margin: 10px 0 0;
+  font-size: 14px;
+  color: #64748b;
+  font-weight: 400;
+  font-style: italic;
+  line-height: 1.6;
+}
+
 .promptRow {
   display: flex;
   gap: 10px;

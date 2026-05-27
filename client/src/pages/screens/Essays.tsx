@@ -46,13 +46,6 @@ const COMMON_APP_PROMPTS = [
   { num: 7, text: 'Share an essay on any topic of your choice. It can be one you\'ve already written, one that responds to a different prompt, or one of your own design.' },
 ];
 
-// Honors essay generic guidance
-const HONORS_PROMPTS = [
-  { num: 1, text: 'Why do you want to join the Honors program? What specific opportunities within the program align with your academic goals?' },
-  { num: 2, text: 'Describe a time you went above and beyond what was required academically. What motivated you and what did you gain?' },
-  { num: 3, text: 'How will you contribute to the Honors community? What perspective, skill, or experience do you bring?' },
-];
-
 // Profile quiz questions for essay brainstormer
 const PROFILE_QUESTIONS = [
   { key: 'challenge', label: 'What is a defining challenge or obstacle you have faced and overcome?' },
@@ -62,12 +55,11 @@ const PROFILE_QUESTIONS = [
   { key: 'unique', label: 'Is there anything unique about your background or story you want colleges to know?' },
 ];
 
-function detectPromptType(school: string): 'uc' | 'commonapp' | 'honors' | 'supplemental' {
+function detectPromptType(school: string): 'uc' | 'commonapp' | null {
   const lower = school.toLowerCase();
   if (/\buc\b|university of california/.test(lower)) return 'uc';
   if (/common app/.test(lower)) return 'commonapp';
-  if (/honors/.test(lower)) return 'honors';
-  return 'supplemental';
+  return null;
 }
 
 interface EssaysData {
@@ -99,10 +91,7 @@ export default function Essays() {
 
   // University prompt lookup
   const [promptSchool, setPromptSchool] = useState('');
-  const [promptResult, setPromptResult] = useState<{ type: string; prompts: { num: number; text: string }[] } | null>(null);
-  const [supplementalLoading, setSupplementalLoading] = useState(false);
-  const [supplementalText, setSupplementalText] = useState('');
-  const [supplementalError, setSupplementalError] = useState('');
+  const [promptResult, setPromptResult] = useState<{ type: 'uc' | 'commonapp'; prompts: { num: number; text: string }[] } | null>(null);
 
   useEffect(() => {
     fetch('/api/student/essays', { credentials: 'include' })
@@ -161,40 +150,12 @@ export default function Essays() {
     const trimmed = promptSchool.trim();
     if (!trimmed) return;
     const type = detectPromptType(trimmed);
-    setSupplementalText('');
-    setSupplementalError('');
-
     if (type === 'uc') {
       setPromptResult({ type: 'uc', prompts: UC_PIQ_PROMPTS });
     } else if (type === 'commonapp') {
       setPromptResult({ type: 'commonapp', prompts: COMMON_APP_PROMPTS });
-    } else if (type === 'honors') {
-      setPromptResult({ type: 'honors', prompts: HONORS_PROMPTS });
     } else {
-      // Check if name also contains "honors"
-      const hasHonors = /honors/i.test(trimmed);
-      setPromptResult({ type: 'supplemental', prompts: hasHonors ? HONORS_PROMPTS : [] });
-      fetchSupplementals(trimmed, hasHonors);
-    }
-  }
-
-  async function fetchSupplementals(school: string, includeHonors: boolean) {
-    setSupplementalLoading(true);
-    setSupplementalError('');
-    try {
-      const res = await fetch('/api/ai/essays/whyus', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ schoolName: school, includeHonors }),
-      });
-      if (!res.ok) throw new Error('Server error');
-      const { result } = await res.json();
-      setSupplementalText(result);
-    } catch {
-      setSupplementalError('Could not generate supplemental info — please try again.');
-    } finally {
-      setSupplementalLoading(false);
+      setPromptResult(null);
     }
   }
 
@@ -288,28 +249,25 @@ export default function Essays() {
       {/* Essay Prompts by University */}
       <section className={styles.section}>
         <h2 className={styles.sectionTitle}>Essay Prompts by University</h2>
-        <div className={styles.devNote}>
-          <strong>Developer note:</strong> Web fetching for supplemental prompts is partially implemented. Schools with server-rendered admissions pages (e.g. UW-Madison) return live data. Schools using JavaScript-rendered SPAs (e.g. Stanford, MIT, Harvard) fall back to AI knowledge, which may be outdated. A headless browser integration (Puppeteer/Playwright) is needed for full coverage.
-        </div>
         <div className={styles.promptNote}>
-          <p><strong>How this works:</strong> Enter a university name to see its actual essay prompts.</p>
+          <p><strong>How this works:</strong> Enter a university name to see its essay prompts.</p>
           <ul className={styles.promptNoteList}>
             <li>Type <strong>UC</strong> or any <strong>University of California</strong> campus → UC Personal Insight Questions (PIQs)</li>
             <li>Type <strong>Common App</strong> → Common App Personal Statement prompts</li>
-            <li>Type any other university (e.g. <strong>Stanford</strong>, <strong>MIT</strong>, <strong>Vanderbilt</strong>) → that school's actual supplemental essay prompts with word limits</li>
-            <li>Add <strong>Honors</strong> next to the name (e.g. "Penn State Honors") → Honors program prompts included</li>
+            <li>For all other schools, search the school's admissions website directly or ask <strong>ChatGPT</strong> — for example: <em>"What are the supplemental essay prompts for [School Name] for 2025–2026?"</em></li>
           </ul>
+          <p className={styles.promptDisclaimer}>Note: Essay prompts may change slightly from year to year. Always verify the current prompts on the school's official admissions page before submitting — but don't wait to start writing. Getting a strong draft down early gives you time to refine it once the final prompts are confirmed.</p>
         </div>
         <div className={styles.promptRow}>
           <input
             className={styles.promptInput}
             type="text"
-            placeholder="e.g. UC Berkeley, Common App, Stanford, Penn State Honors"
+            placeholder="e.g. UC Berkeley, Common App"
             value={promptSchool}
-            onChange={e => { setPromptSchool(e.target.value); setPromptResult(null); setSupplementalText(''); }}
+            onChange={e => { setPromptSchool(e.target.value); setPromptResult(null); }}
           />
-          <button className={styles.promptBtn} onClick={lookupPrompts} disabled={!promptSchool.trim() || supplementalLoading}>
-            {supplementalLoading ? 'Loading…' : 'Get Prompts'}
+          <button className={styles.promptBtn} onClick={lookupPrompts} disabled={!promptSchool.trim()}>
+            Get Prompts
           </button>
         </div>
 
@@ -327,35 +285,11 @@ export default function Essays() {
                 <p className={styles.promptResultNote}>Choose <strong>1 prompt</strong>. Essay is 250–650 words. This essay goes to all Common App schools you apply to.</p>
               </>
             )}
-            {promptResult.type === 'honors' && (
-              <>
-                <div className={styles.promptResultTitle}>Honors Essay Prompts</div>
-                <p className={styles.promptResultNote}>Honors essay prompts vary by school. These general questions reflect common honors application themes.</p>
-              </>
-            )}
-            {promptResult.type === 'supplemental' && (
-              <>
-                <div className={styles.promptResultTitle}>Supplemental Essay Prompts</div>
-                {promptResult.prompts.length > 0 && (
-                  <p className={styles.promptResultNote}>Honors prompts shown below. Supplemental prompts for this school follow.</p>
-                )}
-              </>
-            )}
-
-            {promptResult.prompts.length > 0 && (
-              <ol className={styles.promptList}>
-                {promptResult.prompts.map(p => (
-                  <li key={p.num} className={styles.promptItem}>{p.text}</li>
-                ))}
-              </ol>
-            )}
-
-            {supplementalError && <p className={styles.aiError}>{supplementalError}</p>}
-            {supplementalText && (
-              <div className={styles.aiOutput}>
-                <MarkdownOutput>{supplementalText}</MarkdownOutput>
-              </div>
-            )}
+            <ol className={styles.promptList}>
+              {promptResult.prompts.map(p => (
+                <li key={p.num} className={styles.promptItem}>{p.text}</li>
+              ))}
+            </ol>
           </div>
         )}
       </section>
