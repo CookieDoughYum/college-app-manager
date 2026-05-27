@@ -373,6 +373,17 @@ export default function Essays() {
               value={fbEssayText}
               onChange={(e) => setFbEssayText(e.target.value)}
             />
+            {(() => {
+              const count = fbEssayText.trim() ? fbEssayText.trim().split(/\s+/).length : 0;
+              const status = count === 0 ? 'empty' : count < 250 ? 'short' : count <= 650 ? 'good' : count <= 700 ? 'warn' : 'over';
+              return (
+                <div className={`${styles.wordCount} ${styles[`wordCount_${status}`]}`}>
+                  {count === 0
+                    ? 'Common App: 250–650 words · UC PIQs: 350 words each'
+                    : `${count} word${count === 1 ? '' : 's'}${status === 'short' ? ' — below 250 (Common App min)' : status === 'good' ? ' — within Common App range' : status === 'warn' ? ' — approaching 650 limit' : ' — over 650 (Common App max)'}`}
+                </div>
+              );
+            })()}
           </div>
           <button
             className={styles.aiButton}
