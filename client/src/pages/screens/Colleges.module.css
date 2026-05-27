@@ -294,39 +294,6 @@
   gap: 4px;
 }
 
-.collegeCardExpanded {
-  grid-column: 1 / -1;
-}
-
-.whyUsBtn {
-  align-self: flex-start;
-  margin-top: 8px;
-  background: none;
-  border: 1px solid #0f3460;
-  color: #0f3460;
-  border-radius: 6px;
-  padding: 3px 10px;
-  font-size: 11px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.whyUsBtn:hover:not(:disabled) {
-  background: #f0f4ff;
-}
-
-.whyUsBtn:disabled {
-  opacity: 0.5;
-  cursor: default;
-}
-
-.whyUsOutput {
-  margin-top: 10px;
-  padding-top: 10px;
-  border-top: 1px solid #f0f0f0;
-  font-size: 15px;
-}
-
 .collegeName {
   font-size: 16px;
   font-weight: 600;

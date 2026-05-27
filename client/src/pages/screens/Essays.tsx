@@ -93,6 +93,12 @@ export default function Essays() {
   const [promptSchool, setPromptSchool] = useState('');
   const [promptResult, setPromptResult] = useState<{ type: 'uc' | 'commonapp'; prompts: { num: number; text: string }[] } | null>(null);
 
+  // Why Us tool
+  const [whyUsSchool, setWhyUsSchool] = useState('');
+  const [whyUsResult, setWhyUsResult] = useState('');
+  const [whyUsLoading, setWhyUsLoading] = useState(false);
+  const [whyUsError, setWhyUsError] = useState('');
+
   useEffect(() => {
     fetch('/api/student/essays', { credentials: 'include' })
       .then(r => r.json())
@@ -156,6 +162,28 @@ export default function Essays() {
       setPromptResult({ type: 'commonapp', prompts: COMMON_APP_PROMPTS });
     } else {
       setPromptResult(null);
+    }
+  }
+
+  async function runWhyUs() {
+    if (!whyUsSchool.trim()) return;
+    setWhyUsLoading(true);
+    setWhyUsError('');
+    setWhyUsResult('');
+    try {
+      const res = await fetch('/api/ai/colleges/whyus', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ college: whyUsSchool.trim() }),
+      });
+      if (!res.ok) throw new Error('Server error');
+      const { result } = await res.json();
+      setWhyUsResult(result);
+    } catch {
+      setWhyUsError('Could not generate content — please try again.');
+    } finally {
+      setWhyUsLoading(false);
     }
   }
 
@@ -292,6 +320,34 @@ export default function Essays() {
             </ol>
           </div>
         )}
+      </section>
+
+      {/* Why Us Tool */}
+      <section className={styles.section}>
+        <h2 className={styles.sectionTitle}>AI "Why Us?" Generator</h2>
+        <p className={styles.aiNote}>Type a school name to generate talking points about what makes that college unique — helpful for writing your "Why Us?" supplemental essay.</p>
+        <div className={styles.aiRow}>
+          <div className={styles.aiField}>
+            <label className={styles.aiLabel}>School name</label>
+            <input
+              className={styles.aiInput}
+              type="text"
+              placeholder="e.g. University of Michigan, Vanderbilt, Georgetown"
+              value={whyUsSchool}
+              onChange={e => { setWhyUsSchool(e.target.value); setWhyUsResult(''); setWhyUsError(''); }}
+              onKeyDown={e => e.key === 'Enter' && runWhyUs()}
+            />
+          </div>
+          <button
+            className={styles.aiButton}
+            onClick={runWhyUs}
+            disabled={whyUsLoading || !whyUsSchool.trim()}
+          >
+            {whyUsLoading ? 'Generating…' : 'Generate'}
+          </button>
+        </div>
+        {whyUsError && <p className={styles.aiError}>{whyUsError}</p>}
+        {whyUsResult && <div className={styles.aiOutput}><MarkdownOutput>{whyUsResult}</MarkdownOutput></div>}
       </section>
 
       {/* AI Feedback Tool */}

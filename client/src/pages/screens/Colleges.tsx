@@ -365,8 +365,6 @@ export default function Colleges() {
   const [aiError, setAiError] = useState('');
   const [addingCollege, setAddingCollege] = useState(false);
   const [newCollege, setNewCollege] = useState({ name: '', location: '', variant: 'target' as CollegeEntry['variant'] });
-  const [whyUsLoading, setWhyUsLoading] = useState<Record<number, boolean>>({});
-  const [whyUsText, setWhyUsText] = useState<Record<number, string>>({});
   const [quizOpen, setQuizOpen] = useState(false);
   const [quizAnswers, setQuizAnswers] = useState<Record<number, InterestArea>>({});
   const [quizResult, setQuizResult] = useState<{ area: InterestArea; count: number }[] | null>(null);
@@ -432,25 +430,6 @@ export default function Colleges() {
     save({ ...data, collegeList: [...data.collegeList, { ...newCollege, name }] });
     setNewCollege({ name: '', location: '', variant: 'target' });
     setAddingCollege(false);
-  }
-
-  async function getWhyUs(index: number, collegeName: string) {
-    setWhyUsLoading(prev => ({ ...prev, [index]: true }));
-    try {
-      const res = await fetch('/api/ai/colleges/whyus', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ college: collegeName }),
-      });
-      if (!res.ok) throw new Error('Server error');
-      const { result } = await res.json();
-      setWhyUsText(prev => ({ ...prev, [index]: result }));
-    } catch {
-      setWhyUsText(prev => ({ ...prev, [index]: 'Could not generate content — please try again.' }));
-    } finally {
-      setWhyUsLoading(prev => ({ ...prev, [index]: false }));
-    }
   }
 
   function removeCollege(index: number) {
@@ -770,7 +749,7 @@ export default function Colleges() {
         </div>
         <div className={styles.collegeList}>
           {data.collegeList.map((college, i) => (
-            <div key={i} className={`${styles.collegeCard} ${whyUsText[i] ? styles.collegeCardExpanded : ''}`}>
+            <div key={i} className={styles.collegeCard}>
               <button className={styles.removeBtn} onClick={() => removeCollege(i)} title="Remove">×</button>
               <div className={styles.collegeName}>{college.name}</div>
               <div className={styles.collegeLocation}>{college.location}</div>
@@ -788,18 +767,6 @@ export default function Colleges() {
                   </button>
                 ))}
               </div>
-              <button
-                className={styles.whyUsBtn}
-                onClick={() => whyUsText[i] ? setWhyUsText(prev => { const n = { ...prev }; delete n[i]; return n; }) : getWhyUs(i, college.name)}
-                disabled={whyUsLoading[i]}
-              >
-                {whyUsLoading[i] ? 'Loading…' : whyUsText[i] ? 'Hide' : 'Why Us?'}
-              </button>
-              {whyUsText[i] && (
-                <div className={styles.whyUsOutput}>
-                  <MarkdownOutput>{whyUsText[i]}</MarkdownOutput>
-                </div>
-              )}
             </div>
           ))}
           {addingCollege ? (
