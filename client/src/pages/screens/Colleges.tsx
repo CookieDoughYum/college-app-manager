@@ -705,7 +705,7 @@ export default function Colleges() {
           <MarkdownOutput>{collegeRecText}</MarkdownOutput>
         ) : (
           <p style={{ color: '#374151', fontSize: '15px', background: '#f0f4ff', borderRadius: '6px', padding: '14px 16px', margin: 0, fontWeight: 700 }}>
-            Complete the Professional Interest Quiz and enter your salary goal, then click the button to get college recommendations matched to your profile.
+            Complete the Professional Interest Quiz and College Match Quiz, then click the button to get college recommendations matched to your profile.
           </p>
         )}
       </section>
